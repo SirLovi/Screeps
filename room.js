@@ -1751,7 +1751,7 @@ mod.extend = function () {
 
 	Room.prototype.storedMinerals = function (mineral) {
 
-		let returnValue = (this.storage.store[mineral] || 0) + (this.terminal.store[mineral] || 0) - (this.resourcesOffers[mineral] || 0) - (this.resourcesReactions[mineral] || 0);
+		let returnValue = (this.storage.store[mineral] || 0) /*+ (this.terminal.store[mineral] || 0)*/ - (this.resourcesOffers[mineral] || 0) - (this.resourcesReactions[mineral] || 0);
 		//if (returnValue < 0)
 		// global.logSystem(this.name, `storedMinerals: ${mineral} ${returnValue}`);
 

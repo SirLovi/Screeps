@@ -282,7 +282,7 @@ let mod = {
     USE_SUMMERTIME: true, // Please define isSummerTime in global.js to suit to your local summertime rules
     SPAWN_DEFENSE_ON_ATTACK: true, // This will attempt to store enough to have a defense and spawn troops when invaded.
     MANAGED_CONTAINER_TRIGGER: 0.25, // managed containers get filled below this relative energy amount and emptied when above 1-this value
-    ROUTE_ROOM_COST: { 'shard1':{}}, // custom room routing cost: e.g. `{'shard0':{ 'W0N0':5, 'W4N4': 11 },'shard1':...}`. Affects bestSpawnRoomFor, Creep.Setup calculations, and travel cost predictions. Please call 'delete Memory.routeRange;' whenever you change this property.
+    ROUTE_ROOM_COST: { 'shard0':{'W58N36':99, 'W53N39': 99, 'W55N36': 99, 'W56N40': 99}}, // custom room routing cost: e.g. `{'shard0':{ 'W0N0':5, 'W4N4': 11 },'shard1':...}`. Affects bestSpawnRoomFor, Creep.Setup calculations, and travel cost predictions. Please call 'delete Memory.routeRange;' whenever you change this property.
     TRAVELLING_BORDER_RANGE: 22, // room arrival distance for travelling and routes
     NOTIFICATE_INVADER: false, // Also log common 'Invader' hostiles
     NOTIFICATE_INTRUDER: true, // Log any hostiles in your rooms
@@ -296,7 +296,7 @@ let mod = {
     CONTROLLER_SIGN_MESSAGE: `𝔊𝔯𝔢𝔢𝔱𝔦𝔫𝔤𝔰 𝔗𝔯𝔞𝔳𝔢𝔩𝔢𝔯! 𝔚𝔬𝔲𝔩𝔡 𝔶𝔬𝔲 𝔨𝔦𝔫𝔡𝔩𝔶 𝔰𝔱𝔞𝔶 𝔞𝔴𝔞𝔶?`,
     CONTROLLER_SIGN_UPDATE: true, // Update sign message if user changes CONTROLLER_SIGN_MESSAGE
     MINERS_AUTO_BUILD: true, // miners and remoteMiners will build their own containers if they are missing.
-    MINER_WORK_THRESHOLD: 2, // how long to wait before a miner checks for repairs/construction sites nearby again
+    MINER_WORK_THRESHOLD: 5, // how long to wait before a miner checks for repairs/construction sites nearby again
     REMOTE_HAULER: {
         ALLOW_OVER_CAPACITY: 2450, // Hauler capacity rounds up by MIN_WEIGHT, or this number value.
         DRIVE_BY_BUILD_ALL: true, // If REMOTE_HAULER.DRIVE_BY_BUILDING is enabled then this option will allow remote haulers will drive-by-build any of your structures.
@@ -318,7 +318,7 @@ let mod = {
     // Don't attack. Must be a member of CCC for permanent whitelisting in git repository. But you can change your own copy... Please ask if you are interested in joining CCC :)
     DEFENSE_BLACKLIST: [], // Don't defend those rooms (add room names). Blocks spawning via defense task (will not prevent offensive actions at all)
     CRITICAL_BUCKET_LEVEL: 0, // take action when the bucket drops below this value to prevent the bucket from actually running out
-    CRITICAL_BUCKET_OVERFILL: 0, // Overfill the bucket by this amount before disabling CPU throttle, this can reduce thrashing because all creeps try to act at once
+    CRITICAL_BUCKET_OVERFILL: 100, // Overfill the bucket by this amount before disabling CPU throttle, this can reduce thrashing because all creeps try to act at once
     CRITICAL_ROLES: [ 'worker', 'collapseWorker', 'melee', 'ranger', 'healer', 'miner', 'hauler', 'upgrader' ], // when the bucket drops below the critical bucket level only these creep roles will be executed
     ROBBER_REHOME: true, // May robbers choose closer storage for delivery?
     OBSERVER_OBSERVE_RANGE: 7, // the range for observers to look at

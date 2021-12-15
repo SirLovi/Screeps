@@ -261,8 +261,8 @@ mod.extend = function() {
 
         const [centerX, centerY] = [flag.pos.x, flag.pos.y];
 
-        const placed = [];
-        const sites = [];
+        //const placed = [];
+        //const sites = [];
 
         const failed = () => {
             flag.pos.newFlag(FLAG_COLOR.command.invalidPosition, 'NO_ROOM');
@@ -277,27 +277,25 @@ mod.extend = function() {
                 if (xPos >= 50 || xPos < 0 || yPos >= 50 || yPos < 0) return failed();
                 const pos = room.getPositionAt(xPos, yPos);
                 const structureType = layout[x] && layout[x][y];
-                if (structureType) {
+                if (structureType && (pos.lookFor(LOOK_FLAGS).length === 0) && !(Game.map.getTerrainAt(pos) === 'wall')) {
                     //if (Game.map.getTerrainAt(pos) === 'wall') return failed();
                     if (structureType === STRUCTURE_ROAD) {
                         pos.newFlag(FLAG_COLOR.command.road);
                     } else {
                         const flagColour = constructionFlags[structureType];
-                        placed.push({
-                            flagColour, pos
-                        });
+                        pos.newFlag(flagColour);
                     }
                 }
             }
         }
-
+        /*
         placed.forEach(f => {
             f.pos.newFlag(f.flagColour);
         });
         _.forEach(sites, p => {
             if (_.size(Game.constructionSites) >= 100) return false;
             p.createConstructionSite(STRUCTURE_ROAD);
-        });
+        });*/
 
         flag.remove();
     };
