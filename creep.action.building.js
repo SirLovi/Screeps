@@ -1,6 +1,6 @@
 let action = new Creep.Action('building');
 module.exports = action;
-action.maxPerTarget = 5;
+action.maxPerTarget = 8;
 action.targetRange = 3;
 action.reachedRange = function(creep) {
     return creep.getStrategyHandler([action.name], 'reachedRange', creep);

@@ -309,7 +309,7 @@ mod.removeConstructionFlags = function () {
     }
     return `Removed ${removeFlags.length} construction flags.`;
 };
-mod.runAutobahn = function(roomName) {
+mod.runAutobahn = function(roomName, roomsParsed) {
         
         autobahn = Autobahn;
         
@@ -321,7 +321,7 @@ mod.runAutobahn = function(roomName) {
         
         // Allow autobahn to path in these three rooms
         //let options = {roomFilter: (roomName) => roomName.startsWith('W34')};
-        let options = {roomFilter: ['W57N37', 'W56N37']};
+        let options = {roomFilter: roomsParsed};
 
         // Run autobahn
         let network = autobahn(start, destinations, options);

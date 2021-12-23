@@ -1,9 +1,9 @@
 // useful commands
 
 // Removes all enemy structures in a set room
-destroyAllHostileStructures('<roomName>');
+destroyAllHostileStructures('W54N38');
 
-runAutobahn('W58N39');
+runAutobahn('W58N39',['W58N39','W58N39','W58N39']);
 
 runAutobahnFlagEnd();
 
@@ -20,6 +20,7 @@ removeRoomConstructionFlags('W41N36');
 
 removeRoomRoadFlags('W59N38');
 
+_.forEach((Game.rooms["W54N38"].find(FIND_CREEPS)), s => s.suicide());
 _.forEach((Game.rooms["W5S53"].find(FIND_STRUCTURES, {filter: (i) => i.structureType == STRUCTURE_WALL })), s => s.destroy());
 
 // Recalculates ROUTE_ROOM_COST
@@ -103,7 +104,7 @@ Game.rooms['<roomName>'].placeOrder('<structure>', '<resource>', '<amount>');
 _.values(Game.structures).filter(i=>i.structureType==='lab').map(i=>i.room.setStore(i.id, RESOURCE_ENERGY, 2000));
 
 // Examine the low priority spawn queue in all rooms
-_.chain(Game.spawns).values().map(i=>i.room).unique().filter(i=>i.spawnQueueLow.length).map(i=>[`====${i.name}====>`,i.spawnQueueLow.map(j=>j.name)]).value();
+_.chain(Game.spawns).values().map(i=>i.room).unique().filter(i=>i.spawnQueueLow.length).map(i=>[`\n====${i.name}====>`,i.spawnQueueLow.map(j=>j.name)]).value();
 
 // Show histogram of remoteHauler weight
 JSON.stringify(_.chain(Game.creeps).filter(i=>i.data.creepType==='remoteHauler').groupBy('data.weight').mapValues(i=>i.length))

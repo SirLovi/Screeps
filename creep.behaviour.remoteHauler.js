@@ -93,3 +93,7 @@ mod.strategies.picking = {
     name: `picking-${mod.name}`,
     energyOnly: false
 };
+mod.strategies.defaultStrategy.moveOptions = function(options) {
+    options.avoidSKCreeps = true;
+    return options;
+};

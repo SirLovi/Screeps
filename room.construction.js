@@ -116,7 +116,7 @@ mod.extend = function() {
 
     Room.prototype.processConstructionFlags = function() {
         //if (!this.my || !Util.fieldOrFunction(SEMI_AUTOMATIC_CONSTRUCTION, this)) return;
-        if (!Util.fieldOrFunction(SEMI_AUTOMATIC_CONSTRUCTION, this)) return;
+        if (!this.controller || !Util.fieldOrFunction(SEMI_AUTOMATIC_CONSTRUCTION, this)) return;
         let sitesSize = _.size(Game.constructionSites);
         if (sitesSize >= 100) return;
         const LEVEL = this.controller.level;

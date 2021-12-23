@@ -702,9 +702,9 @@ mod.extend = function () {
 			return find.apply(this, arguments);
 	};
 
-	Room.prototype.findRoute = function (destination, checkOwner = true, preferHighway = true, allowSK = true) {
+	Room.prototype.findRoute = function (destination, checkOwner = true, preferHighway = true, allowSK = true, avoidSKCreeps = true) {
 		if (this.name == destination) return [];
-		const options = {checkOwner, preferHighway, allowSK};
+		const options = {checkOwner, preferHighway, allowSK, avoidSKCreeps};
 		return Game.map.findRoute(this, destination, {
 			routeCallback: Room.routeCallback(this.name, destination, options),
 		});

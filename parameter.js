@@ -51,7 +51,7 @@ let mod = {
     ROOM_VISUALS: false, // display basic room statistics with RoomVisuals
     ROOM_VISUALS_ALL: false, // displays visuals in all rooms you have vision in. Only your rooms when false.
     VISUALS: { // if ROOM_VISUALS is enabled, you can select what you want to display - All is a bit much for some people.
-        VISIBLE_ONLY: false, // depends on userscript: https://github.com/Esryok/screeps-browser-ext/blob/master/visible-room-tracker.user.js
+        VISIBLE_ONLY: true, // depends on userscript: https://github.com/Esryok/screeps-browser-ext/blob/master/visible-room-tracker.user.js
         ROOM: true, // displays basic info relative to the room
         ROOM_GLOBAL: true, // displays basic info relative to your account - requires ROOM: true
         INFO_PIE_CHART: false, // replaces the info bars with pie charts
@@ -68,9 +68,9 @@ let mod = {
         MINERAL: true, // displays mineral amount, or ticks to regen
         SOURCE: true, // displays energy amount, or ticks to regen
         CREEP: true, // draws creep paths
-        WALL: false, // highlight weakest wall and display hits
-        RAMPART: false, // highlight weakest rampart and display hits
-        ROAD: false, // highlight weakest road and display hits
+        WALL: true, // highlight weakest wall and display hits
+        RAMPART: true, // highlight weakest rampart and display hits
+        ROAD: true, // highlight weakest road and display hits
         HEATMAP: false, // collects creep positioning to display a heatmap. WARNING: HIGH MEMORY USAGE
         HEATMAP_INTERVAL: 2, // intervals between collections
         ACTION_ASSIGNMENT: true, // draws a line from a creep and it's new assignment
@@ -207,7 +207,7 @@ let mod = {
 
     ROOM_TRADING: true, // set this true to enable haulers within your colony to request resources from other rooms in your colony
     FILL_POWERSPAWN: true,
-    MIN_MINERAL_SELL_AMOUNT: 20000,
+    MIN_MINERAL_SELL_AMOUNT: 5000,
     ENERGY_VALUE_CREDITS: 0.05, // assumed energy exchange rate (in credits) to determine best mineral sell offer
     //MAX_SELL_RANGE: 60,
     TERMINAL_ENERGY: 100000,
@@ -267,8 +267,8 @@ let mod = {
     MAX_FORTIFY_CONTAINER: 50000,
     LIMIT_URGENT_REPAIRING: 750, // urgent repair when hits below
     GAP_REPAIR_DECAYABLE: 800, // decayables (e.g. roads) only get repaired when that much hits are missing
-    MEMORY_RESYNC_INTERVAL: 100, // interval to reload spawns & towers present in a room
-    PROCESS_ORDERS_INTERVAL: 125, // interval to process room orders and run terminalBroker
+    MEMORY_RESYNC_INTERVAL: 150, // interval to reload spawns & towers present in a room
+    PROCESS_ORDERS_INTERVAL: 26, // interval to process room orders and run terminalBroker
     TIME_REPORT: 28000, // ticks between room reports
     REPORT_MAX_LENGTH: 500,
     REPORTS_PER_LOOP: 18,
@@ -284,11 +284,11 @@ let mod = {
     MANAGED_CONTAINER_TRIGGER: 0.25, // managed containers get filled below this relative energy amount and emptied when above 1-this value
     ROUTE_ROOM_COST: { 'shard0':{'W58N36':99, 'W53N39': 99, 'W55N36': 99, 'W56N40': 99}}, // custom room routing cost: e.g. `{'shard0':{ 'W0N0':5, 'W4N4': 11 },'shard1':...}`. Affects bestSpawnRoomFor, Creep.Setup calculations, and travel cost predictions. Please call 'delete Memory.routeRange;' whenever you change this property.
     TRAVELLING_BORDER_RANGE: 22, // room arrival distance for travelling and routes
-    NOTIFICATE_INVADER: false, // Also log common 'Invader' hostiles
+    NOTIFICATE_INVADER: true, // Also log common 'Invader' hostiles
     NOTIFICATE_INTRUDER: true, // Log any hostiles in your rooms
     NOTIFICATE_HOSTILES: true, // Log any hostiles - Ignores NOTIFICATE_INTRUDER and NOTIFICATE_INVADER
     COMBAT_CREEPS_RESPECT_RAMPARTS: false, // causes own creeps not to leave through ramparts when defending
-    COST_MATRIX_VALIDITY: 1000,
+    COST_MATRIX_VALIDITY: 240,
     // function parameters: room. expected result: array
     CONSTRUCTION_PRIORITY: [STRUCTURE_SPAWN,STRUCTURE_EXTENSION,STRUCTURE_LINK,STRUCTURE_TERMINAL,STRUCTURE_STORAGE,STRUCTURE_TOWER,STRUCTURE_POWER_SPAWN,STRUCTURE_NUKER,STRUCTURE_OBSERVER,STRUCTURE_CONTAINER,STRUCTURE_ROAD,STRUCTURE_EXTRACTOR,STRUCTURE_LAB,STRUCTURE_WALL,STRUCTURE_RAMPART],
     CONTROLLER_SIGN: true,
@@ -302,7 +302,7 @@ let mod = {
         DRIVE_BY_BUILD_ALL: true, // If REMOTE_HAULER.DRIVE_BY_BUILDING is enabled then this option will allow remote haulers will drive-by-build any of your structures.
         DRIVE_BY_BUILD_RANGE: 3, // A creep's max build distance is 3 but cpu can be saved by dropping the search distance to 1.
         DRIVE_BY_BUILDING: true, // Allows remote haulers to build roads and containers. Consider setting REMOTE_WORKER_MULTIPLIER to 0.
-        DRIVE_BY_REPAIR_RANGE: 1, // range that remote haulers should search when trying to repair and move
+        DRIVE_BY_REPAIR_RANGE: 2, // range that remote haulers should search when trying to repair and move
         MIN_LOAD: 0.75, // Haulers will return home as long as their ratio of carrying/capacity is above this amount.
         MIN_WEIGHT: 800, // Small haulers are a CPU drain.
         MULTIPLIER: 1, // Max number of haulers spawned per source in a remote mining room.
@@ -322,7 +322,7 @@ let mod = {
     CRITICAL_ROLES: [ 'worker', 'collapseWorker', 'melee', 'ranger', 'healer', 'miner', 'hauler', 'upgrader' ], // when the bucket drops below the critical bucket level only these creep roles will be executed
     ROBBER_REHOME: true, // May robbers choose closer storage for delivery?
     OBSERVER_OBSERVE_RANGE: 7, // the range for observers to look at
-    OBSERVER_OBSERVE_HIGHWAYS_ONLY: true, // the observers will only look at highways - changing this will require you to clear cached rooms
+    OBSERVER_OBSERVE_HIGHWAYS_ONLY: false, // the observers will only look at highways - changing this will require you to clear cached rooms
     COMPRESS_COST_MATRICES: false, // enable to compress cached cost matrices (1/5 the size, but currently about 2x CPU usage)
     ACTION_SAY: { // what gets said on creep.action.*.onAssignment
         ATTACK_CONTROLLER: String.fromCodePoint(0x1F5E1) + String.fromCodePoint(0x26F3), // 🗡⛳
@@ -345,6 +345,7 @@ let mod = {
         INVADING: String.fromCodePoint(0x1F52B), // 🔫
         MINING: String.fromCodePoint(0x26CF), // ⛏
         PICKING: String.fromCodePoint(0x23EC), // ⏬
+        PICKINGTOMBSTONES: String.fromCodePoint(0x1F480), // ⏬
         REALLOCATING: String.fromCodePoint(0x2194), // ↔
         RECYCLING: String.fromCodePoint(0x267B), // ♻
         REPAIRING: String.fromCodePoint(0x1F528), // 🔨
@@ -379,18 +380,18 @@ let mod = {
     MAKE_COMPOUNDS: true,
     MAKE_COMPOUNDS_INTERVAL: 5,
     MAKE_REACTIONS_WITH_3LABS: true,
-    CHECK_ORDERS_INTERVAL: 25,
+    CHECK_ORDERS_INTERVAL: 19,
     PURCHASE_MINERALS: false,
     STORE_CHARGE_PURCHASE: 0.6,
     COMPOUNDS_TO_MAKE: {    // which compounds to make
         G: {                // for nukes
-            make: false,    // make it or not
+            make: true,    // make it or not
             roomThreshold: 0,   // start producing when room.resourcesAll[compound] <= threshold
             amount: 5000,   // amount to make when room.resourcesAll <= threshold (keep producing, while room.resourcesAll[compound] < amount + threshold)
             rooms: []       // rooms involved, leave it empty for all rooms
         },
         GH2O: {        // +80% upgradeController effectiveness without increasing the energy cost
-            make: false,
+            make: true,
             roomThreshold: 9000,
             amount: 3000,
             rooms: []
