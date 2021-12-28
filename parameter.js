@@ -48,18 +48,18 @@ let mod = {
     CENSUS_ANNOUNCEMENTS: true, // log birth and death
     SELL_NOTIFICATION: true, // send mail when selling minerals
     SPAWN_INTERVAL: 5, // loops between regular spawn probe
-    ROOM_VISUALS: false, // display basic room statistics with RoomVisuals
-    ROOM_VISUALS_ALL: false, // displays visuals in all rooms you have vision in. Only your rooms when false.
+    ROOM_VISUALS: true, // display basic room statistics with RoomVisuals
+    ROOM_VISUALS_ALL: true, // displays visuals in all rooms you have vision in. Only your rooms when false.
     VISUALS: { // if ROOM_VISUALS is enabled, you can select what you want to display - All is a bit much for some people.
         VISIBLE_ONLY: true, // depends on userscript: https://github.com/Esryok/screeps-browser-ext/blob/master/visible-room-tracker.user.js
         ROOM: true, // displays basic info relative to the room
-        ROOM_GLOBAL: true, // displays basic info relative to your account - requires ROOM: true
+        ROOM_GLOBAL: false, // displays basic info relative to your account - requires ROOM: true
         INFO_PIE_CHART: false, // replaces the info bars with pie charts
-        CPU: true, // display a graph containing CPU used, CPU limit, and bucket
+        CPU: false, // display a graph containing CPU used, CPU limit, and bucket
         ROOM_ORDERS: true, // display orders the room creates
         ROOM_OFFERS: true, // display what a room will offer another
         SPAWN: true, // displays creep name and spawn progress percentage when spawning
-        CONTROLLER: true, // displays level, progress, and ticks to downgrade if active
+        CONTROLLER: false, // displays level, progress, and ticks to downgrade if active
         STORAGE: true, // displays storage contents
         TERMINAL: true, // displays terminal contents
         TOWER: true, // displays tower contents
@@ -282,7 +282,7 @@ let mod = {
     USE_SUMMERTIME: true, // Please define isSummerTime in global.js to suit to your local summertime rules
     SPAWN_DEFENSE_ON_ATTACK: true, // This will attempt to store enough to have a defense and spawn troops when invaded.
     MANAGED_CONTAINER_TRIGGER: 0.25, // managed containers get filled below this relative energy amount and emptied when above 1-this value
-    ROUTE_ROOM_COST: { 'shard0':{'W58N36':99, 'W53N39': 99, 'W55N36': 99, 'W56N40': 99}}, // custom room routing cost: e.g. `{'shard0':{ 'W0N0':5, 'W4N4': 11 },'shard1':...}`. Affects bestSpawnRoomFor, Creep.Setup calculations, and travel cost predictions. Please call 'delete Memory.routeRange;' whenever you change this property.
+    ROUTE_ROOM_COST: { 'shard0':{'W58N36':99, 'W53N39': 99, 'W55N36': 99, 'W54N36': 99, 'W56N40': 99, 'W56N36': 99, 'W56N35': 99, 'W56N34': 99}}, // custom room routing cost: e.g. `{'shard0':{ 'W0N0':5, 'W4N4': 11 },'shard1':...}`. Affects bestSpawnRoomFor, Creep.Setup calculations, and travel cost predictions. Please call 'delete Memory.routeRange;' whenever you change this property.
     TRAVELLING_BORDER_RANGE: 22, // room arrival distance for travelling and routes
     NOTIFICATE_INVADER: true, // Also log common 'Invader' hostiles
     NOTIFICATE_INTRUDER: true, // Log any hostiles in your rooms
@@ -305,7 +305,7 @@ let mod = {
         DRIVE_BY_REPAIR_RANGE: 2, // range that remote haulers should search when trying to repair and move
         MIN_LOAD: 0.75, // Haulers will return home as long as their ratio of carrying/capacity is above this amount.
         MIN_WEIGHT: 800, // Small haulers are a CPU drain.
-        MULTIPLIER: 1, // Max number of haulers spawned per source in a remote mining room.
+        MULTIPLIER: 2, // Max number of haulers spawned per source in a remote mining room.
         REHOME: true, // May haulers choose closer storage for delivery?
     },
     TASK_CREEP_CHECK_INTERVAL: 250, // Maximum number of ticks before a task checks to see if it needs to spawn new creeps

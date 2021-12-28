@@ -815,7 +815,7 @@ mod.extend = function () {
 					for (let y = Math.max(0, creep.pos.y - 3); y <= Math.min(49, creep.pos.y + 3); y++) {
 						if (this.isWalkable(x, y)) {
 							const deltaY = y < creep.pos.y ? creep.pos.y - y : y - creep.pos.y;
-							const cost = 17 - (2 * Math.max(deltaX, deltaY));
+							const cost = 99 - (2 * Math.max(deltaX, deltaY));
 							avoidMatrix.set(x, y, cost); // make it less desirable than a swamp
 						}
 					}
