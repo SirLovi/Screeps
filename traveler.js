@@ -249,9 +249,11 @@ module.exports = function(globalOpts = {}){
                     const route = ret.route && ret.route.length;
                     if (options.debug) {
                         if (options.range === 0) {
-                            console.log(`TRAVELER: incomplete path for ${creep.name} from ${creep.pos} to ${destPos}, destination may be blocked.`);
+                            global.logSystem(creep.room.name, `TRAVELER: incomplete path for ${creep.name} from ${creep.pos} to ${destPos}, destination may be blocked.`);
+                            // console.log(`TRAVELER: incomplete path for ${creep.name} from ${creep.pos} to ${destPos}, destination may be blocked.`);
                         } else {
-                            console.log(`TRAVELER: incomplete path for ${creep.name} from ${creep.pos} to ${destPos}, range ${options.range}. Route length ${route}.`);
+                            global.logSystem(creep.room.name, `TRAVELER: incomplete path for ${creep.name} from ${creep.pos} to ${destPos}, range ${options.range}. Route length ${route}.`);
+                            // console.log(`TRAVELER: incomplete path for ${creep.name} from ${creep.pos} to ${destPos}, range ${options.range}. Route length ${route}.`);
                         }
                     }
                     if (route > 1) {

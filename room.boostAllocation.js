@@ -13,6 +13,7 @@ mod.boostAllocation = function () {
 	mod.writeAllocateParametersToMemory();
 
 	let roomTrading = Memory.boostTiming.roomTrading;
+
 	if (roomTrading.boostProduction)
 		return;
 
@@ -144,7 +145,8 @@ mod.boostAllocation = function () {
 
 						},
 						empireResources = room.resourcesToAllocate(compound),
-						roomOrderNeeded = (room.resourcesAll[compound] || 0) + (room.resourcesOrders[compound] || 0) < compoundObject.roomThreshold,
+						roomOrderNeeded = (room.resourcesAll[compound] || 0)
+							+ (room.resourcesOrders[compound] || 0) < compoundObject.roomThreshold,
 						roomOrderGranted = empireResources >= compoundObject.amount;
 
 					if (compoundObject.superior) {
@@ -168,7 +170,7 @@ mod.boostAllocation = function () {
 										return 0;
 
 									} else {
-										superiorMaking = data.reactions.orders.length > 0 ? compoundObject.superior ? compoundObject.superior === data.reactions.orders[0].type && seedLabsLength >= 4 : compound === data.reactions.orders[0].type && seedLabsLength >= 4 : false;
+										superiorMaking = data.reactions.orders.length > 0 ? compoundObject.superior ? compoundObject.superior === data.reactions.orders[0].type && workingLabsLength >= 4 : compound === data.reactions.orders[0].type && workingLabsLength >= 4 : false;
 										return seed;
 									}
 								},
@@ -176,7 +178,7 @@ mod.boostAllocation = function () {
 								seedA = 0,
 								seedB = 0,
 								orderAmount = compoundObject.amount + compoundObject.labRefilledAt,
-								seedLabsLength = room.structures.labs.all - room.structures.labs.storage - 2,
+								workingLabsLength = room.structures.labs.workLabs.length,
 								storageLabId,
 								storageLab;
 
@@ -329,6 +331,10 @@ mod.boostAllocation = function () {
 							break;
 
 						case 'storage':
+
+							if (compound === 'G')
+								global.logSystem(room.name, `compound: ${compound} roomOrderNeeded: ${roomOrderNeeded} roomOrderGranted: ${roomOrderGranted}`);
+
 							// find and unregister not needed boostLabs
 							unregisterBoostLab(room, compound);
 
@@ -344,7 +350,7 @@ mod.boostAllocation = function () {
 
 								if (_.isUndefined(roomFound) && (!room.nuked || (room.nuked && compound === 'XLH2O'))) {
 									let storageOrders = room.memory.resources.storage[0].orders;
-									let amountToOrder = compoundObject.amount - (room.resourcesAll[compound] || 0)
+									let amountToOrder = compoundObject.amount - (room.resourcesAll[compound] || 0);
 									let orderExist = _.some(storageOrders, order => {
 										return order.type === compound && order.orderAmount > 0;
 									});
@@ -366,13 +372,10 @@ mod.boostAllocation = function () {
 							break;
 					}
 
-
-
 				} else {
 					// find and unregister not needed boostLabs
 					unregisterBoostLab(room, compound);
 				}
-
 				if (roomFound)
 					break;
 			}

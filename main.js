@@ -137,13 +137,13 @@ global.install = () => {
         FlagDir: load("flagDir"),
         Task: load("task"),
         Tower: load("tower"),
-        Autobahn: load("autobahn"),
         Util: load('util'),
         Events: load('events'),
         OCSMemory: load('ocsMemory'),
         Grafana: GRAFANA ? load('grafana') : undefined,
         Visuals: load('visuals'),
-        SegmentCommunications: load('segmentCommunications')
+        SegmentCommunications: load('segmentCommunications'),
+        CompoundManager: load('compoundManager')
     });
     _.assign(global.Util, {
         DiamondIterator: load('util.diamond.iterator'),
@@ -250,14 +250,14 @@ global.install = () => {
             fillRoomOrders: load("room.fillRoomOrders"),
             boostProduction: load('room.boostProduction'),
             boostAllocation: load("room.boostAllocation"),
-            cleanRoomMemory: load("room.cleanMemory")
+            cleanRoomMemory: load("room.cleanMemory"),
+            // test: load("test"),
+            handleInvadersCore: load ("room.handleInvaderCore")
         },
     });
     global.inject(Spawn, load("spawn"));
 
     // Extend server objects
-    //global.extend();
-    // SegmentCommunications.extend();
     Extensions.extend();
     Creep.extend();
     Room.extend();
@@ -311,11 +311,6 @@ let cpuAtFirstLoop;
 module.exports.loop = wrapLoop(function () {
     const cpuAtLoop = Game.cpu.getUsed();
     if (Memory.pause) return;
-    
-    if(Game.cpu.bucket == 10000) {
-        console.log(`GENERATING PIXEL`);
-        Game.cpu.generatePixel();
-    }
 
     try {
         const totalUsage = Util.startProfiling('main', {startCPU: cpuAtLoop});
@@ -416,11 +411,14 @@ module.exports.loop = wrapLoop(function () {
 
         OCSMemory.cleanup(); // must come last
         p.checkCPU('OCSMemory.cleanup', PROFILING.ANALYZE_LIMIT);
-        if (ROOM_VISUALS && !Memory.CPU_CRITICAL) Visuals.run(); // At end to correctly display used CPU.
+        if (ROOM_VISUALS && !Memory.CPU_CRITICAL) Visuals.run(); // At end to correctly writePlanToMemory used CPU.
         p.checkCPU('visuals', PROFILING.EXECUTE_LIMIT);
 
         Grafana.run();
         p.checkCPU('grafana', PROFILING.EXECUTE_LIMIT);
+
+        CompoundManager.run();
+        p.checkCPU('compoundManager', PROFILING.EXECUTE_LIMIT);
 
         Game.cacheTime = Game.time;
 

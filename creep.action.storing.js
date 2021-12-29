@@ -8,7 +8,7 @@ action.isValidTarget = function(target){
 };
 action.isAddableTarget = function(target, creep){
     return ( target.my &&
-        (!target.targetOf || target.targetOf.length < this.maxPerTarget) && 
+        (!target.targetOf || target.targetOf.length < this.maxPerTarget) &&
         target.sum + creep.carry[RESOURCE_ENERGY] < target.store.getCapacity());
 };
 action.isValidMineralToTerminal = function(room){
@@ -44,7 +44,7 @@ action.work = function(creep){
     for(let resourceType in creep.carry) {
         if( creep.carry[resourceType] > 0 ){
             workResult = creep.transfer(creep.target, resourceType);
-            if( workResult != OK ) break;
+            if( workResult !== OK ) break;
         }
     }
     delete creep.data.actionName;

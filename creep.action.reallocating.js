@@ -295,7 +295,14 @@ action.newTargetPowerSpawn = function (creep) {
 				}
 				let ret = room.findContainerWith(RESOURCE_ENERGY);
 				if (ret) {
-					if (global.DEBUG && global.TRACE) global.trace('Action', {actionName: 'reallocating', roomName: room.name, creepName: creep.name, targetStructureId: ret.structure.id, resourceType: RESOURCE_ENERGY, targetNeeds: ret.amount});
+					if (global.DEBUG && global.TRACE) global.trace('Action', {
+						actionName: 'reallocating',
+						roomName: room.name,
+						creepName: creep.name,
+						targetStructureId: ret.structure.id,
+						resourceType: RESOURCE_ENERGY,
+						targetNeeds: ret.amount,
+					});
 					creep.data.reallocating = RESOURCE_ENERGY;
 					return ret.structure;
 				}
@@ -443,7 +450,14 @@ action.newTargetTerminal = function (creep) {
 					// found a needed resource so check lower priority containers
 					if (global.DEBUG && global.TRACE) global.trace('Action', {actionName: 'reallocating', roomName: room.name, creepName: creep.name, structureId: terminal.id, resourceType: type, needs: amount});
 					if (room.storage && room.storage.active && room.storage.store[type] && !(type === RESOURCE_ENERGY && room.storage.charge < 0.5)) {
-						if (global.DEBUG && global.TRACE) global.trace('Action', {actionName: 'reallocating', roomName: room.name, creepName: creep.name, targetStructureId: room.storage.id, resourceType: type, targetNeeds: room.storage.store[type]});
+						if (global.DEBUG && global.TRACE) global.trace('Action', {
+							actionName: 'reallocating',
+							roomName: room.name,
+							creepName: creep.name,
+							targetStructureId: room.storage.id,
+							resourceType: type,
+							targetNeeds: room.storage.store[type],
+						});
 						creep.data.reallocating = type;
 						return room.storage;
 					}
@@ -492,7 +506,7 @@ action.newTarget = function (creep) {
 	let room = creep.room;
 	if (DEBUG && TRACE) trace('Action', {actionName: 'reallocating', roomName: room.name, creepName: creep.name, subAction: 'newTarget'});
 	let target = null;
-	if (creep.sum == 0) {
+	if (creep.sum === 0) {
 		let data = room.memory;
 		if (data) {
 			target = this.newTargetLab(creep);
@@ -528,8 +542,7 @@ action.cancelAction = function (creep) {
 action.unloadStructure = function (creep, target, resource, amount) {
 	let amt = Math.min(amount, creep.carryCapacity - creep.sum);
 	let workResult = creep.withdraw(target, resource, amt);
-	if (global.DEBUG && global.TRACE)
-		global.trace('Action', {actionName: 'reallocating', roomName: creep.room.name, creepName: creep.name, subAction: 'unloadStructure', structureId: target.id, resourceType: resource, amount: amt, result: workResult});
+	if (DEBUG && TRACE) trace('Action', {actionName: 'reallocating', roomName: creep.room.name, creepName: creep.name, subAction: 'unloadStructure', structureId: target.id, resourceType: resource, amount: amt, result: workResult});
 	return workResult;
 };
 action.loadStructure = function (creep, target, resource, amount) {
@@ -540,9 +553,9 @@ action.loadStructure = function (creep, target, resource, amount) {
 	if (workResult === OK) {
 		// update order
 		let data = null;
-		if (room.memory.resources) data = room.memory.resources[target.structureType].find((s) => s.id == target.id);
+		if (room.memory.resources) data = room.memory.resources[target.structureType].find((s) => s.id === target.id);
 		if (data && data.orders) {
-			let order = data.orders.find(o => o.type == resource);
+			let order = data.orders.find(o => o.type === resource);
 			if (order && order.orderRemaining > 0) {
 				order.orderRemaining -= amt;
 			}
@@ -554,7 +567,8 @@ action.loadStructure = function (creep, target, resource, amount) {
 action.assignDropOff = function (creep, resource) {
 	let data = this.findNeeding(creep.room, resource, 1, creep.target.id);
 	if (data) {
-		if (DEBUG && TRACE) trace('Action', {actionName: 'reallocating', roomName: creep.room.name, creepName: creep.name, subAction: 'assignDropOff', targetStructureId: data.structure.id, resourceType: resource, amount: data.amount});
+		if (global.DEBUG && global.TRACE)
+			global.trace('Action', {actionName: 'reallocating', roomName: creep.room.name, creepName: creep.name, subAction: 'assignDropOff', targetStructureId: data.structure.id, resourceType: resource, amount: data.amount});
 		this.assign(creep, data.structure);
 	}
 	//delete creep.data.path;
@@ -564,27 +578,28 @@ action.unloadLab = function (creep) {
 	let target = creep.target;
 	let workResult = null;
 	let resource = null;
-	let amount = -target.getNeeds(RESOURCE_ENERGY);
-	if (amount > 0)
-		resource = RESOURCE_ENERGY;
+	let amount = 0;
+	amount = -target.getNeeds(RESOURCE_ENERGY);
+	if (amount > 0) resource = RESOURCE_ENERGY;
 	if (!resource) {
 		amount = -target.getNeeds(target.mineralType);
-		if (amount > 0)
-			resource = target.mineralType;
+		if (amount > 0) resource = target.mineralType;
 	}
-
-	global.logSystem(this.name, `unLoadLab - resource: ${amount} ${resource}`);
-
 	if (resource) {
 		workResult = this.unloadStructure(creep, target, resource, amount);
 	}
-	if (global.DEBUG && global.TRACE)
-		global.trace('Action', {actionName: 'reallocating-unloadLab', roomName: room.name, creepName: creep.name, structureId: target.id, resourceType: resource, needs: amount, workResult});
+
+	// TODO if (target !== seedLAb) -> get next nonSeedLabs with resource to target, check if creeps not full, this.unloadLab(creep)
+
+	// if(workResult === OK && creep.getCapacity() - creep.sum > 0) {
+	//
+	// }
+
+
+	if (DEBUG && TRACE) trace('Action', {actionName: 'reallocating-unloadLab', roomName: room.name, creepName: creep.name, structureId: target.id, resourceType: resource, needs: amount, workResult});
 	if (workResult === OK) {
 		this.assignDropOff(creep, resource);
-	} else
-		this.cancelAction(creep);
-
+	} else this.cancelAction(creep);
 	return workResult;
 };
 action.unloadPowerSpawn = function (creep) {
@@ -602,7 +617,7 @@ action.unloadPowerSpawn = function (creep) {
 		workResult = this.unloadStructure(creep, target, resource, amount);
 	}
 	if (DEBUG && TRACE) trace('Action', {actionName: 'reallocating-unloadPowerSpawn', roomName: room.name, creepName: creep.name, structureId: target.id, resourceType: resource, needs: amount, workResult});
-	if (workResult == OK) {
+	if (workResult === OK) {
 		this.assignDropOff(creep, resource);
 	} else this.cancelAction(creep);
 	return workResult;
@@ -620,9 +635,9 @@ action.unloadContainer = function (creep) {
 	}
 	for (let i = 0; i < store.length; i++) {
 		let res = store[i];
-		if (res && target.store[res] > 0 && (target.structureType == STRUCTURE_LAB || target.getNeeds(res) < 0)) {
+		if (res && target.store[res] > 0 && (target.structureType === STRUCTURE_LAB || target.getNeeds(res) < 0)) {
 			let dat = this.findNeeding(room, res, 1, target.id);
-			//if (dat && dat.structure.id == target.id) dat = null;
+			//if (dat && dat.structure.id === target.id) dat = null;
 			if (dat) {
 				amount = dat.amount;
 			}
@@ -630,7 +645,7 @@ action.unloadContainer = function (creep) {
 			if (amount > 0) {
 				resource = res;
 				break;
-			} else if (storage && storage.active && dat && dat.structure.structureType == STRUCTURE_STORAGE && res == RESOURCE_ENERGY) {
+			} else if (storage && storage.active && dat && dat.structure.structureType === STRUCTURE_STORAGE && res === RESOURCE_ENERGY) {
 				amount = storage.store.getCapacity() - storage.sum;
 				resource = res;
 				break;
@@ -641,7 +656,7 @@ action.unloadContainer = function (creep) {
 		workResult = this.unloadStructure(creep, target, resource, amount);
 	}
 	if (DEBUG && TRACE) trace('Action', {actionName: 'reallocating-unloadContainer', roomName: room.name, creepName: creep.name, structureId: target.id, resourceType: resource, needs: amount, workResult});
-	if (workResult == OK) {
+	if (workResult === OK) {
 		this.assignDropOff(creep, resource);
 	} else this.cancelAction(creep);
 	return workResult;
@@ -654,16 +669,29 @@ action.unloadTerminal = function (creep) {
 	let resource = null;
 	let amount = 0;
 	// identify resource and load up from store
+
+
+	// console.log(`REALLOCATING TERMINAL:`);
 	let store = Object.keys(target.store);
 	if (creep.data.reallocating) {
 		store.unshift(creep.data.reallocating);
+
+		// global.logSystem(creep.room.name, `target: ${target}`);
+		// global.logSystem(creep.room.name, `reAllocate: ${creep.data.reallocating}`);
+		// global.logSystem(creep.room.name, `store: ${global.json(store)}`);
+
 		delete creep.data.reallocating;
 	}
 	for (let i = 0; i < store.length; i++) {
 		let res = store[i];
-		if (res && target.store[res] > 0 && (target.structureType == STRUCTURE_LAB || target.getNeeds(res) < 0)) {
+
+		let needs = target.getNeeds(res);
+		// if (needs !== 0)
+		// 	global.logSystem(creep.room.name, `creep: ${creep.name} target: ${target} mineral: ${res} getNeeds: ${needs}`);
+
+		if (res && target.store[res] > 0 && (target.structureType === STRUCTURE_LAB || target.getNeeds(res) < 0)) {
 			let dat = this.findNeeding(room, res, 1, target.id);
-			//if (dat && dat.structure.id == target.id) dat = null;
+			//if (dat && dat.structure.id === target.id) dat = null;
 			if (dat) {
 				amount = dat.amount;
 			}
@@ -671,21 +699,27 @@ action.unloadTerminal = function (creep) {
 			if (amount > 0) {
 				resource = res;
 				break;
-			} else if (storage && storage.active && dat && dat.structure.structureType == STRUCTURE_STORAGE && res == RESOURCE_ENERGY) {
+			} else if (storage && storage.active && dat && dat.structure.structureType === STRUCTURE_STORAGE && res === RESOURCE_ENERGY) {
 				amount = storage.store.getCapacity() - storage.sum;
 				resource = res;
 				break;
 			}
 		}
 	}
+
+
 	if (resource) {
 		amount = Math.min(amount, target.store[resource] || 0, creep.carryCapacity - creep.sum);
 		workResult = this.unloadStructure(creep, target, resource, amount);
+		// global.logSystem(creep.room.name, `TERMINAL UNLOAD resource: ${resource} ERR: ${global.translateErrorCode(workResult)}`);
 	}
-	if (DEBUG && TRACE) trace('Action', {actionName: 'reallocating-unloadTerminal', roomName: room.name, creepName: creep.name, structureId: target.id, resourceType: resource, needs: amount, workResult});
-	if (workResult == OK) {
+	if (global.DEBUG && global.TRACE)
+		global.trace('Action', {actionName: 'reallocating-unloadTerminal', roomName: room.name, creepName: creep.name, structureId: target.id, resourceType: resource, needs: amount, workResult});
+	if (workResult === OK) {
 		this.assignDropOff(creep, resource);
-	} else this.cancelAction(creep);
+	} else
+		this.cancelAction(creep);
+
 	return workResult;
 };
 action.unloadStorage = function (creep) {
@@ -697,25 +731,42 @@ action.unloadStorage = function (creep) {
 	let amount = 0;
 	// check for other container's needs and local excess
 	let store = Object.keys(target.store);
+
+	// console.log(`REALLOCATING STORAGE:`);
+
 	if (creep.data.reallocating) {
 		store.unshift(creep.data.reallocating);
+
+		// global.logSystem(creep.room.name, `target: ${target}`);
+		// global.logSystem(creep.room.name, `reAllocate: ${creep.data.reallocating}`);
+		// global.logSystem(creep.room.name, `store: ${global.json(store)}`);
+
 		delete creep.data.reallocating;
 	}
 	for (let i = 0; i < store.length; i++) {
 		let res = store[i];
+
+		let needs = target.getNeeds(res);
+		// if (needs !== 0)
+		// 	global.logSystem(creep.room.name, `creep: ${creep.name} target: ${target} mineral: ${res} getNeeds: ${needs}`);
+
 		if (res && target.store[res] > 0) {
-			if (res == RESOURCE_ENERGY && target.charge < 0.5) continue;
+			if (res === RESOURCE_ENERGY && target.charge < 0.5)
+				continue;
 			let dat = this.findNeeding(room, res, 1, target.id);
-			if (DEBUG && TRACE) trace('Action', {actionName: 'reallocating', subAction: 'findNeeding', roomName: room.name, creepName: creep.name, structureId: dat && dat.structure.id, resourceType: res, amount: dat && dat.amount});
-			if (dat && dat.structure.id == target.id) dat = null;
+			if (global.DEBUG && global.TRACE)
+				global.trace('Action', {actionName: 'reallocating', subAction: 'findNeeding', roomName: room.name, creepName: creep.name, structureId: dat && dat.structure.id, resourceType: res, amount: dat && dat.amount});
+			if (dat && dat.structure.id === target.id)
+				dat = null;
 			if (dat) {
 				amount = dat.amount;
 			}
-			//if (!amount) amount = -this.storageNeeds(target, res);
+			// if (!amount)
+			// 	amount = -this.storageNeeds(target, res);
 			if (amount > 0) {
 				resource = res;
 				break;
-			} else if (terminal && terminal.active && dat && dat.structure.structureType == STRUCTURE_TERMINAL && res != RESOURCE_ENERGY && res != RESOURCE_POWER) {
+			} else if (terminal && terminal.active && dat && dat.structure.structureType === STRUCTURE_TERMINAL && res !== RESOURCE_ENERGY && res !== RESOURCE_POWER) {
 				amount = terminal.store.getCapacity() - terminal.sum;
 				resource = res;
 				break;
@@ -725,9 +776,11 @@ action.unloadStorage = function (creep) {
 	if (resource) {
 		amount = Math.min(amount, target.store[resource] || 0, creep.carryCapacity - creep.sum);
 		workResult = this.unloadStructure(creep, target, resource, amount);
+		// global.logSystem(creep.room.name, `STORAGE UNLOAD resource: ${resource} ERR: ${global.translateErrorCode(workResult)}`);
 	}
-	if (DEBUG && TRACE) trace('Action', {actionName: 'reallocating-unloadStorage', roomName: room.name, creepName: creep.name, structureId: target.id, resourceType: resource, needs: amount, workResult});
-	if (workResult == OK) {
+	if (global.DEBUG && global.TRACE)
+		global.trace('Action', {actionName: 'reallocating-unloadStorage', roomName: room.name, creepName: creep.name, structureId: target.id, resourceType: resource, needs: amount, workResult});
+	if (workResult === OK) {
 		this.assignDropOff(creep, resource);
 	} else this.cancelAction(creep);
 	return workResult;
@@ -795,7 +848,7 @@ action.loadContainer = function (creep) {
 	let amount = 0;
 	// drop off at store
 	for (let res in creep.carry) {
-		if (res && creep.carry[res] == 0) continue;
+		if (res && creep.carry[res] === 0) continue;
 		amount = target.getNeeds(res);
 		if (amount > 0) {
 			resource = res;
@@ -820,18 +873,19 @@ action.loadTerminal = function (creep) {
 	let amount = 0;
 	// drop off at store
 	for (let res in creep.carry) {
-		if (res && creep.carry[res] == 0) continue;
+		if (res && creep.carry[res] === 0) continue;
 		amount = target.getNeeds(res);
 		if (amount > 0) {
 			resource = res;
 			break;
-		} else if (res != RESOURCE_ENERGY && res != RESOURCE_POWER) {
+		} else if (res !== RESOURCE_ENERGY && res !== RESOURCE_POWER) {
 			resource = res;
 			amount = target.store.getCapacity() - target.sum;
 			break;
 		}
 	}
-	if (resource) workResult = this.loadStructure(creep, target, resource, amount);
+	if (resource)
+		workResult = this.loadStructure(creep, target, resource, amount);
 	if (DEBUG && TRACE) trace('Action', {actionName: 'reallocating-loadTerminal', roomName: room.name, creepName: creep.name, structureId: target.id, resourceType: resource, needs: amount, workResult});
 	if ((creep.carry[resource] || 0) > amount) {
 		this.assignDropOff(creep, resource);
@@ -848,7 +902,7 @@ action.loadStorage = function (creep) {
 	let amount = 0;
 	// drop off at store
 	for (let res in creep.carry) {
-		if (res && creep.carry[res] == 0) continue;
+		if (res && creep.carry[res] === 0) continue;
 		amount = target.getNeeds(res);
 		if (amount > 0) {
 			resource = res;

@@ -10,16 +10,18 @@ let mod = {
 			return;
 		}
 
-		let roomTrading = Memory.boostTiming.roomTrading;
+		let boostTiming = Memory.boostTiming,
+			roomTrading = Memory.boostTiming.roomTrading;
 
 		if (roomTrading.boostAllocation)
 			return;
+
 
 		// make compounds
 		if (Game.time % global.MAKE_COMPOUNDS_INTERVAL === 0) {
 
 			let orderingRoom = global.orderingRoom(),
-				ordersPlacedRoom = _.some(myRooms, room => {
+				ordersPlacedRoom = _.some(acceptedRooms, room => {
 					let data = room.memory.resources;
 					if (!data || !data.boostTiming)
 						return false;
@@ -28,17 +30,21 @@ let mod = {
 				numberOfOrderingRooms = orderingRoom.length,
 				roomFound = false;
 
-			for (let room of myRooms) {
+
+			for(let room of acceptedRooms) {
+
+				// let room = Game.rooms['E25S11']
 
 				let data = room.memory.resources;
 
 				if (global.AUTO_REGISTER_LABS)
 					room.autoRegisterLabs();
 
-				if (_.isUndefined(data) || _.isUndefined(data.reactions))
-					continue;
+                //if (_.isUndefined(data) || _.isUndefined(data.reactions))
+				if (_.isUndefined(data))
+				    continue;
 
-				let boostTiming = data.boostTiming,
+				let roomBoostTiming = data.boostTiming,
 					checkOrdersPlacedRoom = false,
 					reactionMakingStarted = function () {
 						return data.reactions.orders.length === 1 && _.sum(data.orders, 'amount') === 0;
@@ -56,24 +62,21 @@ let mod = {
 						//
 						// return workingLabs === data.lab.length - 2 - storageLabs;
 					};
-
-				global.logSystem(room.name, `orderingRoom - room[0]: ${orderingRoom[0]} length: ${numberOfOrderingRooms} roomFound: ${roomFound}`);
-				// ordersPlaced => reactionMaking
 				if (data.orders.length === 0 || _.sum(data.orders, 'amount') <= 0) {
 
-					if (boostTiming.roomState === 'ordersPlaced') {
+					if (roomBoostTiming.roomState === 'ordersPlaced') {
 						let reactionMaking = reactionMakingStarted();
 						if (reactionMaking) {
-							boostTiming.roomState = 'reactionMaking';
-							boostTiming.checkRoomAt = Game.time;
-							delete boostTiming.getOfferAttempts;
+							roomBoostTiming.roomState = 'reactionMaking';
+							roomBoostTiming.checkRoomAt = Game.time;
+							delete roomBoostTiming.getOfferAttempts;
 							global.logSystem(room.name, `${room.name} orders done, reaction started`);
-						} else if (Object.keys(boostTiming).length > 2 || boostTiming.checkRoomAt >= Game.time + global.CHECK_ORDERS_INTERVAL)
+						} else if (Object.keys(roomBoostTiming).length > 2 || roomBoostTiming.checkRoomAt >= Game.time + global.CHECK_ORDERS_INTERVAL)
 							checkOrdersPlacedRoom = true;
 					}
 				}
 				// new line
-				if (boostTiming && Game.time >= boostTiming.checkRoomAt && room.structures.labs.all.length !== room.structures.labs.storage.length - 2) {
+				if (roomBoostTiming && Game.time >= roomBoostTiming.checkRoomAt && room.structures.labs.workLabs.length >= 1) {
 
 					// new line
 					//global.logSystem(room.name, `LABS - all: ${room.structures.labs.all.length}, storage: ${room.structures.labs.storage.length}`);
@@ -82,9 +85,9 @@ let mod = {
 					if (data.boostTiming.roomState === 'reactionMaking') {
 
 						if (_.sum(data.reactions.orders, 'amount') > 0) {
-							boostTiming.reactionMaking = Game.time;
+							roomBoostTiming.reactionMaking = Game.time;
 							room.countCheckRoomAt();
-							global.logSystem(room.name, `${room.name} checkRoomAt counted: ${boostTiming.checkRoomAt - Game.time}`);
+							global.logSystem(room.name, `${room.name} checkRoomAt counted: ${roomBoostTiming.checkRoomAt - Game.time}`);
 						} else {
 							global.logSystem(room.name, `reactions done in ${room.name}`);
 
@@ -108,7 +111,7 @@ let mod = {
 				}
 
 				// log and fix next finishing reactions data
-				if ((Game.time % 50 === 0 && data.reactions && data.reactions.reactorMode === 'burst' && data.boostTiming.roomState === 'reactionMaking' && boostTiming.checkRoomAt - Game.time <= 300)
+				if ((Game.time % 50 === 0 && data.reactions && data.reactions.reactorMode === 'burst' && data.boostTiming.roomState === 'reactionMaking' && roomBoostTiming.checkRoomAt - Game.time <= 300)
 					|| (Game.time % 50 === 0 && checkOrdersPlacedRoom)) {
 
 					checkOrdersPlacedRoom = false;
@@ -117,7 +120,7 @@ let mod = {
 
 					if (reactionOrder && reactionOrder.amount > 0) {
 
-						global.logSystem(room.name, `${room.name}, finishing ${reactionOrder.type}. checkRoomAt: ${boostTiming.checkRoomAt - Game.time}`);
+						global.logSystem(room.name, `${room.name}, finishing ${reactionOrder.type}. checkRoomAt: ${roomBoostTiming.checkRoomAt - Game.time}`);
 
 						let labA = Game.getObjectById(data.reactions.seed_a),
 							labB = Game.getObjectById(data.reactions.seed_b),
@@ -138,11 +141,11 @@ let mod = {
 							let minAmount = Math.min(orderA, orderB);
 							if (minAmount >= LAB_REACTION_AMOUNT) {
 								reactionOrder.amount = minAmount;
-								boostTiming.reactionMaking = Game.time;
+								roomBoostTiming.reactionMaking = Game.time;
 								room.countCheckRoomAt();
 							} else {
 								reactionOrder.amount = 0;
-								boostTiming.checkRoomAt = Game.time;
+								roomBoostTiming.checkRoomAt = Game.time;
 							}
 							global.logSystem(room.name, `reactionOrders fixed: ${reactionOrder.amount}`);
 						};
@@ -185,14 +188,14 @@ let mod = {
 					}
 				}
 
-				// inactive rooms => try to make reactions
-				// new line
-				global.logSystem(room.name, `numberOfOrderingRooms: ${numberOfOrderingRooms} roomFound: ${roomFound} allLabs: ${room.structures.labs.all.length} storageLabs: ${room.structures.labs.storage.length}`);
-				if (numberOfOrderingRooms === 0 && !ordersPlacedRoom && !roomFound && room.structures.labs.all.length !== room.structures.labs.storage.length - 2) {
+				if (numberOfOrderingRooms === 0 && !ordersPlacedRoom && !roomFound && room.structures.labs.workLabs.length >= 1) {
 					roomFound = room.makeReaction();
-					//global.logSystem(room.name, `roomFound ${roomFound}`);
+					global.logSystem(room.name, `roomFound ${roomFound}`);
+					// if (roomFound)
+					// 	break;
 				}
 			}
+
 		}
 	},
 };

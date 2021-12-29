@@ -348,15 +348,31 @@ mod.extend = function(){
         // only repair in rooms that we own, have reserved, or belong to our allies, also SK rooms and highways.
         if (this.room.controller && this.room.controller.owner && !(this.room.my || this.room.reserved || this.room.ally)) return;
         // if it has energy and a work part, remoteMiners do repairs once the source is exhausted.
-        if(this.carry.energy > 0 && this.hasActiveBodyparts(WORK)) {
-            const repairRange = this.data && this.data.creepType === 'remoteHauler' ? global.REMOTE_HAULER.DRIVE_BY_REPAIR_RANGE : global.DRIVE_BY_REPAIR_RANGE;
-            const repairTarget = _(this.pos.findInRange(FIND_STRUCTURES, repairRange)).find(s => Room.shouldRepair(this.room, s));
+        if(this.store.energy > 0 && this.hasActiveBodyparts(WORK)) {
+
+
+            // console.log(`repairNearby!!!!!! ${this.room.name}`);
+
+            let repairRange = this.data && this.data.creepType === 'remoteHauler' ? global.REMOTE_HAULER.DRIVE_BY_REPAIR_RANGE : global.DRIVE_BY_REPAIR_RANGE;
+
+            let repairTarget = _(this.pos.findInRange(FIND_STRUCTURES, repairRange)).find(s => Room.shouldRepair(this.room, s));
+
+
+            // global.logSystem(this.room.name, `${global.json(repairTarget)}`);
+
             if (repairTarget) {
-                if( global.DEBUG && global.TRACE ) trace('Creep', {creepName:this.name, Action:'repairing', Creep:'repairNearby'}, repairTarget.pos);
-                this.repair(repairTarget);
+
+                if( global.DEBUG && global.TRACE )
+                    trace('Creep', {creepName:this.name, Action:'repairing', Creep:'repairNearby'}, repairTarget.pos);
+
+                if (repairTarget.structureType !== STRUCTURE_ROAD)
+                    this.repair(repairTarget);
+                else if (this.pos.inRangeTo(repairTarget, 0))
+                    this.repair(repairTarget);
             }
         } else {
-            if( global.DEBUG && global.TRACE ) trace('Creep', {creepName:this.name, pos:this.pos, Action:'repairing', Creep:'repairNearby'}, 'not repairing');
+            if( global.DEBUG && global.TRACE )
+                trace('Creep', {creepName:this.name, pos:this.pos, Action:'repairing', Creep:'repairNearby'}, 'not repairing');
         }
     };
     Creep.prototype.buildNearby = function() {
@@ -404,11 +420,24 @@ mod.extend = function(){
         'sum': {
             configurable: true,
             get: function() {
-                if( _.isUndefined(this._sum) || this._sumSet != Game.time ) {
+                if( _.isUndefined(this._sum) || this._sumSet !== Game.time ) {
                     this._sumSet = Game.time;
                     this._sum = _.sum(this.carry);
                 }
                 return this._sum;
+            }
+        },
+        'carries': {
+            configurable: true,
+            get: function() {
+                if( _.isUndefined(this._carries) || this._carriesSet !== Game.time ) {
+                    this._carriesSet = Game.time;
+                    this._carries = {}
+                    for (const [mineral, amount] of Object.entries(this.store)) {
+                        this._carries[mineral] = amount;
+                    }
+                }
+                return this._carries;
             }
         },
         'threat': {

@@ -35,13 +35,41 @@ mod.extend = function () {
 				configurable: true,
 				get: function () {
 					if (_.isUndefined(this._storage)) {
-						this._storage = _.filter(room.memory.resources.lab.reactionState, reactionState => {
-							return reactionState === 'Storage';
+						this._storage = _.filter(room.memory.resources.lab, lab => {
+							return lab.reactionState === 'Storage';
 						});
 					}
 					return this._storage;
 				},
 			},
+			'workLabs': {
+				configurable: true,
+				get: function () {
+					if (_.isUndefined(this._workLabs)) {
+						let data = this.room.memory.resources.reactions,
+							seed_a = data.seed_a,
+							seed_b = data.seed_b;
+
+						this._workLabs = [];
+
+						let add = entry => {
+							if (entry.id === seed_a || entry.id === seed_b || entry.reactionState === 'Storage')
+								return;
+							let o = Game.getObjectById(entry.id);
+							if (o) {
+								_.assign(o, entry);
+								this._workLabs.push(o);
+							}
+						};
+						_.forEach(this.room.memory.resources.lab, add);
+
+						// console.log(`data ${global.json(data)}`);
+
+					}
+					return this._workLabs;
+				},
+			},
+
 		});
 	};
 	// Lab related Room variables go here
@@ -221,6 +249,7 @@ mod.extend = function () {
 		let data = this.memory.resources;
 		if (!data)
 			return;
+			
 
 		let timing;
 
@@ -768,7 +797,9 @@ mod.extend = function () {
 
 		if (retOrdersA.roomOrderPlaced || retOrdersB.roomOrderPlaced) {
 			boostTiming.roomState = 'ordersPlaced';
+			// TODO is it ok?
 			this.GCOrders();
+			this.GCOffers();
 		} else if (retOrdersA.labOrderPlaced && retOrdersB.labOrderPlaced) {
 			boostTiming.roomState = 'reactionMaking';
 			boostTiming.checkRoomAt = Game.time;

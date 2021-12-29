@@ -541,7 +541,7 @@ mod.extend = function () {
 					//o.ratio = o.credits/o.transactionCost; // old formula
 					//o.ratio = (o.credits-o.transactionCost)/o.transactionAmount; // best offer assuming 1e == 1 credit
 					//o.ratio = o.credits/(o.transactionAmount+o.transactionCost); // best offer assuming 1e == 1 mineral
-					o.ratio = (o.credits - (o.transactionCost * ENERGY_VALUE_CREDITS)) / o.transactionAmount; // best offer assuming 1e == ENERGY_VALUE_CREDITS credits
+					o.ratio = (o.credits - (o.transactionCost * global.energyPrice)) / o.transactionAmount; // best offer assuming 1e == ENERGY_VALUE_CREDITS credits
 
 					return (
 						(terminalFull || o.ratio >= buyRatio &&
@@ -556,7 +556,7 @@ mod.extend = function () {
 						global.BB(order);
 					}
 					let result = Game.market.deal(order.id, order.transactionAmount, that.name);
-					if (global.DEBUG || SELL_NOTIFICATION) logSystem(that.name, `Selling ${order.transactionAmount} ${mineral} for ${global.roundUp(order.credits)} (${order.price} ¢/${mineral}, ${order.transactionCost} e): ${translateErrorCode(result)}`);
+					if (global.DEBUG || SELL_NOTIFICATION) logSystem(that.name, `Selling ${order.transactionAmount} ${mineral} for ${global.round(order.credits)} (${order.price} ¢/${mineral}, ${order.transactionCost} e): ${translateErrorCode(result)}`);
 					if (SELL_NOTIFICATION) Game.notify(`<h2>Room ${that.name} executed an order!</h2><br/>Result: ${translateErrorCode(result)}<br/>Details:<br/>${JSON.stringify(order).replace(',', ',<br/>')}`);
 					transacting = result == OK;
 					break;

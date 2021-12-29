@@ -4,22 +4,25 @@ const TRADING = 'basicTrading';
 
 let mod = {
 	analyze() {
-		if (Game.shard.name !== 'shard0')
+		if (Game.shard.name !== 'shard1')
 			return;
 
 		if (!global.SEGMENT_COMMS.enabled)
 			return;
-
 
 		if (_.isUndefined(Memory.segmentTransactions)) {
 			Memory.segmentTransactions = {};
 			// Memory.segmentTransactions.otherPlayerSegmentCount = 0;
 		}
 		if (Game.time % global.SEGMENT_COMMS.sendAndRequestTiming === 0) {
+			console.log(`SEGMENT COMMUNICATIONS STARTING`);
 			this.analyzeOtherPlayerSegment();
 			this.setMyPublicSegment();
 		} else if (Game.time % global.SEGMENT_COMMS.trackTiming === 0)
 			this.trackSegmentSharing();
+	},
+	minEnergy() {
+		 return global.acceptedRooms.length * (global.MAX_STORAGE_ENERGY[8] + global.TERMINAL_ENERGY + global.ENERGY_BALANCE_TRANSFER_AMOUNT);
 	},
 	getObjectPlayerSegment(playerName, seg) {
 		let raw = RawMemory.foreignSegment;
@@ -31,7 +34,7 @@ let mod = {
 			if (raw.data !== undefined) {
 				//parseSegment(raw.data);
 				if (raw.data[0] === '{' && raw.data[raw.data.length - 1] === '}') {
-					console.log(`player: ${playerName} ${global.json(JSON.parse(raw.data))}`);
+					// console.log(`player: ${playerName} ${global.json(JSON.parse(raw.data))}`);
 					return JSON.parse(raw.data);
 				} else {
 					console.log(playerName, 'segment is not an object ERROR');
@@ -41,26 +44,28 @@ let mod = {
 	},
 	roomRequestMineral(targetRoom, resource, amount) {
 
-		let message = `from SirLovi at ${Game.time}`;
+		let message = `from Zolcsika at ${Game.time}`;
 
 		let offerRooms = _.filter(acceptedRooms, room => {
 			// console.log(`${room.storage.store[resource] >= amount || room.terminal.store[resource] >= amount}`);
-			return room.storage.store[resource] >= amount || room.terminal.store[resource] >= amount;
+			return room.terminal.store[resource] >= amount;
 		});
 
 		console.log(`offerRooms.length: ${offerRooms.length} for ${amount} ${resource}`);
 
-		offerRooms.sort((a, b) => {
-			return Game.map.getRoomLinearDistance(targetRoom, a.name, true) - Game.map.getRoomLinearDistance(targetRoom, b.name, true);
-		});
+		if (offerRooms.length > 0) {
+			offerRooms.sort((a, b) => {
+				// return Game.map.getRoomLinearDistance(targetRoom, a.name, true) - Game.map.getRoomLinearDistance(targetRoom, b.name, true);
+				return b.terminal.store[resource] - a.terminal.store[resource];
+			});
+		}
 
 		let offerRoom = offerRooms[0];
 		if (!_.isUndefined(offerRoom)) {
 
-			console.log(`offerRoom: ${offerRoom.name}`);
-			console.log(`${offerRoom.name} has ${offerRoom.terminal.store[resource]} ${resource} in the terminal`);
-			console.log(`enough: ${offerRoom.terminal.store[resource] && offerRoom.terminal.store[resource] >= amount}`);
-			console.log(`terminal ready to send: ${offerRoom.terminal.cooldown <= 0} cooldown: ${offerRoom.terminal.cooldown}`);
+			global.logSystem(offerRoom.name, `has ${offerRoom.terminal.store[resource]} ${resource} in the terminal`);
+			// console.log(`enough: ${offerRoom.terminal.store[resource] && offerRoom.terminal.store[resource] >= amount}`);
+			// console.log(`terminal ready to send: ${offerRoom.terminal.cooldown <= 0} cooldown: ${offerRoom.terminal.cooldown}`);
 
 			if (offerRoom.terminal.store[resource] && offerRoom.terminal.store[resource] >= amount && offerRoom.terminal.cooldown <= 0) {
 
@@ -73,26 +78,25 @@ let mod = {
 				// console.log(`request mineral send: ${translateErrorCode(ret)}`);
 
 
-			} else {
+			} else if (offerRoom.terminal.cooldown > 0) {
 
-				let containerData = offerRoom.memory.resources.terminal[0];
-				let existingOrder = containerData.orders.find((r) => r.type === resource && r.storeAmount === amount);
+				// let containerData = offerRoom.memory.resources.terminal[0];
+				// let existingOrder = containerData.orders.find((r) => r.type === resource && r.storeAmount === amount);
+				//
+				// console.log(`terminalId: ${containerData.id}, existingOrder:`);
+				// if (existingOrder)
+				// 	global.BB(existingOrder);
+				//
+				// if (_.isUndefined(existingOrder) && !(offerRoom.terminal.store[resource] && offerRoom.terminal.store[resource] >= amount)) {
+				// 	let ret = offerRoom.setStore(containerData.id, resource, amount);
+				// 	global.logSystem(offerRoom.name, `terminal order placed ${resource} ${amount} ERR: ${global.translateErrorCode(ret)}`);
+				// }
 
-				console.log(`terminalId: ${containerData.id}, existingOrder:`);
-				if (existingOrder)
-					global.BB(existingOrder);
+				global.logSystem(offerRoom.name, `terminal is busy, cooldown: ${offerRoom.terminal.cooldown}`);
 
-				if (_.isUndefined(existingOrder) && !(offerRoom.terminal.store[resource] && offerRoom.terminal.store[resource] >= amount)) {
-					let ret = offerRoom.setStore(containerData.id, resource, amount);
-					global.logSystem(offerRoom.name, `terminal order placed ${resource} ${amount} ERR: ${global.translateErrorCode(ret)}`);
-				}
 			}
-
-			// console.log(`resource: ${resource} room: ${offerRoom.name}`);
-
-
 		} else {
-			return `There is no offerRoom for this resource ${resource}`;
+			console.log(`There is no offerRoom for ${resource}`);
 		}
 
 	},
@@ -125,16 +129,25 @@ let mod = {
 				// console.log(`wanted: ${basic[resource]} resource: ${resource} Memory: ${Memory.stats.empireMinerals[resource]}`);
 				// console.log(`available: ${Memory.stats.empireMinerals[resource] > acceptNum}`);
 				// console.log(`contains: ${_.contains(acceptable, resource)}`);
-				if (basic[resource]) {
-					if (Memory.stats.empireMinerals[resource] > acceptNum && _.contains(acceptable, resource)) {
-						// Here we do the sending logic.
-						let amount = global.MIN_OFFER_AMOUNT;
-						// if (resource === 'X') {
-						// 	amount = 1001;
-						// }
-						mod.roomRequestMineral(basic.room, resource, amount);
+				if (resource !== RESOURCE_ENERGY) {
+					if (basic[resource]) {
+						if (Memory.stats.empireMinerals[resource] > acceptNum && _.contains(acceptable, resource)) {
+							// Here we do the sending logic.
+							let amount = global.MIN_OFFER_AMOUNT;
+							mod.roomRequestMineral(basic.room, resource, amount);
 
-						// profitReport('E58S57', alliedList[Memory.otherPlayerSegmentCount][0], zz, undefined, amount, resource, 0, basic.room);
+							// profitReport('E58S57', alliedList[Memory.otherPlayerSegmentCount][0], zz, undefined, amount, resource, 0, basic.room);
+						}
+					}
+				} else {
+					if (basic[resource]) {
+						if (Memory.stats.empireMinerals[resource] > mod.minEnergy() && _.contains(acceptable, resource)) {
+							// Here we do the sending logic.
+							let amount = global.MIN_OFFER_AMOUNT;
+							mod.roomRequestMineral(basic.room, resource, amount);
+
+							// profitReport('E58S57', alliedList[Memory.otherPlayerSegmentCount][0], zz, undefined, amount, resource, 0, basic.room);
+						}
 					}
 				}
 			}
@@ -149,7 +162,7 @@ let mod = {
 		console.log(`makeRequest`);
 		let ret = {
 			basicTrading: { // currently used by all and basic empire balancing.
-				room: 'W59N39',
+				room: 'E23S14',
 				energy: false,
 				H: false,
 				O: false,
@@ -180,7 +193,8 @@ let mod = {
 		};
 		for (let mineral in ret.basicTrading) {
 			if (mineral !== 'room') {
-				if (Memory.stats.empireMinerals[mineral] < global.SEGMENT_COMMS.minAmount) {
+				if (Memory.stats.empireMinerals[mineral] < global.SEGMENT_COMMS.minAmount
+					|| (mineral === 'energy') && Memory.stats.empireMinerals[mineral] < mod.minEnergy()) {
 					console.log('Making request string', mineral);
 					ret.basicTrading[mineral] = true;
 				}

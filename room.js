@@ -649,6 +649,17 @@ mod.extend = function () {
 				}
 			},
 		},
+
+		// 'nextTurn': {
+		// 	configurable: true,
+		// 	get() {
+		// 		if (!this._nextTurn || this._nextTurnSetTime) {
+		// 			this._nextTurnSetTime = Game.time;
+		// 			this._nextTurn = this._nextTurnSetTime + 1 === Game.time;
+		// 		}
+		// 		return this._nextTurn;
+		// 	},
+		// },
 	});
 
 	Room.prototype.checkRCL = function () {
@@ -702,9 +713,9 @@ mod.extend = function () {
 			return find.apply(this, arguments);
 	};
 
-	Room.prototype.findRoute = function (destination, checkOwner = true, preferHighway = true, allowSK = true, avoidSKCreeps = true) {
+	Room.prototype.findRoute = function (destination, checkOwner = true, preferHighway = true, allowSK = true) {
 		if (this.name == destination) return [];
-		const options = {checkOwner, preferHighway, allowSK, avoidSKCreeps};
+		const options = {checkOwner, preferHighway, allowSK};
 		return Game.map.findRoute(this, destination, {
 			routeCallback: Room.routeCallback(this.name, destination, options),
 		});
@@ -714,7 +725,8 @@ mod.extend = function () {
 		if (!ROAD_CONSTRUCTION_ENABLE &&
 			(!ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name] ||
 				(ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name] &&
-					ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name].indexOf(this.name) == -1))) return;
+					ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name].indexOf(this.name) == -1)))
+			return;
 		let x = creep.pos.x;
 		let y = creep.pos.y;
 		if (x == 0 || y == 0 || x == 49 || y == 49 ||
@@ -815,7 +827,7 @@ mod.extend = function () {
 					for (let y = Math.max(0, creep.pos.y - 3); y <= Math.min(49, creep.pos.y + 3); y++) {
 						if (this.isWalkable(x, y)) {
 							const deltaY = y < creep.pos.y ? creep.pos.y - y : y - creep.pos.y;
-							const cost = 99 - (2 * Math.max(deltaX, deltaY));
+							const cost = 17 - (2 * Math.max(deltaX, deltaY));
 							avoidMatrix.set(x, y, cost); // make it less desirable than a swamp
 						}
 					}
@@ -989,6 +1001,90 @@ mod.extend = function () {
 		}
 		return this._creepMatrix;
 	};
+	// TODO it can be passed by a parameter or needed? (called from fillARoomOrder, room.lab and?)
+	Room.prototype.checkAllOrdersWithOffers = function (data, reactions, componentA, componentB) {
+
+		if (!this.allOrdersWithOffers()) {
+
+			global.logSystem(this.name, `no offers`);
+
+			if (global.DEBUG) {
+				global.logSystem(this.name, `not enough or no offers found. Updating room orders in room ${this.name}`);
+			}
+			if (_.isUndefined(data.boostTiming.getOfferAttempts))
+				data.boostTiming.getOfferAttempts = 0;
+			else
+				data.boostTiming.getOfferAttempts++;
+
+			// GCAllRoomOffers and terminal offers
+			// global.logSystem(this.name, `${this.name} running GCAllRoomOffers`);
+			//
+			// for (let room of acceptedRooms) {
+			//
+			// 	if (room.name === this.name)
+			// 		continue;
+			//
+			// 	let data = room.memory.resources;
+			//
+			// 	if (_.isUndefined(room.memory.resources.terminal) || room.memory.resources.terminal.length === 0) {
+			// 		room.memory.resources.terminal = [];
+			// 		room.memory.resources.terminal.push({
+			// 				id: room.terminal.id,
+			// 				orders: [],
+			// 			},
+			// 		);
+			// 	}
+			//
+			//
+			// 	let terminalOrders = data.terminal[0].orders;
+			//
+			// 	for (let [idx, order] of terminalOrders.entries()) {
+			// 		if (order.storeAmount === 100 && order.orderRemaining === 0 && order.orderAmount !== 0) {
+			// 			order.orderAmount = 0;
+			// 		}
+			// 		let terminalStored = this.terminal.store[order.type] || 0;
+			// 		if (order.storeAmount === 0
+			// 			&& (order.orderAmount - order.orderRemaining !== terminalStored + (this.resourcesCreeps[order.type] || 0))
+			// 			|| order.orderAmount === 0 && order.orderRemaining === 0) {
+			// 			terminalOrders.splice(idx, 1);
+			// 			idx--;
+			// 		}
+			// 	}
+			// 	data.offers = [];
+			// }
+
+			if (data.boostTiming.getOfferAttempts < 3) {
+				this.updateRoomOrders();
+				//data.boostTiming.ordersPlaced = Game.time;
+				data.boostTiming.checkRoomAt = Game.time + 1;
+				return false;
+			} else {
+				if (Memory.boostTiming.roomTrading.boostAllocation) {
+					global.logSystem(this.name, `${this.name} no offers found. Orders for boostAllocation are DELETED`);
+					data.orders = _.filter(data.orders, order => {
+						return order.amount > 0 && (order.type === componentA || order.type === componentB);
+					});
+					data.orders.offers = [];
+				} else if (Memory.boostTiming.roomTrading.boostProduction) {
+					global.logSystem(this.name, `${this.name} no offers found. Reactions and orders for boostProduction are DELETED`);
+					data.orders = _.filter(data.orders, order => {
+						return order.amount > 0 && !_.isUndefined(Memory.compoundsToAllocate[order.type]) && Memory.compoundsToAllocate[order.type].allocate;
+					});
+					data.orders.offers = [];
+					reactions.orders = [];
+					data.boostTiming = {};
+
+				}
+				delete data.boostTiming.getOfferAttempts;
+				return true;
+
+			}
+		} else {
+			data.boostTiming.checkRoomAt = Game.time + global.CHECK_ORDERS_INTERVAL;
+			delete data.boostTiming.getOfferAttempts;
+			return true;
+		}
+	};
 
 	Room.prototype.GCOrders = function () {
 
@@ -1031,87 +1127,7 @@ mod.extend = function () {
 			});
 		}
 
-		// TODO it can be passed by a parameter or needed? (called from fillARoomOrder, room.lab and?)
-		if (!this.allOrdersWithOffers()) {
-
-			global.logSystem(this.name, `no offers`);
-
-			if (global.DEBUG) {
-				global.logSystem(this.name, `not enough or no offers found. Updating room orders in room ${this.name}`);
-			}
-			if (_.isUndefined(data.boostTiming.getOfferAttempts))
-				data.boostTiming.getOfferAttempts = 0;
-			else
-				data.boostTiming.getOfferAttempts++;
-
-			// GCAllRoomOffers
-			global.logSystem(this.name, `${this.name} running GCAllRoomOffers`);
-
-			for (let room of acceptedRooms) {
-
-				if (room.name === this.name)
-					continue;
-
-				let data = room.memory.resources;
-
-				// if (_.isUndefined(room.memory.resources.terminal) || room.memory.resources.terminal.length === 0) {
-				// 	room.memory.resources.terminal = [];
-				// 	room.memory.resources.terminal.push({
-				// 			id: room.terminal.id,
-				// 			orders: [],
-				// 		},
-				// 	);
-				// }
-
-
-				// let terminalOrders = data.terminal[0].orders;
-				//
-				// for (let [idx, order] of terminalOrders.entries()) {
-				// 	if (order.storeAmount === 100 && order.orderRemaining === 0 && order.orderAmount !== 0) {
-				// 		order.orderAmount = 0;
-				// 	}
-				// 	let terminalStored = this.terminal.store[order.type] || 0;
-				// 	if (order.storeAmount === 0
-				// 		&& (order.orderAmount - order.orderRemaining !== terminalStored + (this.resourcesCreeps[order.type] || 0))
-				// 		|| order.orderAmount === 0 && order.orderRemaining === 0) {
-				// 		terminalOrders.splice(idx, 1);
-				// 		idx--;
-				// 	}
-				// }
-				// data.offers = [];
-			}
-
-			if (data.boostTiming.getOfferAttempts < 3) {
-				this.updateRoomOrders();
-				//data.boostTiming.ordersPlaced = Game.time;
-				data.boostTiming.checkRoomAt = Game.time + 1;
-				return false;
-			} else {
-				if (Memory.boostTiming.roomTrading.boostAllocation) {
-					global.logSystem(this.name, `${this.name} no offers found. Orders for boostAllocation are DELETED`);
-					data.orders = _.filter(data.orders, order => {
-						return order.amount > 0 && (order.type === componentA || order.type === componentB);
-					});
-					data.orders.offers = [];
-				} else if (Memory.boostTiming.roomTrading.boostProduction) {
-					global.logSystem(this.name, `${this.name} no offers found. Reactions and orders for boostProduction are DELETED`);
-					data.orders = _.filter(data.orders, order => {
-						return order.amount > 0 && !_.isUndefined(Memory.compoundsToAllocate[order.type]) && Memory.compoundsToAllocate[order.type].allocate;
-					});
-					data.orders.offers = [];
-					reactions.orders = [];
-					data.boostTiming = {};
-
-				}
-				delete data.boostTiming.getOfferAttempts;
-				return true;
-
-			}
-		} else {
-			data.boostTiming.checkRoomAt = Game.time + global.CHECK_ORDERS_INTERVAL;
-			delete data.boostTiming.getOfferAttempts;
-			return true;
-		}
+		// return this.checkAllOrdersWithOffers(data, reactions, componentA, componentB);
 
 
 	};
@@ -1155,8 +1171,8 @@ mod.extend = function () {
 				if (offer.id === order.id && resourcesAll >= offer.amount)
 					return true;
 				else if (offer.id === order.id) {
-					orderRoom.memory.resources.orders[i].offers = [];
-					// orderRoom.memory.resources.orders.offers.splice(i--, 1);
+					// orderRoom.memory.resources.orders[i].offers = [];
+					orderRoom.memory.resources.orders.offers.splice(i--, 1);
 					return false;
 				}
 			}
@@ -1199,23 +1215,23 @@ mod.extend = function () {
 
 					// TODO is it necessary?
 					// garbage collecting offerRoom terminal orders
-					/*
 
-					if (terminalMemory.orders.length > 0) {
-						terminalMemory.orders = _.filter(terminalMemory.orders, order => {
 
-							return (_.some(data.offers, offer => {
-										return (offer.type === order.type && offer.amount === order.orderRemaining + (terminal.store[offer.type] || 0));
-										})
-									|| (order.type === this.mineralType && this.storage.store[order.type] >= global.MAX_STORAGE_MINERAL)
-									|| (order.type.length === 1 && order.type !== this.mineralType && order.type !== RESOURCE_ENERGY && this.storage.store[order.type] >= global.MAX_STORAGE_NOT_ROOM_MINERAL)
-									|| (global.SELL_COMPOUND[order.type] && global.SELL_COMPOUND[order.type].sell
-										&& (global.SELL_COMPOUND[order.type].rooms.length === 0 || _.some(global.SELL_COMPOUND[mineral], {'rooms': this.name})))
-								);
-						});
-					}
+					// if (terminalMemory.orders.length > 0) {
+					// 	terminalMemory.orders = _.filter(terminalMemory.orders, order => {
+					//
+					// 		return (_.some(data.offers, offer => {
+					// 					return (offer.type === order.type && offer.amount === order.orderRemaining + (terminal.store[offer.type] || 0));
+					// 					})
+					// 				|| (order.type === this.mineralType && this.storage.store[order.type] >= global.MAX_STORAGE_MINERAL)
+					// 				|| (order.type.length === 1 && order.type !== this.mineralType && order.type !== RESOURCE_ENERGY && this.storage.store[order.type] >= global.MAX_STORAGE_NOT_ROOM_MINERAL)
+					// 				|| (global.SELL_COMPOUND[order.type] && global.SELL_COMPOUND[order.type].sell
+					// 					&& (global.SELL_COMPOUND[order.type].rooms.length === 0 || _.some(global.SELL_COMPOUND[mineral], {'rooms': this.name})))
+					// 			);
+					// 	});
+					// }
 
-					*/
+
 
 					// making terminal orders if it does not exist
 					let ordered = global.sumCompoundType(terminalMemory.orders, 'orderRemaining'),
@@ -1593,7 +1609,7 @@ mod.extend = function () {
 									o.transactionAmount = Game.market.credits / o.price;
 									if (o.transactionAmount === 0) return false;
 								}
-								o.ratio = (credits + (transactionCost * global.ENERGY_VALUE_CREDITS)) / o.transactionAmount;
+								o.ratio = (credits + (transactionCost * global.energyPrice)) / o.transactionAmount;
 
 								return o.amount > global.MIN_OFFER_AMOUNT;
 							});
@@ -1650,6 +1666,9 @@ mod.extend = function () {
 						currentRoom.GCLabs();
 
 						// place the reaction order
+
+						// global.logSystem(roomName, `placeReactionOrder - ingredient: ${ingredient} amount: ${amount}`);
+
 						let ret = currentRoom.placeReactionOrder(global.guid(), ingredient, amount);
 
 						if (ret === OK) {
@@ -1661,6 +1680,10 @@ mod.extend = function () {
 							// boostTiming.roomState = 'reactionPlaced';
 							return true;
 						} else {
+							if (ret === false)
+								global.logSystem(currentRoom.name, `placeReactionOrder: ${ret}`);
+							else
+								global.logSystem(currentRoom.name, `placeReactionOrder: ${global.translateErrorCode(ret)}`);
 							return false;
 						}
 					},
@@ -1702,7 +1725,7 @@ mod.extend = function () {
 							// collect compounds if it can not be ordered
 							else if ((ingredient.length > 1 || ingredient === 'G') && that.resourcesAllButMe(ingredient) < ingredientAmount)
 								compoundArray.push({
-									compound: ingredient,
+						 			compound: ingredient,
 									amount: ingredientAmount,
 								});
 						}
@@ -1725,20 +1748,28 @@ mod.extend = function () {
 
 		Object.keys(global.COMPOUNDS_TO_MAKE).forEach(compound => {
 
-			if (global.COMPOUNDS_TO_MAKE[compound].make && !roomFound && (global.COMPOUNDS_TO_MAKE[compound].rooms.indexOf(this.name) > -1 || global.COMPOUNDS_TO_MAKE[compound].rooms.length === 0)) {
+			if (global.COMPOUNDS_TO_MAKE[compound].make
+				&& !roomFound && (global.COMPOUNDS_TO_MAKE[compound].rooms.indexOf(this.name) > -1
+					|| global.COMPOUNDS_TO_MAKE[compound].rooms.length === 0)) {
 
 				let storedResources = this.resourcesAll[compound] || 0;
 
 				//global.logSystem(this.name, `start making ${compound} amount: ${storedResources}`);
 
 				if (storedResources === 0) {
+
 					amountToMake = global.roundUpTo(global.COMPOUNDS_TO_MAKE[compound].amount + global.COMPOUNDS_TO_MAKE[compound].roomThreshold, global.MIN_OFFER_AMOUNT);
+
 					roomFound = makeCompound(this.name, compound, amountToMake);
+
 					if (roomFound && global.DEBUG)
 						global.logSystem(this.name, `there is no ${compound}, so try to make the compounds for ${amountToMake} ${compound} in ${this.name}`);
+
 				} else if (storedResources < global.COMPOUNDS_TO_MAKE[compound].roomThreshold) {
+
 					amountToMake = global.roundUpTo(global.COMPOUNDS_TO_MAKE[compound].amount + global.COMPOUNDS_TO_MAKE[compound].roomThreshold - storedResources, global.MIN_OFFER_AMOUNT);
 					roomFound = makeCompound(this.name, compound, amountToMake);
+
 					if (roomFound && global.DEBUG)
 						global.logSystem(this.name, `${compound} below the threshold, so try to make the compounds for ${amountToMake} ${compound} in ${this.name}`);
 				}
@@ -1751,7 +1782,7 @@ mod.extend = function () {
 
 	Room.prototype.storedMinerals = function (mineral) {
 
-		let returnValue = (this.storage.store[mineral] || 0) /*+ (this.terminal.store[mineral] || 0)*/ - (this.resourcesOffers[mineral] || 0) - (this.resourcesReactions[mineral] || 0);
+		let returnValue = (this.storage.store[mineral] || 0) + (this.terminal.store[mineral] || 0) - (this.resourcesOffers[mineral] || 0) - (this.resourcesReactions[mineral] || 0);
 		//if (returnValue < 0)
 		// global.logSystem(this.name, `storedMinerals: ${mineral} ${returnValue}`);
 
@@ -1767,8 +1798,8 @@ mod.extend = function () {
 			numberOfLabs = data.lab.length,
 			reactionCoolDown = REACTION_TIME[data.reactions.orders[0].type],
 			producedAmountPerTick = LAB_REACTION_AMOUNT,
-			storageLabs = this.structures.labs.storage,
-			numberOfSlaveLabs = numberOfLabs - storageLabs.length - 2,
+			// storageLabs = this.structures.labs.storage,
+			numberOfSlaveLabs = this.structures.labs.workLabs.length,
 			allLabsProducedAmountPerTick = producedAmountPerTick * numberOfSlaveLabs / reactionCoolDown,
 			amount = data.reactions.orders[0].amount;
 
@@ -1902,6 +1933,55 @@ mod.extend = function () {
 		}
 	};
 
+	Room.prototype.launchAvailableNuke = function(targetPos) {
+
+		let isAvailable = function (nuker, room, target) {
+
+			if (nuker.pos.roomName === this.name)
+				return false;
+
+			if (!nuker.isActive())
+			    return false;
+
+			if (_.isUndefined(target.roomName)) {
+				console.log(`targetRoom: ${targetRoom} not visible`);
+			}
+
+			if (nuker.store['energy'] < nuker.store.getCapacity('energy')) {
+				console.log(`not enough energy to launch nuke! energy: ${nuker.energy} energyCapacity: ${nuker.energyCapacity}`);
+				return false;
+			}
+
+			if (nuker.store['G'] < nuker.store.getCapacity('G')) {
+				console.log(`not enough G to launch nuke! ghodium: ${nuker.store['G']} ghodiumCapacity: ${nuker.store.getCapacity('G')}`);
+				return false;
+			}
+
+			if (Game.map.getRoomLinearDistance(room.name, target.roomName) > 10)
+				return false;
+
+			return nuker.cooldown <= 0;
+		};
+
+		for (const room of myRooms) {
+
+			let nuker = room.structures.nukers.all[0];
+			if (isAvailable(nuker, room, targetPos)) {
+				// console.log(`ROOM: ${room.name}`);
+				// console.log(`target: ${target}`);
+
+				global.logSystem(room.name, `there is a nuker to ${targetPos}`);
+
+				let ret = nuker.launchNuke(targetPos);
+				if (ret === OK) {
+					console.log(`NUKER STARTED: from ${room.name} to: ${targetPos.roomName}`);
+					break;
+				}
+			}
+		}
+
+	}
+
 	RoomPosition.prototype.findClosestByPathFinder = function (goals, itr = _.identity) {
 		let mapping = _.map(goals, itr);
 		if (_.isEmpty(mapping))
@@ -1929,6 +2009,8 @@ mod.extend = function () {
 	RoomPosition.prototype.findClosestSpawn = function () {
 		return this.findClosestByPathFinder(Game.spawns, (spawn) => ({pos: spawn.pos, range: 1})).goal;
 	};
+
+
 };
 mod.flush = function () {
 	// run flush in each of our submodules

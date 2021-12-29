@@ -195,7 +195,7 @@ mod.extend = function () {
 				if (_.isUndefined(this._minerals)) {
 					this._minerals = [];
 					let add = id => {
-						addById(this._minerals, id);
+						global.addById(this._minerals, id);
 					};
 					_.forEach(this.memory.minerals, add);
 				}
@@ -269,15 +269,21 @@ mod.extend = function () {
 	});
 
 	Room.prototype.resourcesAllButMe = function (compound) {
-		console.log(`empire: ${Memory.stats.empireMinerals[compound] || 0} room: ${this.resourcesAll[compound] || 0}`);
+		// console.log(`empire: ${Memory.stats.empireMinerals[compound] || 0} room: ${this.resourcesAll[compound] || 0}`);
 		return (Memory.stats.empireMinerals[compound] || 0) - (this.resourcesAll[compound] || 0);
 	};
 
 	Room.prototype.resourcesToAllocate = function (compound) {
 		let empireResources = this.resourcesAllButMe(compound),
-			numberOfAcceptedRooms = acceptedRooms.length;
+			numberOfAcceptedRooms = acceptedRooms.length - 1;
 
-		return empireResources - Memory.compoundsToAllocate[compound].roomThreshold * numberOfAcceptedRooms;
+		if (global.isCompoundToManage(compound))
+			empireResources -= Memory.compoundsManage[compound].roomThreshold * numberOfAcceptedRooms;
+
+		empireResources = empireResources < 0 ? 0 : empireResources;
+
+		return empireResources;
+
 	};
 
 	Room.prototype.saveMinerals = function () {

@@ -687,6 +687,32 @@ module.exports = {
 
                     data.offers = [];
                     data.orders = [];
+                    
+                    if (_.isUndefined(room.memory.resources.terminal) || room.memory.resources.terminal.length === 0) {
+				 	    room.memory.resources.terminal = [];
+				 	    room.memory.resources.terminal.push({
+				 			id: room.terminal.id,
+				 			orders: []
+				 	    }
+				 	    );
+                    }
+                    
+                    if (_.isUndefined(room.memory.resources.storage) || room.memory.resources.storage.length === 0) {
+				 	    room.memory.resources.storage = [];
+				 	    room.memory.resources.storage.push({
+				 			id: room.storage.id,
+				 			orders: []
+				 	    }
+				 	    );
+                    }
+                    
+                    if (_.isUndefined(room.memory.resources.lab) || room.memory.resources.lab.length === 0) {
+				 	    room.memory.resources.lab = [];
+                    }
+                    
+                    if (_.isUndefined(room.memory.resources.reactions) || room.memory.resources.reactions.length === 0) {
+				 	    room.memory.resources.reactions = {};
+                    }
 
                     if (data.terminal[0])
                         data.terminal[0].orders = [];

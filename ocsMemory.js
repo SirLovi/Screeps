@@ -78,7 +78,8 @@ mod.saveSegment = (range, inputData) => {
                     const size = _.round((temp.length + 2) / 1024, 2);
                     return logError('RawMemory', `Cannot save data at key ${keyNum}, exceeds 100kb limit ${size}kb`);
                 }
-                if (global.DEBUG) logSystem('OCSMemory.saveSegment', 'Saving ' + _.round(encodedData.length / 1024, 2) + 'kb of data to segment ' + id);
+                // if (global.DEBUG)
+                //     global.logSystem('OCSMemory.saveSegment', 'Saving ' + _.round(encodedData.length / 1024, 2) + 'kb of data to segment ' + id);
                 RawMemory.segments[id] = encodedData + '}';
                 Memory.cacheValid[id] = Game.time;
                 encodedData = full && temp ? '{' + temp : '{';

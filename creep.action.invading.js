@@ -115,8 +115,10 @@ action.run = {
             }
             creep.travelTo( creep.target );
         }
-        if( !creep.target.my )
-            creep.attacking = creep.attack(creep.target) == OK;
+        if( !creep.target.my ) {
+            // global.logSystem(creep.room.name, `${creep.name} ${global.json(creep.target)}`);
+            creep.attacking = creep.attack(creep.target) === OK;
+        }
     },
     ranger: function(creep){
         let range = creep.pos.getRangeTo(creep.target);

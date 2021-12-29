@@ -22,11 +22,19 @@ let mod = {
 		if (_.isUndefined(Memory.boostTiming.timeStamp))
 			Memory.boostTiming.timeStamp = Game.time;
 
+		if(_.isUndefined(Memory.boostTiming.checkRooms)) {
+			Memory.boostTiming.checkRooms = {
+				nextCheck: Game.time,
+				rooms: myRoomsName
+			}
+		} else if (Memory.boostTiming.checkRooms.rooms.length === 0)
+			Memory.boostTiming.checkRooms.rooms = myRoomsName;
+
 		let orderingRoom = global.orderingRoom(),
 			numberOfOrderingRooms = orderingRoom.length,
 			roomTrading = Memory.boostTiming.roomTrading,
 			roomTradingType,
-			// TODO it can be orderingRoom[0].memory.resources.roomState = 'reactionPlaced'
+			// TODO it can be orderingRoom[0].memory.resources.boostTiming.roomState = 'reactionPlaced'
 			ordersPlacedRoom = _.some(myRooms, room => {
 				let data = room.memory.resources;
 				if (!data || !data.boostTiming)
@@ -40,6 +48,7 @@ let mod = {
 		}
 
 		if (numberOfOrderingRooms === 1) {
+
 			let room = orderingRoom[0];
 
 			if (roomTrading.boostProduction)
@@ -48,8 +57,9 @@ let mod = {
 				roomTradingType = `BOOST_ALLOCATION since: ${Game.time - Memory.boostTiming.timeStamp}`;
 
 			if (!Memory.boostTiming.multiOrderingRoomName && Game.time % 5 === 0) {
-				let checkRoomAt = room.memory.resources.boostTiming.checkRoomAt || 0;
-				let currentRoomTradingType = _.isUndefined(roomTradingType) ? 'noActivity' : roomTradingType;
+				let checkRoomAt = room.memory.resources.boostTiming.checkRoomAt || Game.time + 1;
+				let currentRoomTradingType = _.isUndefined(roomTradingType) ?
+					roomTradingType = `BOOST_ALLOCATION since: ${Game.time - Memory.boostTiming.timeStamp}` : roomTradingType;
 				global.logSystem(room.name, `orderingRoom.name: ${room.name}, checkRoomAt: ${checkRoomAt - Game.time} ${currentRoomTradingType}`);
 			} else if (Game.time % 5 === 0)
 				global.logSystem(room.name, `multi ordering in progress at ${Memory.boostTiming.multiOrderingRoomName}`);
@@ -73,7 +83,7 @@ let mod = {
 				global.logSystem(room.name, `checkOffers called from ${room.name} returnValue: ${returnValue}`);
 			} else {
 				global.logSystem(room.name, `${room.name} no offers found, updating offers`);
-				room.GCOrders();
+				room.GCOffers();
 				global.logSystem(room.name, `founded offers:`);
 				global.logSystem(room.name, `orders: ${global.json(data.orders)}`);
 				global.logSystem(room.name, `offers: ${global.json(data.offers)}`);
