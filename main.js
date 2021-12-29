@@ -311,6 +311,11 @@ let cpuAtFirstLoop;
 module.exports.loop = wrapLoop(function () {
     const cpuAtLoop = Game.cpu.getUsed();
     if (Memory.pause) return;
+    
+    if(Game.cpu.bucket == 10000) {
+        console.log(`GENERATING PIXEL`);
+        Game.cpu.generatePixel();
+    }
 
     try {
         const totalUsage = Util.startProfiling('main', {startCPU: cpuAtLoop});
