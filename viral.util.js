@@ -500,7 +500,7 @@ viralUtil.cancelMarket = function (mineral) {
 
 viralUtil.look = function (x, y) {
 
-	let pos = new RoomPosition(x, y, 'E25S21'),
+	let pos = new RoomPosition(x, y, 'W57N37'),
 		objects = pos.look(),
 		noObstacle = !_.some(objects, object => {
 

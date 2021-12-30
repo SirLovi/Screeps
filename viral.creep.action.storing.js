@@ -63,7 +63,7 @@ action.isValidMineralToTerminal = function (room, mineral) {
 			&& isTerminalFreeSpace;
 	}
 
-	if (room.name === 'E23S14' && mineral === 'XGH2O') {
+	if (room.name === 'W57N37' && mineral === 'XGH2O') {
 
 		// global.logSystem(room.name, `isCompound: ${mineralIsCompound}`);
 		// global.logSystem(room.name, `stored: ${storedMineral || 0}`);
