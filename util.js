@@ -692,6 +692,36 @@ module.exports = {
                     data.offers = [];
                     data.orders = [];
 
+                    if (_.isUndefined(room.memory.resources.terminal) || room.memory.resources.terminal.length === 0) {
+                        room.memory.resources.terminal = [];
+                        room.memory.resources.terminal.push({
+                            id: room.terminal.id,
+                            orders: []
+                        }
+                        );
+                    }
+                        
+                    if (_.isUndefined(room.memory.resources.storage) || room.memory.resources.storage.length === 0) {
+                        room.memory.resources.storage = [];
+                        room.memory.resources.storage.push({
+                            id: room.storage.id,
+                            orders: []
+                        }
+                        );
+                    }
+                    
+                    if (_.isUndefined(room.memory.resources.container)) {
+                        room.memory.resources.container = [];
+                    }
+                        
+                    if (_.isUndefined(room.memory.resources.lab)) {
+                        room.memory.resources.lab = [];
+                    }
+                        
+                    if (_.isUndefined(room.memory.resources.reactions)) {
+                        room.memory.resources.reactions = {};
+                    }
+
                     if (data.terminal[0])
                         data.terminal[0].orders = [];
 
@@ -705,14 +735,14 @@ module.exports = {
                         data.lab = [];
                         _.values(Game.structures).filter(i => i.structureType === 'lab').map(i => i.room.setStore(i.id, RESOURCE_ENERGY, 2000));
                     }
-                    delete data.boostTiming;
-                    delete data.seedCheck;
+                    data.boostTiming = {};
+                    //delete data.seedCheck;
                 } else
                     console.log(`${room.name} has no memory.resources`);
             }
         }
         if (roomName === undefined)
-            delete Memory.boostTiming;
+            Memory.boostTiming = {};
 
     }
 };
