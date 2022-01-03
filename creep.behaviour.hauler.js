@@ -5,10 +5,9 @@ mod.inflowActions = (creep) => {
         //Creep.action.pickPower,
         Creep.action.uncharging,
         Creep.action.picking,
-        //Creep.action.pickingTombstones,
+        Creep.action.pickingTombstones,
         Creep.action.withdrawing,
-        Creep.action.reallocating,
-        Creep.action.pickingTombstones
+        Creep.action.reallocating
     ];
 };
 mod.outflowActions = (creep) => {

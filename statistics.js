@@ -3,7 +3,9 @@ module.exports = mod;
 mod.storedStatisticsTime = (Memory.statistics && Memory.statistics.time ? Memory.statistics.time : 0 );
 mod.process = function(){
     if( _.isUndefined(Memory.statistics) ) {
-        Memory.statistics = {};
+        Memory.statistics = {
+            reports: []
+        };
     }
     let message;
     if( SEND_STATISTIC_REPORTS && this.storedStatisticsTime > 0 ) {

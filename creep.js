@@ -18,8 +18,7 @@ mod.extend = function(){
         return Creep.prototype.findGroupMemberBy(c => c.creepType === creepType, flagName);
     };
     Creep.prototype.findGroupMemberBy = function(findFunc, flagName) {
-        if (_.isUndefined(flagName))
-            flagName = this.data.flagName;
+        if (_.isUndefined(flagName)) flagName = this.data.flagName;
         if (!_.isUndefined(findFunc) && flagName) {
             const ret = _(Memory.population).filter({flagName}).find(findFunc);
             return ret ? ret.creepName : null;
@@ -38,13 +37,13 @@ mod.extend = function(){
             }
         }
     };
-
+    
     Creep.prototype.getBodyparts = function(type) {
         return _(this.body).filter({type}).value().length;
     };
-
-    // Check if a creep has body parts of a certain type anf if it is still active.
-    // Accepts a single part type (like RANGED_ATTACK) or an array of part types.
+    
+    // Check if a creep has body parts of a certain type anf if it is still active. 
+    // Accepts a single part type (like RANGED_ATTACK) or an array of part types. 
     // Returns true, if there is at least any one part with a matching type present and active.
     Creep.prototype.hasActiveBodyparts = function(partTypes) {
         return this.hasBodyparts(partTypes, this.body.length - Math.ceil(this.hits * 0.01));
@@ -93,7 +92,7 @@ mod.extend = function(){
                 let breeding = this.memory.breeding;
                 if( type && weight && home && spawn && breeding  ) {
                     //console.log( 'Fixing corrupt creep without population entry: ' + this.name );
-                    let entry = Population.setCreep({
+                    var entry = Population.setCreep({
                         creepName: this.name,
                         creepType: type,
                         weight: weight,
@@ -108,14 +107,14 @@ mod.extend = function(){
                     });
                     Population.countCreep(this.room, entry);
                 } else {
-                    console.log(dye(CRAYON.error, 'Corrupt creep without population entry!! : ' + this.name), Util.stack());
+                    console.log( dye(CRAYON.error, 'Corrupt creep without population entry!! : ' + this.name ), Util.stack());
                     //this.suicide();
                     // trying to import creep
                     let counts = _.countBy(this.body, 'type');
                     if( counts[WORK] && counts[CARRY])
                     {
                         let weight = (counts[WORK]*BODYPART_COST[WORK]) + (counts[CARRY]*BODYPART_COST[CARRY]) + (counts[MOVE]*BODYPART_COST[MOVE]);
-                        let entry = Population.setCreep({
+                        var entry = Population.setCreep({
                             creepName: this.name,
                             creepType: 'worker',
                             weight: weight,
@@ -348,31 +347,15 @@ mod.extend = function(){
         // only repair in rooms that we own, have reserved, or belong to our allies, also SK rooms and highways.
         if (this.room.controller && this.room.controller.owner && !(this.room.my || this.room.reserved || this.room.ally)) return;
         // if it has energy and a work part, remoteMiners do repairs once the source is exhausted.
-        if(this.store.energy > 0 && this.hasActiveBodyparts(WORK)) {
-
-
-            // console.log(`repairNearby!!!!!! ${this.room.name}`);
-
-            let repairRange = this.data && this.data.creepType === 'remoteHauler' ? global.REMOTE_HAULER.DRIVE_BY_REPAIR_RANGE : global.DRIVE_BY_REPAIR_RANGE;
-
-            let repairTarget = _(this.pos.findInRange(FIND_STRUCTURES, repairRange)).find(s => Room.shouldRepair(this.room, s));
-
-
-            // global.logSystem(this.room.name, `${global.json(repairTarget)}`);
-
+        if(this.carry.energy > 0 && this.hasActiveBodyparts(WORK)) {
+            const repairRange = this.data && this.data.creepType === 'remoteHauler' ? global.REMOTE_HAULER.DRIVE_BY_REPAIR_RANGE : global.DRIVE_BY_REPAIR_RANGE;
+            const repairTarget = _(this.pos.findInRange(FIND_STRUCTURES, repairRange)).find(s => Room.shouldRepair(this.room, s));
             if (repairTarget) {
-
-                if( global.DEBUG && global.TRACE )
-                    trace('Creep', {creepName:this.name, Action:'repairing', Creep:'repairNearby'}, repairTarget.pos);
-
-                if (repairTarget.structureType !== STRUCTURE_ROAD)
-                    this.repair(repairTarget);
-                else if (this.pos.inRangeTo(repairTarget, 0))
-                    this.repair(repairTarget);
+                if( global.DEBUG && global.TRACE ) trace('Creep', {creepName:this.name, Action:'repairing', Creep:'repairNearby'}, repairTarget.pos);
+                this.repair(repairTarget);
             }
         } else {
-            if( global.DEBUG && global.TRACE )
-                trace('Creep', {creepName:this.name, pos:this.pos, Action:'repairing', Creep:'repairNearby'}, 'not repairing');
+            if( global.DEBUG && global.TRACE ) trace('Creep', {creepName:this.name, pos:this.pos, Action:'repairing', Creep:'repairNearby'}, 'not repairing');
         }
     };
     Creep.prototype.buildNearby = function() {
@@ -420,24 +403,11 @@ mod.extend = function(){
         'sum': {
             configurable: true,
             get: function() {
-                if( _.isUndefined(this._sum) || this._sumSet !== Game.time ) {
+                if( _.isUndefined(this._sum) || this._sumSet != Game.time ) {
                     this._sumSet = Game.time;
                     this._sum = _.sum(this.carry);
                 }
                 return this._sum;
-            }
-        },
-        'carries': {
-            configurable: true,
-            get: function() {
-                if( _.isUndefined(this._carries) || this._carriesSet !== Game.time ) {
-                    this._carriesSet = Game.time;
-                    this._carries = {}
-                    for (const [mineral, amount] of Object.entries(this.store)) {
-                        this._carries[mineral] = amount;
-                    }
-                }
-                return this._carries;
             }
         },
         'threat': {
@@ -602,7 +572,7 @@ mod.compileBody = function (room, params, sort = true) {
     if (params.sort !== undefined) sort = params.sort;
     let parts = [];
     const multi = Creep.multi(room, params);
-    for (let i = 0; i < multi; i++) {
+    for (var i = 0; i < multi; i++) {
         parts = parts.concat(params.multiBody);
     }
     parts = parts.concat(params.fixedBody);

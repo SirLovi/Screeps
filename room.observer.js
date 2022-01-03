@@ -4,8 +4,7 @@ mod.analyzeRoom = function(room, needMemoryResync) {
     if (needMemoryResync) {
         room.saveObserver();
         // to re-evaluate rooms, in case parameters are changed
-        if (room.structures.observer)
-            room.initObserverRooms();
+        if (room.structures.observer) room.initObserverRooms();
     }
 };
 mod.executeRoom = function(memory, roomName) {
@@ -97,8 +96,7 @@ mod.extend = function() {
         [this.memory.observer.id] = this.find(FIND_MY_STRUCTURES, {
             filter: s => s instanceof StructureObserver
         }).map(s => s.id);
-        if (_.isUndefined(this.memory.observer.id))
-            delete this.memory.observer;
+        if (_.isUndefined(this.memory.observer.id)) delete this.memory.observer;
     };
     // New Room methods go here
 };

@@ -106,7 +106,7 @@ action.work = function(creep) {
         if (creep.sum > minCarry) {
             if (creep.target.link && creep.target.link.energy < creep.target.link.energyCapacity) {
                 creep.transfer(creep.target.link, RESOURCE_ENERGY);
-            } else if (creep.target.container && creep.target.container.sum < creep.target.container.store.getCapacity()) {
+            } else if (creep.target.container && creep.target.container.sum < creep.target.container.storeCapacity) {
                 const transfer = r => {
                     if (creep.carry[r] > 0) creep.transfer(creep.target.container, r);
                 };

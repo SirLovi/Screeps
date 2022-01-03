@@ -33,7 +33,7 @@ mod.extend = function(){
     };
     Spawn.prototype.createCreepBySetup = function(setup){
         if( global.DEBUG && global.TRACE ) trace('Spawn',{setupType:this.type, rcl:this.room.controller.level, energy:this.room.energyAvailable, maxEnergy:this.room.energyCapacityAvailable, Spawn:'createCreepBySetup'}, 'creating creep');
-        let params = setup.buildParams(this);
+        var params = setup.buildParams(this);
         if( this.create(params.parts, params.name, params.setup) )
             return params;
         return null;
@@ -72,9 +72,9 @@ mod.extend = function(){
             queue.unshift(params);
             return true;
         }
-        let completeName;
-        let stumb = params.name;
-        for (let son = 1; (completeName == null) || Game.creeps[completeName] || Memory.population[completeName]; son++) {
+        var completeName;
+        var stumb = params.name;
+        for (var son = 1; (completeName == null) || Game.creeps[completeName] || Memory.population[completeName]; son++) {
             completeName = params.name + '-' + son;
         }
         params.name = completeName;
@@ -87,7 +87,7 @@ mod.extend = function(){
     };
     Spawn.prototype.create = function(body, name, behaviour, destiny){
         if( body.length == 0 ) return false;
-        let success = this.spawnCreep(body, name);
+        var success = this.spawnCreep(body, name);
         if( success == OK ){
             let cost = 0;
             body.forEach(function(part){

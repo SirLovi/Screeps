@@ -38,7 +38,7 @@ mod.outflowActions = (creep) => {
     return priority;
 };
 mod.nextAction = function(creep) {
-    let flag;
+    var flag;
     if( creep.data.destiny ) flag = Game.flags[creep.data.destiny.flagName];
     
     if( flag ) {
@@ -72,8 +72,4 @@ mod.nextAction = function(creep) {
         }
     }    
     return this.nextEnergyAction(creep);
-};
-mod.strategies.defaultStrategy.moveOptions = function(options) {
-    options.avoidSKCreeps = true;
-    return options;
 };

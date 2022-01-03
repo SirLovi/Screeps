@@ -43,7 +43,7 @@ let Setup = function(typeName){
     this._maxWeight = this.rclProperty('maxWeight');
 
     this.buildParams = function(spawn){
-        let memory = {
+        var memory = {
             setup: null,
             name: null,
             parts: [],
@@ -57,7 +57,7 @@ let Setup = function(typeName){
         memory.cost = Creep.bodyCosts(memory.parts);
         memory.mother = spawn.name;
         memory.home = spawn.pos.roomName;
-        for( let son = 1; memory.name == null || Game.creeps[memory.name] || Memory.population[memory.name]; son++ ) {
+        for( var son = 1; memory.name == null || Game.creeps[memory.name] || Memory.population[memory.name]; son++ ) {
             memory.name = this.type + '-' + memory.cost + '-' + son;
         }
         return memory;

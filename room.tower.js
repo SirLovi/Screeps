@@ -22,7 +22,7 @@ mod.extend = function() {
             get: function() {
                 if( _.isUndefined(this._towerFreeCapacity) ) {
                     this._towerFreeCapacity = 0;
-                    let addFreeCapacity = tower => this._towerFreeCapacity += (tower.energyCapacity - tower.energy);
+                    var addFreeCapacity = tower => this._towerFreeCapacity += (tower.energyCapacity - tower.energy);
                     _.forEach(this.structures.towers, addFreeCapacity);
                 }
                 return this._towerFreeCapacity;
@@ -34,7 +34,7 @@ mod.extend = function() {
             filter: {structureType: STRUCTURE_TOWER}
         });
         if( towers.length > 0 ){
-            let id = obj => obj.id;
+            var id = obj => obj.id;
             this.memory.towers = _.map(towers, id);
         } else delete this.memory.towers;
     };

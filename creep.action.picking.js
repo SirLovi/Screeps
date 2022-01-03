@@ -1,7 +1,7 @@
 let action = new Creep.Action('picking');
 module.exports = action;
-action.maxPerAction = 8;
-action.maxPerTarget = 8;
+action.maxPerAction = 4;
+action.maxPerTarget = 2;
 action.isValidAction = function(creep){
     return ( creep.sum < creep.carryCapacity );
 };
@@ -31,7 +31,7 @@ action.newTarget = function(creep){
     return creep.pos.findClosestByPath(droppedResources, {filter: filter});
 };
 action.work = function(creep){
-    let result = creep.pickup(creep.target);
+    var result = creep.pickup(creep.target);
     if( result == OK ){
         if( creep.sum < creep.carryCapacity*0.8 ) {
             // is there another in range?

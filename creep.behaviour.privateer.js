@@ -82,15 +82,15 @@ mod.nextAction = function(creep){
                 // energy available
                 else {
                     // harvesting or picking
-                    let actions = [
-                        Creep.action.dismantling,
-                        Creep.action.picking,
+                    var actions = [
+                        //Creep.action.dismantling,
+                        //Creep.action.picking,
                         Creep.action.robbing,
-                        Creep.action.harvesting
+                        //Creep.action.harvesting
                     ];
                     // TODO: Add extracting (if extractor present) ?
-                    for(let iAction = 0; iAction < actions.length; iAction++) {
-                        let action = actions[iAction];
+                    for(var iAction = 0; iAction < actions.length; iAction++) {
+                        var action = actions[iAction];
                         if(action.isValidAction(creep) &&
                             action.isAddableAction(creep) &&
                             action.assign(creep))
@@ -104,9 +104,9 @@ mod.nextAction = function(creep){
             }
             // carrier full
             else {
-                let actions = [Creep.action.building];
-                for(let iAction = 0; iAction < actions.length; iAction++) {
-                    let action = actions[iAction];
+                var actions = [Creep.action.building];
+                for(var iAction = 0; iAction < actions.length; iAction++) {
+                    var action = actions[iAction];
                     if(action.isValidAction(creep) &&
                         action.isAddableAction(creep) &&
                         action.assign(creep))

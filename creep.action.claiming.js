@@ -4,10 +4,6 @@ action.isValidAction = function(creep){ return true; };
 action.isValidTarget = function(target){ return !target.room || !target.owner; }; // no sight or not owned
 action.isAddableAction = function(){ return true; };
 action.isAddableTarget = function(){ return true; };
-action.defaultStrategy.moveOptions = function(options) {
-    options.avoidSKCreeps = true;
-    return options;
-};
 action.newTarget = function(creep){
     let flag;
     // TODO: remove  || creep.data.destiny.flagName (temporary backward compatibility)
@@ -50,21 +46,16 @@ action.step = function(creep){
 
     let range = creep.pos.getRangeTo(creep.target);
     if( range <= this.targetRange ) {
-        let workResult = this.work(creep);
+        var workResult = this.work(creep);
         if( workResult != OK ) {
             creep.handleError({errorCode: workResult, action: this, target: creep.target, range, creep});
         }
     }
-    if (creep.target.pos.roomName !== creep.room.name){
-        return Creep.action.travelling.assignRoom(creep, creep.target.pos.roomName);
-    }
-    else {
-        creep.travelTo(creep.target.pos);
-    }
+    creep.travelTo(creep.target.pos);
 };
 action.work = function(creep){
     creep.controllerSign();
-
+    
     if( (creep.target.owner && !creep.target.my) ||
         (creep.target.reservation && !Task.reputation.allyOwner(creep.target.reservation))){
         workResult = creep.attackController(creep.target);
@@ -74,7 +65,7 @@ action.work = function(creep){
     }
     return workResult;
     /*
-    let workResult;
+    var workResult;
         workResult = creep.claimController(creep.target);
     if( creep.target.owner && !creep.target.my ){
         workResult = creep.attackController(creep.target);

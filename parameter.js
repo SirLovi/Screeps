@@ -34,7 +34,7 @@ let mod = {
 		minAmount: 300000, // The minimum you have of the above mineral before you trade.
 	},
 	HANDLE_INVADERS_CORE: {
-		enabled: false,
+		enabled: true,
 		display: true,
 		timing: 100
 	},
@@ -437,7 +437,7 @@ let mod = {
     USE_SUMMERTIME: true, // Please define isSummerTime in global.js to suit to your local summertime rules
     SPAWN_DEFENSE_ON_ATTACK: true, // This will attempt to store enough to have a defense and spawn troops when invaded.
     MANAGED_CONTAINER_TRIGGER: 0.25, // managed containers get filled below this relative energy amount and emptied when above 1-this value
-    ROUTE_ROOM_COST: { 'shard0':{'W58N36':99, 'W53N39': 99, 'W55N36': 99, 'W54N36': 99, 'W56N40': 99, 'W56N36': 99, 'W56N35': 99, 'W56N34': 99}}, // custom room routing cost: e.g. `{'shard0':{ 'W0N0':5, 'W4N4': 11 },'shard1':...}`. Affects bestSpawnRoomFor, Creep.Setup calculations, and travel cost predictions. Please call 'delete Memory.routeRange;' whenever you change this property.
+    ROUTE_ROOM_COST: { 'shard0':{'W58N36':99, 'W53N39': 99, 'W55N36': 99, 'W54N36': 99, 'W56N36': 99, 'W56N35': 99, 'W56N34': 99, 'W59N34': 99, 'W56N33': 99, 'W53N35': 99, 'W54N32': 99, 'W58N31': 99, 'W62N39': 99}}, // custom room routing cost: e.g. `{'shard0':{ 'W0N0':5, 'W4N4': 11 },'shard1':...}`. Affects bestSpawnRoomFor, Creep.Setup calculations, and travel cost predictions. Please call 'delete Memory.routeRange;' whenever you change this property.
     TRAVELLING_BORDER_RANGE: 22, // room arrival distance for travelling and routes
     NOTIFICATE_INVADER: true, // Also log common 'Invader' hostiles
     NOTIFICATE_INTRUDER: true, // Log any hostiles in your rooms
@@ -471,7 +471,7 @@ let mod = {
     REMOTE_WORKER_MULTIPLIER: 0, // Number of workers spawned per remote mining room.
     PLAYER_WHITELIST: ['SirLovi','IceDragon','Zolcsika'],
     // Don't attack. Must be a member of CCC for permanent whitelisting in git repository. But you can change your own copy... Please ask if you are interested in joining CCC :)
-    DEFENSE_BLACKLIST: [], // Don't defend those rooms (add room names). Blocks spawning via defense task (will not prevent offensive actions at all)
+    DEFENSE_BLACKLIST: ['W59N38'], // Don't defend those rooms (add room names). Blocks spawning via defense task (will not prevent offensive actions at all)
     CRITICAL_BUCKET_LEVEL: 0, // take action when the bucket drops below this value to prevent the bucket from actually running out
     CRITICAL_BUCKET_OVERFILL: 100, // Overfill the bucket by this amount before disabling CPU throttle, this can reduce thrashing because all creeps try to act at once
     CRITICAL_ROLES: [ 'worker', 'collapseWorker', 'melee', 'ranger', 'healer', 'miner', 'hauler', 'upgrader' ], // when the bucket drops below the critical bucket level only these creep roles will be executed

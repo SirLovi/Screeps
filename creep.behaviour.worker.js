@@ -11,8 +11,7 @@ mod.inflowActions = function(creep) {
         Creep.action.withdrawing,
         Creep.action.uncharging,
         Creep.action.harvesting,
-        Creep.action.reallocating,
-        Creep.action.pickingTombstones
+        Creep.action.reallocating
     ];
     if (creep.sum > creep.carry.energy) {
         priority.unshift(Creep.action.storing);
@@ -45,9 +44,7 @@ mod.outflowActions = function(creep) {
     } else {
         let priority = [
             Creep.action.repairing,
-            //Creep.action.building,
             Creep.action.feeding,
-            //Creep.action.upgrading,
             Creep.action.building,
             Creep.action.fueling,
             Creep.action.fortifying,

@@ -14,7 +14,7 @@
  *                                   determines it is stuck and repaths.
  *   reportThreshold:   integer    The mimimum CPU used on pathing to console.log() warnings on CPU usage. Defaults to 50
  *
- * Examples: let Traveler = require('Traveler')();
+ * Examples: var Traveler = require('Traveler')();
  *           require('util.traveler')({exportTraveler: false, installTraveler: false, installPrototype: true, defaultStuckValue: 2});
  */
 module.exports = function(globalOpts = {}){
@@ -249,11 +249,9 @@ module.exports = function(globalOpts = {}){
                     const route = ret.route && ret.route.length;
                     if (options.debug) {
                         if (options.range === 0) {
-                            global.logSystem(creep.room.name, `TRAVELER: incomplete path for ${creep.name} from ${creep.pos} to ${destPos}, destination may be blocked.`);
-                            // console.log(`TRAVELER: incomplete path for ${creep.name} from ${creep.pos} to ${destPos}, destination may be blocked.`);
+                            console.log(`TRAVELER: incomplete path for ${creep.name} from ${creep.pos} to ${destPos}, destination may be blocked.`);
                         } else {
-                            global.logSystem(creep.room.name, `TRAVELER: incomplete path for ${creep.name} from ${creep.pos} to ${destPos}, range ${options.range}. Route length ${route}.`);
-                            // console.log(`TRAVELER: incomplete path for ${creep.name} from ${creep.pos} to ${destPos}, range ${options.range}. Route length ${route}.`);
+                            console.log(`TRAVELER: incomplete path for ${creep.name} from ${creep.pos} to ${destPos}, range ${options.range}. Route length ${route}.`);
                         }
                     }
                     if (route > 1) {

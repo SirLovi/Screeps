@@ -45,7 +45,7 @@ mod.extend = function() {
     };
 
     Room.bestSpawnRoomFor = function(targetRoomName) {
-        let range = room => room.my ? routeRange(room.name, targetRoomName) : Infinity;
+        var range = room => room.my ? routeRange(room.name, targetRoomName) : Infinity;
         return _.min(Game.rooms, range);
     };
 

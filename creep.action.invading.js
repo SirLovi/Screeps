@@ -7,9 +7,9 @@ action.getFlaggedStructure = function(flagColor, pos){
     let flagsEntries = FlagDir.filter(flagColor, pos, true);
     let target = [];
     let checkFlag = flagEntry => {
-        let flag = Game.flags[flagEntry.name];
+        var flag = Game.flags[flagEntry.name];
         if( flag && flag.pos.roomName == pos.roomName && flag.room !== undefined ){ // room is visible
-            let targets = flag.room.lookForAt(LOOK_STRUCTURES, flag.pos.x, flag.pos.y);
+            var targets = flag.room.lookForAt(LOOK_STRUCTURES, flag.pos.x, flag.pos.y);
             if( targets && targets.length > 0){
                 addTarget = structure => {
                     structure.destroyFlag = flag;
@@ -27,13 +27,13 @@ action.getFlaggedStructure = function(flagColor, pos){
     return null;
 };
 action.newTarget = function(creep){
-    let destroy = this.getFlaggedStructure(FLAG_COLOR.destroy, creep.pos);
+    var destroy = this.getFlaggedStructure(FLAG_COLOR.destroy, creep.pos);
     if( destroy ) {
         if( destroy.destroyFlag ) Population.registerCreepFlag(creep, destroy.destroyFlag);
         return destroy;
     }
     // move to invasion room
-    let flag = FlagDir.find(FLAG_COLOR.invade, creep.pos, false);
+    var flag = FlagDir.find(FLAG_COLOR.invade, creep.pos, false);
     if( flag && (!flag.room || flag.pos.roomName != creep.pos.roomName)){
         Population.registerCreepFlag(creep, flag);
         return flag; // other room
@@ -48,7 +48,7 @@ action.newTarget = function(creep){
 
     if( !flag.room.controller || !flag.room.controller.my ) {
         //attack healer
-        let target = creep.pos.findClosestByRange(creep.room.hostiles, {
+        var target = creep.pos.findClosestByRange(creep.room.hostiles, {
             function(hostile){ return _.some(hostile.body, {'type': HEAL}); }
         });
         if( target )
@@ -115,13 +115,11 @@ action.run = {
             }
             creep.travelTo( creep.target );
         }
-        if( !creep.target.my ) {
-            // global.logSystem(creep.room.name, `${creep.name} ${global.json(creep.target)}`);
-            creep.attacking = creep.attack(creep.target) === OK;
-        }
+        if( !creep.target.my )
+            creep.attacking = creep.attack(creep.target) == OK;
     },
     ranger: function(creep){
-        let range = creep.pos.getRangeTo(creep.target);
+        var range = creep.pos.getRangeTo(creep.target);
         if( !creep.flee ){
             if( creep.target instanceof Flag ){
                 creep.travelTo( creep.target );
@@ -138,7 +136,7 @@ action.run = {
             }
         }
         // attack
-        let targets = creep.pos.findInRange(creep.room.hostiles, 3);
+        var targets = creep.pos.findInRange(creep.room.hostiles, 3);
         if(targets.length > 2) { // TODO: calc damage dealt
             if(global.CHATTY) creep.say('MassAttack');
             creep.attackingRanged = creep.rangedMassAttack() == OK;

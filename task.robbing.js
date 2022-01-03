@@ -1,6 +1,7 @@
 // This task will react on robbing flags (invade/rob or red/yellow), sending 2 creeps to rob that room
 let mod = {};
 module.exports = mod;
+mod.minControllerLevel = 4;
 mod.name = 'robbing';
 // hook into events
 mod.register = () => {};
@@ -27,8 +28,8 @@ mod.checkForRequiredCreeps = (flag) => {
     // count creeps assigned to task
     const count = memory.queued.length + memory.spawning.length + memory.running.length;
     const roomName = flag.pos.roomName;
-
-    // if creep count below requirement spawn a new creep creep
+    
+    // if creep count below requirement spawn a new creep creep 
     if( count < (memory.numRobbers || 2) ) {
         const spawnRoom = mod.strategies.robber.spawnRoom(roomName);
         if( !spawnRoom ) {
@@ -117,11 +118,11 @@ mod.handleCreepDied = name => {
 };
 // get task memory
 mod.memory = (flag) => {
-    if( !flag.memory.tasks )
+    if( !flag.memory.tasks ) 
         flag.memory.tasks = {};
     if( !flag.memory.tasks.robbing ) {
         flag.memory.tasks.robbing = {
-            queued: [],
+            queued: [], 
             spawning: [],
             running: [],
             numRobbers: 2
@@ -151,13 +152,11 @@ mod.nextAction = function(creep){
                 let target = creep.pos.findClosestByRange(deposit);
                 if (target.structureType === STRUCTURE_STORAGE && this.assignAction(creep, 'storing', target)) return;
                 else if (Creep.action.charging.assign(creep, target)) return;
-            } else if(Creep.action.dropping.assign(creep)){
-                return;
             } else {
-            //if( Creep.action.storing.assign(creep) ) return;
+            if( Creep.action.storing.assign(creep) ) return;
             if (Creep.action.charging.assign(creep)) return;
             if (!creep.room.ally && Creep.action.storing.assign(creep)) return;
-            Creep.behaviour.worker.nextAction.call(this, creep);
+            Creep.action.idle.assign(creep);
             return;
             }
         }
@@ -168,7 +167,7 @@ mod.nextAction = function(creep){
         else {
             // no new flag
             // behave as worker
-            Creep.behaviour.worker.nextAction.call(this, creep);
+            Creep.action.idle.assign(creep);
             return;
         }
     }
@@ -195,16 +194,16 @@ mod.nextAction = function(creep){
                 // energy available
                 else {
                     // harvesting or picking
-                    let actions = [
+                    var actions = [
                         Creep.action.withdrawing,
-                        Creep.action.dismantling,
-                        Creep.action.picking,
+                        //Creep.action.dismantling,
+                        //Creep.action.picking,
                         Creep.action.robbing,
-                        Creep.action.harvesting
+                        //Creep.action.harvesting
                     ];
                     // TODO: Add extracting (if extractor present) ?
-                    for(let iAction = 0; iAction < actions.length; iAction++) {
-                        let action = actions[iAction];
+                    for(var iAction = 0; iAction < actions.length; iAction++) {
+                        var action = actions[iAction];
                         if(action.isValidAction(creep) &&
                             action.isAddableAction(creep) &&
                             action.assign(creep))
@@ -219,9 +218,9 @@ mod.nextAction = function(creep){
             // carrier full
             else {
                 if(PRIVATEERS_BUILD){
-                    let actions = [Creep.action.building];
-                    for(let iAction = 0; iAction < actions.length; iAction++) {
-                        let action = actions[iAction];
+                    var actions = [Creep.action.building];
+                    for(var iAction = 0; iAction < actions.length; iAction++) {
+                        var action = actions[iAction];
                         if(action.isValidAction(creep) &&
                             action.isAddableAction(creep) &&
                             action.assign(creep))
@@ -248,7 +247,7 @@ mod.exploitNextRoom = function(creep){
         let validColor = flagEntry => (
             Flag.compare(flagEntry, FLAG_COLOR.invade.exploit) || Flag.compare(flagEntry, FLAG_COLOR.invade.robbing)
         );
-        let flag = FlagDir.find(validColor, new RoomPosition(25, 25, creep.data.homeRoom), false, FlagDir.exploitMod, creep.name);
+        let flag = FlagDir.find(FLAG_COLOR.invade.robbing, new RoomPosition(25, 25, creep.data.homeRoom), false, FlagDir.exploitMod, creep.name);
         // new flag found
         if( flag ) {
             // travelling
@@ -304,8 +303,8 @@ mod.creep = {
     robbing: {
         fixedBody: [],
         multiBody: [CARRY, MOVE],
-        name: "robber",
-        behaviour: "privateer",
+        name: "robber", 
+        behaviour: "privateer", 
         queue: 'Low'
     },
 };
