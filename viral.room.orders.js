@@ -329,8 +329,8 @@ mod.extend = function () {
 		// 	this.memory.resources.powerSpawn = [];
 		// if (this.memory.resources.nuker === undefined)
 		// 	this.memory.resources.nuker = [];
-        
-		if (!this.memory.[container.structureType].find((s) => s.id === containerId)) {
+
+		if (!this.memory.resources[container.structureType].find((s) => s.id === containerId)) {
 			this.memory.resources[container.structureType].push(container.structureType === STRUCTURE_LAB ? {
 				id: containerId,
 				orders: [],
@@ -612,52 +612,91 @@ mod.extend = function () {
 		return OK;
 	};
 
-	Room.prototype.terminalBroker = function () {
-
+	Room.prototype.transferEnergy = function () {
 		global.logSystem(this.name, `TERMINAL BROKER FOR: ${this.name}`);
-
 
 		if (this.terminal.cooldown && this.terminal.cooldown > 0)
 			return;
 
-		// let that = this;
+		let that = this;
 		let transacting = false;
 
 
-		let charge = global.Util.chargeScale(this.storage.store.energy - global.ENERGY_BALANCE_TRANSFER_AMOUNT,
+		let offerRoomCharge = global.Util.chargeScale(this.storage.store.energy - global.ENERGY_BALANCE_TRANSFER_AMOUNT,
 			global.MIN_STORAGE_ENERGY[this.controller.level],
 			global.MAX_STORAGE_ENERGY[this.controller.level]);
 
-		global.logSystem(this.name, `energy stored: ${this.storage.store.energy} chargeScale: ${global.round(charge, 3)}`);
+		global.logSystem(this.name, `energy stored: ${this.storage.store.energy} chargeScale: ${global.round(offerRoomCharge, 3)}`);
 
-		if (this.controller.level === 8 && charge > 1 && this.terminal.store.energy > global.ENERGY_BALANCE_TRANSFER_AMOUNT * 1.1) {
+		if (this.controller.level === 8 && offerRoomCharge > 1 && this.terminal.store.energy > global.ENERGY_BALANCE_TRANSFER_AMOUNT * 1.1) {
 
 			global.logSystem(this.name, `can transfer energy`);
 
 			let requiresEnergy = room => (
-				room.terminal.store.getCapacity() * global.TARGET_STORAGE_SUM_RATIO > room.terminal.sum + global.ENERGY_BALANCE_TRANSFER_AMOUNT &&
-				room.storage.store.getCapacity() * global.TARGET_STORAGE_SUM_RATIO > room.storage.sum + global.ENERGY_BALANCE_TRANSFER_AMOUNT &&
-				!room._isReceivingEnergy &&
-				room.storage.store[RESOURCE_ENERGY] < global.MAX_STORAGE_ENERGY[room.controller.level] + global.TERMINAL_ENERGY - room.terminal.store.energy
+				global.terminalCapacity * global.TARGET_STORAGE_SUM_RATIO > room.terminal.sum + global.ENERGY_BALANCE_TRANSFER_AMOUNT
+				&& global.storageCapacity * global.TARGET_STORAGE_SUM_RATIO > room.storage.sum + global.ENERGY_BALANCE_TRANSFER_AMOUNT
+				&& !room._isReceivingEnergy
+				&& room.storage.store.energy < global.MAX_STORAGE_ENERGY[room.controller.level]
 			);
 
-			let targetRoom = _.min(_.filter(global.acceptedRooms, requiresEnergy), 'storage.store.energy');
+			let targetRooms = _.filter(global.acceptedRooms, requiresEnergy);
 
-			if (targetRoom instanceof Room
-				&& Game.market.calcTransactionCost(global.ENERGY_BALANCE_TRANSFER_AMOUNT, this.name, targetRoom.name) < (this.terminal.store.energy - global.ENERGY_BALANCE_TRANSFER_AMOUNT)) {
-				global.logSystem(this.name, `TARGET_ROOM: ${targetRoom.name}`);
-				targetRoom._isReceivingEnergy = true;
-				let response = this.terminal.send('energy', global.ENERGY_BALANCE_TRANSFER_AMOUNT, targetRoom.name, 'have fun');
-				if (global.DEBUG)
-					global.logSystem(this.name, `Transferring ${global.Util.formatNumber(global.ENERGY_BALANCE_TRANSFER_AMOUNT)} energy to ${targetRoom.name}: ${global.translateErrorCode(response)}`);
-				transacting = response === OK;
+			for (const targetRoom of targetRooms)
+				console.log(`targetRooms: ${targetRoom.name} ${targetRoom.storage.store.energy}`);
+
+			let targetRoom = _.min(targetRooms, 'storage.store.energy');
+
+			if (targetRoom instanceof Room) {
+
+				global.logSystem(targetRoom.name, `TARGET_ROOM: ${targetRoom.name} storage: ${targetRoom.storage.store.energy} terminal: ${targetRoom.terminal.store.energy}`);
+
+				let transAction = function () {
+
+					targetRoom._isReceivingEnergy = true;
+
+					if (global.TERMINAL_BROKER_TRANSFER_ENERGY) {
+						let response = that.terminal.send('energy', transactionAmount, targetRoom.name, 'have fun');
+
+						if (global.DEBUG)
+							global.logSystem(that.name, `Transferring ${global.Util.formatNumber(transactionAmount)} energy to ${targetRoom.name} ${targetRoomCharge}: ${global.translateErrorCode(response)}`);
+
+						transacting = response === OK;
+
+					} else {
+						console.log(`TERMINAL_BROKER_TRANSFER_ENERGY: ${global.TERMINAL_BROKER_TRANSFER_ENERGY}`);
+						if (global.DEBUG)
+							global.logSystem(that.name, `CAN Transferring ${global.Util.formatNumber(transactionAmount)} energy to ${targetRoom.name} ${targetRoomCharge}`);
+
+					}
+				};
+
+				let transactionCost = Game.market.calcTransactionCost(global.ENERGY_BALANCE_TRANSFER_AMOUNT, this.name, targetRoom.name);
+				let transactionAmount = global.ENERGY_BALANCE_TRANSFER_AMOUNT;
+
+				let targetRoomCharge = global.Util.chargeScale(targetRoom.storage.store.energy - global.ENERGY_BALANCE_TRANSFER_AMOUNT,
+					global.MIN_STORAGE_ENERGY[targetRoom.controller.level],
+					global.MAX_STORAGE_ENERGY[targetRoom.controller.level]);
+
+				if (targetRoomCharge < 0.5 && transactionCost > (this.terminal.store.energy - global.ENERGY_BALANCE_TRANSFER_AMOUNT)) {
+					transactionAmount = global.changeAmount(this.name, targetRoom.name, global.ENERGY_BALANCE_TRANSFER_AMOUNT, this.terminal.store.energy, true);
+					transAction();
+				} else if (transactionCost < (this.terminal.store.energy - global.ENERGY_BALANCE_TRANSFER_AMOUNT))
+					transAction();
+
+
 			} else {
 				global.logSystem(this.name, `NO ENERGY TRANSFER`);
 			}
 		}
 
+		global.logSystem(this.name, `transacting: ${transacting}`);
+
+		return transacting;
+	};
+
+	Room.prototype.sellMineral = function () {
 		// we want to sell
-		if ((this.controller.level === 8 || global.MARKET_SELL_NOT_RCL8_ROOMS) && !transacting && global.TERMINAL_BROKER_SELL) {
+		if ((this.controller.level === 8 || global.MARKET_SELL_NOT_RCL8_ROOMS) && global.TERMINAL_BROKER_SELL) {
 
 			for (const mineral in this.terminal.store) {
 
@@ -681,7 +720,10 @@ mod.extend = function () {
 						sell = true;
 				}
 
-				let terminalStored = global.round(((this.terminal.store[mineral] || 0) - (this.resourcesOffers[mineral] || 0) - (this.resourcesReactions[mineral] || 0)) * global.TARGET_STORAGE_SUM_RATIO);
+				let terminalStored = global.round((this.terminal.store[mineral] || 0) - (this.resourcesOffers[mineral] || 0) - (this.resourcesReactions[mineral] || 0));
+
+				if (mineral === 'energy')
+					terminalStored = _.min([terminalStored, global.ENERGY_BALANCE_TRANSFER_AMOUNT]);
 
 				if (terminalStored > global.MIN_OFFER_AMOUNT && sell) {
 
@@ -711,6 +753,13 @@ mod.extend = function () {
 				}
 			}
 		}
+	};
+
+	Room.prototype.terminalBroker = function () {
+
+		if (!this.transferEnergy())
+			this.sellMineral();
+
 	};
 
 	Room.prototype.terminalOrderToSell = function () {

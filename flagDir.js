@@ -144,12 +144,12 @@ mod.rangeMod = function (range, flagItem, args) {
 	return range + (crowd * rangeModPerCrowd);
 };
 mod.exploitMod = function (range, flagItem, creepName) {
-	if (range > 100) return Infinity;
+	if (range > 1000) return Infinity;
 	let flag = Game.flags[flagItem.name];
 	if (flag.room) {
-		if (flag.room.my) {
+		/*if (flag.room.my) {
 			return Infinity;
-		}
+		}*/
 		let assigned = flag.targetOf ? _.sum(flag.targetOf.map(t => t.creepType != 'privateer' || t.creepName == creepName ? 0 : t.carryCapacityLeft)) : 0;
 		if (flag.room.sourceEnergyAvailable <= assigned) return Infinity;
 		return (range * range) / (flag.room.sourceEnergyAvailable - assigned);

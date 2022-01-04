@@ -20,6 +20,8 @@ removeRoomConstructionFlags('W41N36');
 
 removeRoomRoadFlags('W59N38');
 
+removeConstructionSites('W59N38');
+
 _.forEach((Game.rooms["W54N38"].find(FIND_CREEPS)), s => s.suicide());
 _.forEach((Game.rooms["W5S53"].find(FIND_STRUCTURES, {filter: (i) => i.structureType == STRUCTURE_WALL })), s => s.destroy());
 

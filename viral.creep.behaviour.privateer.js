@@ -210,6 +210,9 @@ mod.exploitNextRoom = function(creep){
         let validColor = flagEntry => (
             Flag.compare(flagEntry, FLAG_COLOR.invade.exploit) || Flag.compare(flagEntry, FLAG_COLOR.invade.robbing)
         );
+
+        global.logSystem(creep.room.name, `BEHAVIOUR VALID COLOR: ${validColor}`);
+
         let flag = FlagDir.find(validColor, new RoomPosition(25, 25, creep.data.homeRoom), false, FlagDir.exploitMod, creep.name);
         // new flag found
         if( flag ) {

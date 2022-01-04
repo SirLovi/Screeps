@@ -90,36 +90,6 @@ viralUtil.resetBoostProduction = function (roomName) {
 
 				data.offers = [];
 				data.orders = [];
-				
-				if (_.isUndefined(room.memory.resources.terminal) || room.memory.resources.terminal.length === 0) {
-				    room.memory.resources.terminal = [];
-				    room.memory.resources.terminal.push({
-						id: room.terminal.id,
-						orders: []
-				    }
-				    );
-                }
-                    
-                if (_.isUndefined(room.memory.resources.storage) || room.memory.resources.storage.length === 0) {
-				    room.memory.resources.storage = [];
-				    room.memory.resources.storage.push({
-						id: room.storage.id,
-						orders: []
-				    }
-				    );
-                }
-                
-                if (_.isUndefined(room.memory.resources.container)) {
-				    room.memory.resources.container = [];
-                }
-                    
-                if (_.isUndefined(room.memory.resources.lab)) {
-				    room.memory.resources.lab = [];
-                }
-                    
-                if (_.isUndefined(room.memory.resources.reactions)) {
-				    room.memory.resources.reactions = {};
-                }
 
 				if (data.terminal[0])
 					data.terminal[0].orders = [];
@@ -139,7 +109,7 @@ viralUtil.resetBoostProduction = function (roomName) {
 
 
 				data.boostTiming = {};
-				//delete data.seedCheck;
+				// delete data.seedCheck;
 			} else
 				console.log(`${room.name} has no memory.resources`);
 		}
@@ -330,7 +300,6 @@ viralUtil.terminalBroker = function (roomName = undefined) {
 
 	if (_.isUndefined(roomName)) {
 		for (let room of myRooms) {
-			console.log(`util at ${room.name}`);
 			room.terminalBroker();
 		}
 	} else
@@ -500,7 +469,7 @@ viralUtil.cancelMarket = function (mineral) {
 
 viralUtil.look = function (x, y) {
 
-	let pos = new RoomPosition(x, y, 'W57N37'),
+	let pos = new RoomPosition(x, y, 'E25S21'),
 		objects = pos.look(),
 		noObstacle = !_.some(objects, object => {
 
@@ -913,34 +882,68 @@ viralUtil.freeSpace = (roomName) => {
 viralUtil.requiresEnergyRoom = () => {
 
 	for (let roomFrom of global.acceptedRooms) {
+		let transacting = false;
 
-		let charge = global.Util.chargeScale(roomFrom.storage.store.energy - global.ENERGY_BALANCE_TRANSFER_AMOUNT,
+		let offerRoomCharge = global.Util.chargeScale(roomFrom.storage.store.energy - global.ENERGY_BALANCE_TRANSFER_AMOUNT,
 			global.MIN_STORAGE_ENERGY[roomFrom.controller.level],
 			global.MAX_STORAGE_ENERGY[roomFrom.controller.level]);
 
-		global.logSystem(roomFrom.name, `stored: ${roomFrom.storage.store.energy} chargeScale: ${charge}`);
+		global.logSystem(roomFrom.name, `stored: ${roomFrom.storage.store.energy} chargeScale: ${offerRoomCharge}`);
 
-		let transacting = false;
+		if (roomFrom.controller.level === 8 && !transacting && offerRoomCharge > 0.8 && roomFrom.terminal.store.energy > global.ENERGY_BALANCE_TRANSFER_AMOUNT * 1.1) {
 
-		if (roomFrom.controller.level === 8 && !transacting && charge > 1 && roomFrom.terminal.store.energy > global.ENERGY_BALANCE_TRANSFER_AMOUNT * 1.1) {
+			global.logSystem(offerRoomCharge.name, `can transfer energy`);
 
 			let requiresEnergy = room => (
-				// room.my && room.storage && room.terminal &&
-				// room.terminal.sum < room.terminal.store.getCapacity() * global.TARGET_STORAGE_SUM_RATIO - global.ENERGY_BALANCE_TRANSFER_AMOUNT &&
-				// room.storage.sum < room.storage.store.getCapacity() * global.TARGET_STORAGE_SUM_RATIO - global.ENERGY_BALANCE_TRANSFER_AMOUNT &&
-				room.terminal.store.getCapacity() * global.TARGET_STORAGE_SUM_RATIO > room.terminal.sum + global.ENERGY_BALANCE_TRANSFER_AMOUNT &&
-				room.storage.store.getCapacity() * global.TARGET_STORAGE_SUM_RATIO > room.storage.sum + global.ENERGY_BALANCE_TRANSFER_AMOUNT &&
-				!room._isReceivingEnergy &&
-				room.storage.store[RESOURCE_ENERGY] < global.MAX_STORAGE_ENERGY[room.controller.level]
+				room.terminal.store.getCapacity() * global.TARGET_STORAGE_SUM_RATIO > room.terminal.sum + global.ENERGY_BALANCE_TRANSFER_AMOUNT
+				&& room.storage.store.getCapacity() * global.TARGET_STORAGE_SUM_RATIO > room.storage.sum + global.ENERGY_BALANCE_TRANSFER_AMOUNT
+				&& !room._isReceivingEnergy && room.name !== roomFrom.name
+				&& room.storage.store[RESOURCE_ENERGY] < global.MAX_STORAGE_ENERGY[room.controller.level] + global.TERMINAL_ENERGY - room.terminal.store.energy
 			);
 
-			let roomTo = _.min(_.filter(global.acceptedRooms, requiresEnergy), 'storage.store.energy');
+			let targetRooms = _.filter(acceptedRooms, requiresEnergy);
 
-			if (roomTo instanceof Room
-				&& Game.market.calcTransactionCost(global.ENERGY_BALANCE_TRANSFER_AMOUNT, roomFrom.name, roomTo.name) < (roomFrom.terminal.store.energy - global.ENERGY_BALANCE_TRANSFER_AMOUNT)) {
+			for (const targetRoom of targetRooms) {
+				console.log(`targetRooms: ${targetRoom.name} ${targetRoom.storage.store.energy}`);
+			}
 
-				global.logSystem(roomFrom.name, `transfer from ${roomFrom.name} stored ${roomFrom.storage.store['energy']} to ${roomTo.name} stored ${roomTo.storage.store['energy']} is POSSIBLE`);
 
+			let targetRoom = _.min(targetRooms, 'storage.store.energy');
+
+			console.log(`targetRoom: ${global.json(targetRoom)}`);
+
+			if (targetRoom instanceof Room) {
+
+				let transAction = function() {
+					global.logSystem(roomFrom.name, `TARGET_ROOM: ${targetRoom.name}`);
+
+					targetRoom._isReceivingEnergy = true;
+
+					// let response = that.terminal.send('energy', transactionAmount, targetRoom.name, 'have fun');
+
+					if (global.DEBUG)
+						global.logSystem(roomFrom.name, `Transferring ${global.Util.formatNumber(transactionAmount)} energy to ${targetRoom.name} ${targetRoomCharge}`);
+
+					transacting = true;
+				};
+
+				let transactionCost = Game.market.calcTransactionCost(global.ENERGY_BALANCE_TRANSFER_AMOUNT, roomFrom.name, targetRoom.name);
+				let transactionAmount = global.ENERGY_BALANCE_TRANSFER_AMOUNT;
+
+				let targetRoomCharge = global.Util.chargeScale(targetRoom.storage.store.energy - global.ENERGY_BALANCE_TRANSFER_AMOUNT,
+					global.MIN_STORAGE_ENERGY[targetRoom.controller.level],
+					global.MAX_STORAGE_ENERGY[targetRoom.controller.level]);
+
+				if (targetRoomCharge < 0.5 && transactionCost > (roomFrom.terminal.store.energy - global.ENERGY_BALANCE_TRANSFER_AMOUNT)) {
+					transactionAmount = global.changeAmount(roomFrom.name, targetRoom.name, global.ENERGY_BALANCE_TRANSFER_AMOUNT, roomFrom.terminal.store.energy, true);
+					transAction();
+				}
+				else if (transactionCost < (roomFrom.terminal.store.energy - global.ENERGY_BALANCE_TRANSFER_AMOUNT)) {
+					transAction();
+				}
+
+			} else {
+				global.logSystem(roomFrom.name, `NO ENERGY TRANSFER`);
 			}
 		}
 	}
@@ -956,6 +959,36 @@ viralUtil.energyCalc = (amount, distance) => {
 
 };
 
+viralUtil.requiresEnergy = (roomName) => {
+
+	let room = Game.rooms[roomName];
+
+	let requiresEnergy = room => (
+		room.terminal.store.getCapacity() * global.TARGET_STORAGE_SUM_RATIO > room.terminal.sum + global.ENERGY_BALANCE_TRANSFER_AMOUNT
+		&& room.storage.store.getCapacity() * global.TARGET_STORAGE_SUM_RATIO > room.storage.sum + global.ENERGY_BALANCE_TRANSFER_AMOUNT
+		&& !room._isReceivingEnergy
+		&& room.storage.store.energy < global.MAX_STORAGE_ENERGY[room.controller.level]
+	);
+
+	console.log(`${room.terminal.store.getCapacity() * global.TARGET_STORAGE_SUM_RATIO > room.terminal.sum + global.ENERGY_BALANCE_TRANSFER_AMOUNT}`);
+	console.log(`${room.storage.store.getCapacity() * global.TARGET_STORAGE_SUM_RATIO > room.storage.sum + global.ENERGY_BALANCE_TRANSFER_AMOUNT}`);
+	console.log(`${!room._isReceivingEnergy}`);
+	console.log(`${room.storage.store.energy < global.MAX_STORAGE_ENERGY[room.controller.level]}`);
+
+	let targetRooms = _.filter(acceptedRooms, requiresEnergy);
+
+	for (const targetRoom of targetRooms)
+		console.log(`targetRooms: ${targetRoom.name} ${targetRoom.storage.store.energy}`);
+
+	let targetRoom = _.min(targetRooms, 'storage.store.energy');
+	if (targetRoom instanceof Room)
+		console.log(`TARGET ROOM: ${targetRoom.name}`);
+	else
+		console.log(`NO TRANSFER`);
+};
+
+
+// HERE comes room.memory.resources
 
 /*
 Orders[

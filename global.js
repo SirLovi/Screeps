@@ -266,6 +266,7 @@ mod.dye = function (style, text) {
 // predefined log colors
 mod.CRAYON = {
 	death: {color: 'black', 'font-weight': 'bold'},
+	ordersCheck: {color: '#0095b6', 'font-weight': 'bold'},
 	birth: '#e6de99',
 	error: '#e79da7',
 	system: {color: '#999', 'font-size': '10px'},
@@ -299,6 +300,82 @@ mod.removeConstructionFlags = function () {
 		flag.remove();
 	}
 	return `Removed ${removeFlags.length} construction flags.`;
+};
+mod.runAutobahn = function(roomName, roomsParsed) {
+        
+        autobahn = Autobahn;
+        
+        // Use a flag as the start point
+        let start = Game.flags['START'];
+
+        // Create an array of energy sources to use as the destinations
+        let destinations = Game.rooms[roomName].find(FIND_SOURCES);
+        
+        // Allow autobahn to path in these three rooms
+        //let options = {roomFilter: (roomName) => roomName.startsWith('W34')};
+        let options = {roomFilter: roomsParsed};
+
+        // Run autobahn
+        let network = autobahn(start, destinations, options);
+
+        // Build the road network
+        for (let i = 0; i < network.length; i++) {
+	        let pos = network[i];
+	        //Game.rooms[pos.roomName].createConstructionSite(pos, STRUCTURE_ROAD);
+	        if((pos.lookFor(LOOK_FLAGS).length == 0) && (pos.lookFor(LOOK_CONSTRUCTION_SITES).length == 0) && (pos.lookFor(LOOK_STRUCTURES).length == 0)){
+			    pos.newFlag(FLAG_COLOR.command.road);
+	        }
+        }
+};
+mod.runAutobahnFlagEnd = function() {
+        
+        autobahn = Autobahn;
+        
+        // Use a flag as the start point
+        let start = Game.flags['START'];
+
+        // Create an array of energy sources to use as the destinations
+        let destinations = [Game.flags['END']];
+        
+        // Allow autobahn to path in these three rooms
+        //let options = {roomFilter: (roomName) => roomName.startsWith('W34')};
+        let options = {roomFilter: ['W59N39', 'W58N39']};
+
+        // Run autobahn
+        let network = autobahn(start, destinations, options);
+
+        // Build the road network
+        for (let i = 0; i < network.length; i++) {
+	        let pos = network[i];
+	        //Game.rooms[pos.roomName].createConstructionSite(pos, STRUCTURE_ROAD);
+	        if((pos.lookFor(LOOK_FLAGS).length == 0) && (pos.lookFor(LOOK_CONSTRUCTION_SITES).length == 0) && (pos.lookFor(LOOK_STRUCTURES).length == 0)){
+			    pos.newFlag(FLAG_COLOR.command.road);
+	        }
+        }
+};
+mod.removeRoomRoadFlags = function (roomName) {
+    let room = Game.rooms[roomName];
+    let removeFlags = _.filter(room.find(FIND_FLAGS), flag => flag.color == COLOR_WHITE || flag.secondaryColor == COLOR_WHITE);
+    for (let flag of removeFlags) {
+        flag.remove();
+    }
+    return `Removed ${removeFlags.length} road flags.`;
+};
+mod.removeRoomConstructionFlags = function (roomName) {
+    let room = Game.rooms[roomName];
+    let removeFlags = _.filter(room.find(FIND_FLAGS), flag => flag.color == COLOR_CYAN || flag.color == COLOR_WHITE);
+    for (let flag of removeFlags) {
+        flag.remove();
+    }
+    return `Removed ${removeFlags.length} construction flags.`;
+};
+mod.removeConstructionSites = function (roomName) {
+	let room = Game.rooms[roomName];
+    let removeSites = room.find(FIND_CONSTRUCTION_SITES);
+    for (let site of removeSites) {
+        site.remove();
+    }
+    return `Removed ${removeSites.length} construction sites.`;
 };
 mod.listConstructionSites = function (filter) {
 	let msg = `${_.keys(Game.constructionSites).length} construction sites currently present: `;

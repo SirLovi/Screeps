@@ -218,12 +218,19 @@ mod.nextAction = function (creep) {
         if (carrySum > 0) {
             let deposit = []; // deposit energy in...
             // links?
-            if (creep.carry.energy === carrySum) deposit = creep.room.structures.links.privateers;
+            if (creep.carry.energy === carrySum)
+                deposit = creep.room.structures.links.privateers;
             // storage?
-            if (creep.room.storage) deposit.push(creep.room.storage);
+            if (creep.room.storage)
+                deposit.push(creep.room.storage);
             // containers?
-            if (creep.room.structures.container) deposit = deposit.concat(creep.room.structures.container.privateers);
+            if (creep.room.structures.container)
+                deposit = deposit.concat(creep.room.structures.container.privateers);
             // Choose the closest
+
+
+            console.log(`DEPOSIT: ${deposit}`);
+
             deposit = _(deposit).filter({'my': true});
             if (deposit.length > 0) {
                 let target = creep.pos.findClosestByRange(deposit);
@@ -330,9 +337,17 @@ mod.exploitNextRoom = function (creep) {
         let validColor = flagEntry => (
             Flag.compare(flagEntry, FLAG_COLOR.invade.exploit) || Flag.compare(flagEntry, FLAG_COLOR.invade.robbing)
         );
+
+
+
+        // let flag = FlagDir.find(FLAG_COLOR.invade.robbing, new RoomPosition(25, 25, creep.data.homeRoom), false, FlagDir.exploitMod, creep.name);
         let flag = FlagDir.find(validColor, new RoomPosition(25, 25, creep.data.homeRoom), false, FlagDir.exploitMod, creep.name);
+
+        // global.logSystem(creep.room.name, `FLAG: ${flag.name}`);
+
         // new flag found
         if (flag) {
+            global.logSystem(creep.room.name, `TRAVELLING: ${flag.name}`);
             // travelling
             if (Creep.action.travelling.assignRoom(creep, flag.pos.roomName)) {
                 Population.registerCreepFlag(creep, flag);
