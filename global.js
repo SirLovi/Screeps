@@ -266,7 +266,6 @@ mod.dye = function (style, text) {
 // predefined log colors
 mod.CRAYON = {
 	death: {color: 'black', 'font-weight': 'bold'},
-	ordersCheck: {color: '#0095b6', 'font-weight': 'bold'},
 	birth: '#e6de99',
 	error: '#e79da7',
 	system: {color: '#999', 'font-size': '10px'},
@@ -300,82 +299,6 @@ mod.removeConstructionFlags = function () {
 		flag.remove();
 	}
 	return `Removed ${removeFlags.length} construction flags.`;
-};
-mod.runAutobahn = function(roomName, roomsParsed) {
-        
-        autobahn = Autobahn;
-        
-        // Use a flag as the start point
-        let start = Game.flags['START'];
-
-        // Create an array of energy sources to use as the destinations
-        let destinations = Game.rooms[roomName].find(FIND_SOURCES);
-        
-        // Allow autobahn to path in these three rooms
-        //let options = {roomFilter: (roomName) => roomName.startsWith('W34')};
-        let options = {roomFilter: roomsParsed};
-
-        // Run autobahn
-        let network = autobahn(start, destinations, options);
-
-        // Build the road network
-        for (let i = 0; i < network.length; i++) {
-	        let pos = network[i];
-	        //Game.rooms[pos.roomName].createConstructionSite(pos, STRUCTURE_ROAD);
-	        if((pos.lookFor(LOOK_FLAGS).length == 0) && (pos.lookFor(LOOK_CONSTRUCTION_SITES).length == 0) && (pos.lookFor(LOOK_STRUCTURES).length == 0)){
-			    pos.newFlag(FLAG_COLOR.command.road);
-	        }
-        }
-};
-mod.runAutobahnFlagEnd = function() {
-        
-        autobahn = Autobahn;
-        
-        // Use a flag as the start point
-        let start = Game.flags['START'];
-
-        // Create an array of energy sources to use as the destinations
-        let destinations = [Game.flags['END']];
-        
-        // Allow autobahn to path in these three rooms
-        //let options = {roomFilter: (roomName) => roomName.startsWith('W34')};
-        let options = {roomFilter: ['W59N39', 'W58N39']};
-
-        // Run autobahn
-        let network = autobahn(start, destinations, options);
-
-        // Build the road network
-        for (let i = 0; i < network.length; i++) {
-	        let pos = network[i];
-	        //Game.rooms[pos.roomName].createConstructionSite(pos, STRUCTURE_ROAD);
-	        if((pos.lookFor(LOOK_FLAGS).length == 0) && (pos.lookFor(LOOK_CONSTRUCTION_SITES).length == 0) && (pos.lookFor(LOOK_STRUCTURES).length == 0)){
-			    pos.newFlag(FLAG_COLOR.command.road);
-	        }
-        }
-};
-mod.removeRoomRoadFlags = function (roomName) {
-    let room = Game.rooms[roomName];
-    let removeFlags = _.filter(room.find(FIND_FLAGS), flag => flag.color == COLOR_WHITE || flag.secondaryColor == COLOR_WHITE);
-    for (let flag of removeFlags) {
-        flag.remove();
-    }
-    return `Removed ${removeFlags.length} road flags.`;
-};
-mod.removeRoomConstructionFlags = function (roomName) {
-    let room = Game.rooms[roomName];
-    let removeFlags = _.filter(room.find(FIND_FLAGS), flag => flag.color == COLOR_CYAN || flag.color == COLOR_WHITE);
-    for (let flag of removeFlags) {
-        flag.remove();
-    }
-    return `Removed ${removeFlags.length} construction flags.`;
-};
-mod.removeConstructionSites = function (roomName) {
-	let room = Game.rooms[roomName];
-    let removeSites = room.find(FIND_CONSTRUCTION_SITES);
-    for (let site of removeSites) {
-        site.remove();
-    }
-    return `Removed ${removeSites.length} construction sites.`;
 };
 mod.listConstructionSites = function (filter) {
 	let msg = `${_.keys(Game.constructionSites).length} construction sites currently present: `;
@@ -804,8 +727,12 @@ mod.marketOrders = function (roomName, mineral, orderType, type) {
 		if (_.isUndefined(Memory.marketOrders[type][mineral])) {
 			Memory.marketOrders[type][mineral] = {};
 			Memory.marketOrders[type][mineral].orders = Game.market.getAllOrders({resourceType: mineral, type: orderType});
-			if (mineral === 'energy')
+			if (mineral === 'energy') {
+				Memory.marketOrders[type][mineral].orders = _.filter(Memory.marketOrders[type][mineral].orders, order => {
+					return order.price > 0.05;
+				});
 				avgPrice(Memory.marketOrders[type][mineral], mineral, type);
+			}
 
 		}
 
@@ -823,6 +750,19 @@ mod.marketOrders = function (roomName, mineral, orderType, type) {
 	}
 };
 
+mod.changeAmount = function (roomFrom, roomTo, amount, terminalEnergy, sellEnergy = false) {
+	let distance = Game.map.getRoomLinearDistance(roomFrom, roomTo, true);
+
+	if (sellEnergy) {
+		let euler = Math.exp(distance / 30);
+		return Math.floor((amount * euler) / (2 * euler - 1));
+
+	} else {
+		let euler = 1 - Math.exp(-distance / 30);
+		return Math.floor((terminalEnergy * global.TARGET_STORAGE_SUM_RATIO) / euler);
+	}
+};
+
 mod.selectOrders = function (roomName, type, amount, mineral) {
 
 	let room = Game.rooms[roomName],
@@ -835,7 +775,7 @@ mod.selectOrders = function (roomName, type, amount, mineral) {
 		isFreeSpace;
 
 	if (room.storage.store[RESOURCE_ENERGY] < global.MAX_STORAGE_ENERGY[room.controller.level])
-		isTerminalFreeSpace = terminalSum < (global.terminalCapacity * global.TARGET_STORAGE_SUM_RATIO) - global.ENERGY_BALANCE_TRANSFER_AMOUNT;
+		isTerminalFreeSpace = terminalSum < global.terminalCapacity * global.TARGET_STORAGE_SUM_RATIO - global.ENERGY_BALANCE_TRANSFER_AMOUNT;
 	else
 		isTerminalFreeSpace = terminalSum < global.terminalCapacity * global.TARGET_STORAGE_SUM_RATIO;
 
@@ -846,26 +786,23 @@ mod.selectOrders = function (roomName, type, amount, mineral) {
 
 	return _.filter(Memory.marketOrders[type][mineral].orders, o => {
 
-		if (o.amount <= 0)
-			return false;
-
 		// we can`t afford min amount
-		let changeAmount = function (sellEnergy = false) {
-
-			let distance = Game.map.getRoomLinearDistance(roomName, o.roomName, true);
-
-			if (sellEnergy) {
-				let euler = Math.exp(distance / 30);
-				o.transactionAmount = Math.floor((amount * euler) / (2 * euler - 1));
-
-			} else {
-				let euler = 1 - Math.exp(-distance / 30);
-				o.transactionAmount = Math.floor((terminalEnergy * global.TARGET_STORAGE_SUM_RATIO) / euler);
-			}
-
-			o.transactionCost = Game.market.calcTransactionCost(o.transactionAmount, o.roomName, roomName);
-			o.credits = o.transactionAmount * o.price;
-		};
+		// let changeAmount = function (sellEnergy = false) {
+		//
+		// 	let distance = Game.map.getRoomLinearDistance(roomName, o.roomName, true);
+		//
+		// 	if (sellEnergy) {
+		// 		let euler = Math.exp(distance / 30);
+		// 		o.transactionAmount = Math.floor((amount * euler) / (2 * euler - 1));
+		//
+		// 	} else {
+		// 		let euler = 1 - Math.exp(-distance / 30);
+		// 		o.transactionAmount = Math.floor((terminalEnergy * global.TARGET_STORAGE_SUM_RATIO) / euler);
+		// 	}
+		//
+		// 	o.transactionCost = Game.market.calcTransactionCost(o.transactionAmount, o.roomName, roomName);
+		// 	o.credits = o.transactionAmount * o.price;
+		// };
 
 		// we want to buy
 		let sellOrders = function () {
@@ -889,8 +826,11 @@ mod.selectOrders = function (roomName, type, amount, mineral) {
 			}
 
 			// can not afford by TRANSACTION COST, try max possible amount
-			if (o.transactionCost > terminalEnergy)
-				changeAmount();
+			if (o.transactionCost > terminalEnergy) {
+				o.transactionAmount = mod.changeAmount(roomName, o.roomName, amount, terminalEnergy);
+				o.transactionCost = Game.market.calcTransactionCost(o.transactionAmount, o.roomName, roomName);
+				o.credits = o.transactionAmount * o.price;
+			}
 
 			let avgEnergyPrice = Memory.marketOrders.sell.energy.avgPrice;
 
@@ -904,14 +844,17 @@ mod.selectOrders = function (roomName, type, amount, mineral) {
 		// we want to sell
 		let buyOrders = function () {
 
+			if (o.price < 0.05 && isFreeSpace)
+				return false;
+
 			o.transactionAmount = _.min([o.amount, amount]);
 			o.credits = o.transactionAmount * o.price;
 			o.transactionCost = Game.market.calcTransactionCost(o.transactionAmount, o.roomName, roomName);
 
 			if (o.resourceType === RESOURCE_ENERGY) {
 
-				// global.ENERGY_BALANCE_TRANSFER_AMOUNT -> do not sell below global.ENERGY_BALANCE_TRANSFER_AMOUNT
-				let sellEnergy = global.Util.chargeScale(room.storage.store.energy - global.ENERGY_BALANCE_TRANSFER_AMOUNT,
+				// global.ENERGY_BALANCE_TRANSFER_AMOUNT -> do not sell below global.ENERGY_BALANCE_TRANSFER_AMOUNT * 1.1 surplus
+				let sellEnergy = global.Util.chargeScale(room.storage.store.energy - global.ENERGY_BALANCE_TRANSFER_AMOUNT * 1.1,
 					global.MIN_STORAGE_ENERGY[room.controller.level],
 					global.MAX_STORAGE_ENERGY[room.controller.level]);
 
@@ -920,11 +863,17 @@ mod.selectOrders = function (roomName, type, amount, mineral) {
 
 				let totalEnergyCost = o.transactionCost + o.transactionAmount;
 
-				if (totalEnergyCost > amount)
-					changeAmount(true);
+				if (totalEnergyCost > amount) { // we can`t afford min amount
+					o.transactionAmount = mod.changeAmount(roomName, o.roomName, amount, terminalEnergy, true);
+					o.transactionCost = Game.market.calcTransactionCost(o.transactionAmount, o.roomName, roomName);
+					o.credits = o.transactionAmount * o.price;
+				}
 
-			} else if (o.transactionCost > terminalEnergy * global.TARGET_STORAGE_SUM_RATIO)
-				changeAmount();
+			} else if (o.transactionCost > terminalEnergy * global.TARGET_STORAGE_SUM_RATIO) { // we can`t afford min amount
+				o.transactionAmount = mod.changeAmount(roomName, o.roomName, amount, terminalEnergy);
+				o.transactionCost = Game.market.calcTransactionCost(o.transactionAmount, o.roomName, roomName);
+				o.credits = o.transactionAmount * o.price;
+			}
 
 			let avgEnergyPrice = Memory.marketOrders.buy.energy.avgPrice;
 
@@ -935,13 +884,20 @@ mod.selectOrders = function (roomName, type, amount, mineral) {
 			o.urgent = false;
 
 			if (o.ratio <= 0 && !isFreeSpace && o.resourceType !== RESOURCE_ENERGY) {
+
 				// bad deal, but we have no storage/terminal space
 				// 1550: hauler carryCapacity
-				let freeSpaceNeed = (global.ENERGY_BALANCE_TRANSFER_AMOUNT - terminalFreeSpace - 1550 * 2);
+				let freeSpaceNeed = global.ENERGY_BALANCE_TRANSFER_AMOUNT + 1550 * 2 - terminalFreeSpace;
 
-				o.transactionAmount = _.min([o.transactionAmount, freeSpaceNeed])
+				console.log(`BAD DEAL WANTED for freeSpace: ${freeSpaceNeed} ${mineral}`);
+
+				if (freeSpaceNeed <= 0)
+					return false;
+
+				o.transactionAmount = _.min([o.transactionAmount, freeSpaceNeed]);
 
 				o.urgent = true;
+
 				return true;
 
 			} else if (o.ratio <= 0) {
@@ -992,12 +948,13 @@ mod.bestMarketOrder = function (roomName, amount, mineral, orderType) {
 
 			};
 
+
 			let avgRatio = getAvgRatio(orders, mineral, type);
 
 			// we want to sell
 			if (orderType === ORDER_BUY) {
 				let selected = _.max(orders, 'ratio');
-				if (selected.ratio < avgRatio && !orders.urgent)
+				if (selected.ratio < avgRatio && !selected.urgent)
 					return false;
 				global.logSystem(roomName, `selected for sell: ${global.json(selected)}`);
 				return selected;

@@ -2,7 +2,6 @@ let mod = {};
 module.exports = mod;
 mod.newTargetNuker = function (creep) {
 	let room = creep.room;
-	if( !room.structures.nuker) return null;
 	let nuker = room.structures.nukers.all[0];
 	// check nukers for needs and make sure to empty the nuker before filling
 

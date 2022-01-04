@@ -188,7 +188,6 @@ global.install = () => {
             invading: load("creep.action.invading"),
             mining: load("creep.action.mining"),
             picking: load("creep.action.picking"),
-            pickingTombstones: load("creep.action.pickingTombstones"),
             reallocating:load("creep.action.reallocating"),
             recycling:load("creep.action.recycling"),
             repairing: load("creep.action.repairing"),
@@ -311,11 +310,6 @@ let cpuAtFirstLoop;
 module.exports.loop = wrapLoop(function () {
     const cpuAtLoop = Game.cpu.getUsed();
     if (Memory.pause) return;
-    
-    if(Game.cpu.bucket == 10000) {
-        console.log(`GENERATING PIXEL`);
-        Game.cpu.generatePixel();
-    }
 
     try {
         const totalUsage = Util.startProfiling('main', {startCPU: cpuAtLoop});

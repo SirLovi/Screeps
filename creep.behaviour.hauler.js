@@ -2,13 +2,10 @@ const mod = new Creep.Behaviour('hauler');
 module.exports = mod;
 mod.inflowActions = (creep) => {
     return [
-        //Creep.action.pickPower,
         Creep.action.uncharging,
         Creep.action.picking,
-        //Creep.action.pickingTombstones,
         Creep.action.withdrawing,
-        Creep.action.reallocating,
-        Creep.action.pickingTombstones
+        Creep.action.reallocating
     ];
 };
 mod.outflowActions = (creep) => {

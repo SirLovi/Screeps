@@ -1006,7 +1006,7 @@ const Visuals = class {
             for (let x = 0; x < 50; x++) {
                 for (let y = 0; y < 50; y++) {
                     const pos = room.getPositionAt(x, y);
-                    //if (Game.map.getTerrainAt(pos) === 'wall') continue;
+                    if (Game.map.getTerrainAt(pos) === 'wall') continue;
                     const key = `${String.fromCharCode(32 + x)}${String.fromCharCode(32 + y)}_x${x}-y${y}`;
                     r[key] = 0;
                 }

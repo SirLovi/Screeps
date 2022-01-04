@@ -69,10 +69,6 @@ action.unregister = function(creep) {
     delete creep.data.travelRoom;
     delete creep.data.travelRange;
 };
-action.defaultStrategy.moveOptions = function(options) {
-    options.avoidSKCreeps = true;
-    return options;
-};
 action.defaultStrategy.newTarget = function(creep) {
     if( creep.data.travelPos || creep.data.travelRoom ) {
         return FlagDir.specialFlag();

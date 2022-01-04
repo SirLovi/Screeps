@@ -12,11 +12,16 @@ mod.flagFilter = function (flagColour) {
 };
 mod.findName = function (flagColor, pos, local = true, mod, modArgs) {
 	let list = this.list;
+
+	// console.log(`flagColor: ${global.json(flagColor)}`);
+
 	if (!flagColor || list.length === 0)
 		return null;
+
 	let filter;
 	if (pos instanceof Room)
 		pos = pos.getPositionAt(25, 25);
+
 	if (typeof flagColor === 'function') {
 		filter = function (flagEntry) {
 			if (flagColor(flagEntry) && flagEntry.cloaking === 0) {
@@ -41,6 +46,9 @@ mod.findName = function (flagColor, pos, local = true, mod, modArgs) {
 	}
 	let flags = _.filter(list, filter);
 
+	// if (flags.length > 0)
+	// 	console.log(`FLAGS: ${flags[0].name}`);
+
 	if (flags.length === 0)
 		return null;
 	if (flags.length === 1)
@@ -63,6 +71,7 @@ mod.findName = function (flagColor, pos, local = true, mod, modArgs) {
 			return r;
 		};
 		let flag = _.min(flags, range); //_.sortBy(flags, range)[0];
+		// console.log(`FLAG: ${flag}`);
 		return flag.valid ? flag.name : null;
 	} else {
 		return flags[0].name;
@@ -144,14 +153,19 @@ mod.rangeMod = function (range, flagItem, args) {
 	return range + (crowd * rangeModPerCrowd);
 };
 mod.exploitMod = function (range, flagItem, creepName) {
-	if (range > 1000) return Infinity;
+
+	global.logSystem(creepName, `ROBBING!!! ${range} ${flagItem}`);
+
+	if (range > 100)
+		return Infinity;
 	let flag = Game.flags[flagItem.name];
 	if (flag.room) {
-		/*if (flag.room.my) {
+		if (flag.room.my) {
 			return Infinity;
-		}*/
-		let assigned = flag.targetOf ? _.sum(flag.targetOf.map(t => t.creepType != 'privateer' || t.creepName == creepName ? 0 : t.carryCapacityLeft)) : 0;
-		if (flag.room.sourceEnergyAvailable <= assigned) return Infinity;
+		}
+		let assigned = flag.targetOf ? _.sum(flag.targetOf.map(t => t.creepType !== 'privateer' || t.creepName === creepName ? 0 : t.carryCapacityLeft)) : 0;
+		if (flag.room.sourceEnergyAvailable <= assigned)
+			return Infinity;
 		return (range * range) / (flag.room.sourceEnergyAvailable - assigned);
 	}
 	return range;

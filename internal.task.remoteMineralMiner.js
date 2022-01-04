@@ -1,7 +1,7 @@
 const mod = {};
 module.exports = mod;
 mod.name = 'remoteMineralMiner';
-mod.minControllerLevel = 6;
+mod.minControllerLevel = 2;
 mod.maxCount = flag => {
     if (flag.memory.noMineralMiners) return 0;
     if (!flag.room) return 1;
@@ -138,7 +138,7 @@ mod.findSpawning = (roomName, type) => {
 };
 mod.findRunning = (roomName, type) => {
     return _(Game.creeps)
-        //.filter(c => !c.spawning && c.data && c.data.creepType === type && c.data.destiny && c.data.destiny.room === roomName)
+        .filter(c => !c.spawning && c.data && c.data.creepType === type && c.data.destiny && c.data.destiny.room === roomName)
         .map(c => c.name);
 };
 mod.memory = key => {

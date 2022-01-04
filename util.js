@@ -1,5 +1,5 @@
 // All methods require a JSDoc comment describing it.
-// http://usejsdoc.org
+// http://usejsdoc.org/
 module.exports = {
 
     /**
@@ -20,37 +20,6 @@ module.exports = {
         }
 
         return visibleRooms;
-    },
-    destroyAllHostileStructures(roomName) {
-        let room = Game.rooms[roomName];
-        if (!room)
-            return `${roomName} is undefined! (No vision?)`;
-        if (!room.my)
-            return `${roomName} is not owned by you!`;
-        let hostileStructures = room.find(FIND_HOSTILE_STRUCTURES);
-        for (let structure of hostileStructures) {
-            structure.destroy();
-        }
-        return `Destroyed ${hostileStructures.length} hostile structures.`;
-    },
-    removeFlagsByColor(color$$1, secondaryColor) {
-        let removeFlags = _.filter(Game.flags, flag => flag.color == color$$1 && flag.secondaryColor == secondaryColor);
-        for (let flag of removeFlags) {
-            flag.remove();
-        }
-        return `Removed ${removeFlags.length} flags.`;
-    },
-    listConstructionSites(filter) {
-        let msg = `${_.keys(Game.constructionSites).length} construction sites currently present: \n`;
-        for (let id in Game.constructionSites) {
-            let site = Game.constructionSites[id];
-            if (!filter || filter(site)) {
-                msg += `${bullet}Type: ${site.structureType}`.padRight(20) +
-                    `Pos: ${site.pos.print}`.padRight(65) +
-                    `Progress: ${site.progress} / ${site.progressTotal} \n`;
-            }
-        }
-        return msg;
     },
     /**
      * formats an integer into a readable value
@@ -687,32 +656,6 @@ module.exports = {
 
                     data.offers = [];
                     data.orders = [];
-                    
-                    if (_.isUndefined(room.memory.resources.terminal) || room.memory.resources.terminal.length === 0) {
-				 	    room.memory.resources.terminal = [];
-				 	    room.memory.resources.terminal.push({
-				 			id: room.terminal.id,
-				 			orders: []
-				 	    }
-				 	    );
-                    }
-                    
-                    if (_.isUndefined(room.memory.resources.storage) || room.memory.resources.storage.length === 0) {
-				 	    room.memory.resources.storage = [];
-				 	    room.memory.resources.storage.push({
-				 			id: room.storage.id,
-				 			orders: []
-				 	    }
-				 	    );
-                    }
-                    
-                    if (_.isUndefined(room.memory.resources.lab) || room.memory.resources.lab.length === 0) {
-				 	    room.memory.resources.lab = [];
-                    }
-                    
-                    if (_.isUndefined(room.memory.resources.reactions) || room.memory.resources.reactions.length === 0) {
-				 	    room.memory.resources.reactions = {};
-                    }
 
                     if (data.terminal[0])
                         data.terminal[0].orders = [];

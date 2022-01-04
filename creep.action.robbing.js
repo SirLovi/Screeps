@@ -1,16 +1,16 @@
 let action = new Creep.Action('robbing');
 module.exports = action;
-action.maxPerTarget = 10;
+action.maxPerTarget = 2;
 action.maxPerAction = 10;
-action.isValidAction = function(creep){ 
-    return ( creep.sum < ( creep.carryCapacity * 0.95 )/* && !creep.room.my*/);
+action.isValidAction = function(creep){
+    return ( creep.sum < ( creep.carryCapacity * 0.95 ) && !creep.room.my);
 };
 action.isValidTarget = function(target){
     if (_.some(target.pos.lookFor(LOOK_STRUCTURES), {structureType: STRUCTURE_RAMPART, isPublic: false, my: false})) {
         return false;
     }
 
-    if (target.structureType === STRUCTURE_NUKER || target.my == true || target.structureType === STRUCTURE_CONTAINER) {
+    if (target.structureType === STRUCTURE_NUKER || target.structureType === STRUCTURE_POWER_SPAWN) {
         return false;
     }
 
@@ -110,7 +110,7 @@ action.defaultStrategy.moveOptions = function(options) {
     // if (_.isUndefined(options.allowHostile)) options.allowHostile = true;
     return options;
 };
-action.minimumTTL = 300;
+action.minimumTTL = 500;
 action.defaultStrategy.resourceValue = function(creep) {
     let energyOnly = creep.ticksToLive < action.minimumTTL;
     if (!energyOnly && creep.data.homeRoom) {

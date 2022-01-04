@@ -249,7 +249,6 @@ mod.extend = function () {
 		let data = this.memory.resources;
 		if (!data)
 			return;
-			
 
 		let timing;
 

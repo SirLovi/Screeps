@@ -24,46 +24,10 @@ mod.approach = function(creep) {
     return range;
 };
 mod.run = function(creep) {
-    if( creep.room.controller.upgradeBlocked && !creep.data.boosted){
+    if( creep.room.controller.upgradeBlocked ){
         creep.data.creepType='recycler';
         return;
     }
-    
-    if (creep.ticksToLive > 1350 && creep.data && !creep.data.boosted) {
-        
-        let notBoostedParts = _.some(creep.body, bodyParts => {
-            return bodyParts.type === 'work' && !bodyParts.boost;
-        });
-
-        if (!notBoostedParts)
-            creep.data.boosted = true;
-
-        let labs = creep.room.find(FIND_MY_STRUCTURES, {filter: (s)=> {
-                return s.structureType === STRUCTURE_LAB && s.mineralType === RESOURCE_CATALYZED_GHODIUM_ACID &&
-                    s.mineralAmount > LAB_BOOST_MINERAL && s.energy >= LAB_BOOST_ENERGY;
-            }});/*
-        if (labs.length === 0)
-            labs = creep.room.find(FIND_MY_STRUCTURES, {filter: (s)=> {
-                return s.structureType === STRUCTURE_LAB && s.mineralType === RESOURCE_GHODIUM_ACID &&
-                    s.mineralAmount > LAB_BOOST_MINERAL && s.energy >= LAB_BOOST_ENERGY;
-            }});
-        if (labs.length === 0)
-            labs = creep.room.find(FIND_MY_STRUCTURES, {filter: (s)=> {
-                return s.structureType === STRUCTURE_LAB && s.mineralType === RESOURCE_GHODIUM_HYDRIDE &&
-                    s.mineralAmount > LAB_BOOST_MINERAL && s.energy >= LAB_BOOST_ENERGY;
-            }});*/
-
-        if (labs.length > 0) {
-            let lab = _.max(labs, 'mineralAmount');
-            if (global.SAY_ASSIGNMENT) creep.say(String.fromCharCode(9883), global.SAY_PUBLIC);
-            if (creep.pos.getRangeTo(lab) > 1)
-                creep.moveTo(lab);
-            else
-                lab.boostCreep(creep);
-            return;
-        }
-    }
-    
     if( !creep.action || creep.action.name !== 'upgrading' ) Population.registerAction(creep, Creep.action.upgrading, creep.room.controller);
     if( !creep.data.determinatedSpot ) {
         let determineSpots = (ignoreSources=false) => {

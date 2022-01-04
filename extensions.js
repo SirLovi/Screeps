@@ -279,7 +279,6 @@ mod.extend = function(){
     StructureStorage.prototype.getNeeds = function(resourceType) {
         var ret = 0;
         if (!this.room.memory.resources) return 0;
-        if (!this.room.memory.resources.storage) return 0;
 
         let storageData = this.room.memory.resources.storage[0];
         // look up resource and calculate needs
@@ -319,7 +318,6 @@ mod.extend = function(){
     StructureTerminal.prototype.getNeeds = function(resourceType) {
         var ret = 0;
         if (!this.room.memory.resources) return 0;
-        if (!this.room.memory.resources.terminal) return 0;
         let terminalData = this.room.memory.resources.terminal[0];
         // look up resource and calculate needs
         let order = null;
@@ -345,7 +343,6 @@ mod.extend = function(){
     });
     StructureContainer.prototype.getNeeds = function(resourceType) {
         if (!this.room.memory.resources) return 0;
-        if (!this.room.memory.resources.container) return 0;
 
         // look up resource and calculate needs
         let containerData = this.room.memory.resources.container.find( (s) => s.id == this.id );

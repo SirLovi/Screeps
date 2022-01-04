@@ -34,7 +34,7 @@ mod.checkForRequiredCreeps = (flag) => {
             { // spawn room selection params
                 targetRoom: flag.pos.roomName, 
                 minEnergyCapacity: 1000,
-                maxRange: 6,
+                maxRange: 5,
                 allowTargetRoom: true
             },
             creepSetup => { // callback onQueued
@@ -117,7 +117,7 @@ mod.memory = (flag) => {
 
 mod.creep = {
     hopper: {
-        fixedBody: [ATTACK,MOVE], 
+        fixedBody: [], 
         multiBody: {
             [HEAL]: 1,
             [MOVE]: 2,

@@ -1,6 +1,6 @@
 let setup = new Creep.Setup('privateer');
 module.exports = setup;
-setup.minControllerLevel = 4;
+setup.minControllerLevel = 3;
 setup.globalMeasurement = true;
 setup.measureByHome = true;
 setup.default = {
@@ -15,7 +15,7 @@ setup.default = {
 setup.RCL = {
     1: setup.none,
     2: setup.none,
-    3: setup.none,
+    3: setup.default,
     4: setup.default,
     5: setup.default,
     6: setup.default,

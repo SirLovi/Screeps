@@ -2,39 +2,19 @@ const mod = new Creep.Behaviour('worker');
 module.exports = mod;
 mod.inflowActions = function(creep) {
     let priority = [
-        
-        Creep.action.picking,
         Creep.action.bulldozing,
-        //Creep.action.picking,
+        Creep.action.picking,
         Creep.action.dismantling,
-        //Creep.action.pickingTombstones,
         Creep.action.withdrawing,
         Creep.action.uncharging,
         Creep.action.harvesting,
-        Creep.action.reallocating,
-        Creep.action.pickingTombstones
+        Creep.action.reallocating
     ];
     if (creep.sum > creep.carry.energy) {
         priority.unshift(Creep.action.storing);
     }
     return priority;
 };
-mod.nextEnergyAction = function(creep) {
-        if (this.needEnergy(creep)) {
-            return this.selectInflowAction(creep);
-        } else {
-            if (creep.data.nextAction && creep.data.nextTarget) {
-                const action = Creep.action[creep.data.nextAction];
-                const target = Game.getObjectById(creep.data.nextTarget);
-                delete creep.data.nextAction;
-                delete creep.data.nextTarget;
-                if (this.assignAction(creep, action, target)) {
-                    return true;
-                }
-            }
-            return this.selectAction(creep, this.outflowActions(creep));
-        }
-    };
 mod.outflowActions = function(creep) {
     if( creep.room.situation.invasion && creep.room.controller && creep.room.controller.level > 2 ) {
         return [
@@ -45,9 +25,7 @@ mod.outflowActions = function(creep) {
     } else {
         let priority = [
             Creep.action.repairing,
-            //Creep.action.building,
             Creep.action.feeding,
-            //Creep.action.upgrading,
             Creep.action.building,
             Creep.action.fueling,
             Creep.action.fortifying,

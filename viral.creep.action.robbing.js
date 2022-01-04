@@ -116,7 +116,7 @@ action.defaultStrategy.moveOptions = function(options) {
     // if (_.isUndefined(options.allowHostile)) options.allowHostile = true;
     return options;
 };
-action.minimumTTL = 300;
+action.minimumTTL = 500;
 action.defaultStrategy.resourceValue = function(creep) {
     let energyOnly = creep.ticksToLive < action.minimumTTL;
     if (!energyOnly && creep.data.homeRoom) {

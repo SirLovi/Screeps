@@ -350,9 +350,6 @@ mod.extend = function(){
         // if it has energy and a work part, remoteMiners do repairs once the source is exhausted.
         if(this.store.energy > 0 && this.hasActiveBodyparts(WORK)) {
 
-
-            // console.log(`repairNearby!!!!!! ${this.room.name}`);
-
             let repairRange = this.data && this.data.creepType === 'remoteHauler' ? global.REMOTE_HAULER.DRIVE_BY_REPAIR_RANGE : global.DRIVE_BY_REPAIR_RANGE;
 
             let repairTarget = _(this.pos.findInRange(FIND_STRUCTURES, repairRange)).find(s => Room.shouldRepair(this.room, s));
@@ -362,13 +359,19 @@ mod.extend = function(){
 
             if (repairTarget) {
 
+                // if (this.room.name === 'E22S19')
+                //     global.logSystem(this.room.name, `ALERT FOR REPAIR ${this.name} REPAIRS: ${repairTarget.structureType} RANGE: ${repairRange}`);
+
                 if( global.DEBUG && global.TRACE )
                     trace('Creep', {creepName:this.name, Action:'repairing', Creep:'repairNearby'}, repairTarget.pos);
 
                 if (repairTarget.structureType !== STRUCTURE_ROAD)
                     this.repair(repairTarget);
-                else if (this.pos.inRangeTo(repairTarget, 0))
+                else if (this.pos.inRangeTo(repairTarget, global.DRIVE_BY_REPAIR_RANGE_ROAD)) {
+                    if (this.room.name === 'E22S19')
+                        global.logSystem(this.room.name, `${this.name} REPAIRS: ${repairTarget.structureType} RANGE: ${global.DRIVE_BY_REPAIR_RANGE_ROAD}`);
                     this.repair(repairTarget);
+                }
             }
         } else {
             if( global.DEBUG && global.TRACE )

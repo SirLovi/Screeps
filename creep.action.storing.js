@@ -18,17 +18,17 @@ action.isValidMineralToTerminal = function(room){
 };
 action.newTarget = function(creep){
     let roomMineralType = creep.room.mineralType;
+
     let sendMineralToTerminal = creep => (
         creep.carry[roomMineralType] &&
         creep.carry[roomMineralType] > 0 &&
         this.isValidMineralToTerminal(creep.room));
+
     let sendEnergyToTerminal = creep => (
         creep.carry.energy > 0 &&
         creep.room.storage.charge > 0.5 &&
         creep.room.terminal.store.energy < TERMINAL_ENERGY*0.95 &&
         creep.room.terminal.sum  < creep.room.terminal.store.getCapacity());
-        // &&
-        //(creep.room.terminal.store.getCapacity() - creep.room.terminal.sum) >= creep.carry[roomMineralType]);
 
     if( creep.room.terminal && creep.room.terminal.active &&
         ( sendMineralToTerminal(creep) || sendEnergyToTerminal(creep) ) &&

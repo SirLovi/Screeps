@@ -5,7 +5,6 @@ mod.outflowActions = (creep) => {
     let priority;
     if (creep.room.controller && creep.room.controller.level < 2) {
         priority = [
-            //Creep.action.dropping,
             Creep.action.feeding,
             Creep.action.upgrading,
             Creep.action.building,
@@ -72,8 +71,4 @@ mod.nextAction = function(creep) {
         }
     }    
     return this.nextEnergyAction(creep);
-};
-mod.strategies.defaultStrategy.moveOptions = function(options) {
-    options.avoidSKCreeps = true;
-    return options;
 };

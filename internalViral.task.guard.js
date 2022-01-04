@@ -1,17 +1,16 @@
 let mod = {};
 module.exports = mod;
-mod.minControllerLevel = 7;
 mod.creep = {
     guard: {
-        fixedBody: [ATTACK, MOVE, ATTACK, RANGED_ATTACK, HEAL, MOVE, MOVE, MOVE],
-        multiBody: [TOUGH, ATTACK, RANGED_ATTACK, HEAL, MOVE, MOVE, MOVE, MOVE],
+        fixedBody: [ATTACK, MOVE],
+        multiBody: [TOUGH, ATTACK, RANGED_ATTACK, HEAL, MOVE, MOVE],
         boostedBody: {
             fixedBody:[RANGED_ATTACK,MOVE],
             multiBody:[TOUGH,RANGED_ATTACK,HEAL,MOVE],
         },
         name: "guard", 
         behaviour: "warrior", 
-        queue: 'High'
+        queue: 'Low'
     },
 };
 mod.handleFlagFound = flag => {
@@ -47,7 +46,7 @@ mod.checkForRequiredCreeps = (flag) => {
             }, 
             { // spawn room selection params
                 targetRoom: flag.pos.roomName, 
-                minEnergyCapacity: 770, 
+                minEnergyCapacity: 1800, 
                 rangeRclRatio: 3, // stronger preference of higher RCL rooms
                 allowTargetRoom: true,
             },

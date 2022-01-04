@@ -40,9 +40,8 @@ let mod = {
 				if (global.AUTO_REGISTER_LABS)
 					room.autoRegisterLabs();
 
-                //if (_.isUndefined(data) || _.isUndefined(data.reactions))
-				if (_.isUndefined(data))
-				    continue;
+				// if (_.isUndefined(data) || _.isUndefined(data.reactions))
+				// 	continue;
 
 				let roomBoostTiming = data.boostTiming,
 					checkOrdersPlacedRoom = false,

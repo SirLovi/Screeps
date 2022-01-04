@@ -4,10 +4,6 @@ action.isValidAction = function(creep){ return true; };
 action.isValidTarget = function(target){ return !target.room || !target.owner; }; // no sight or not owned
 action.isAddableAction = function(){ return true; };
 action.isAddableTarget = function(){ return true; };
-action.defaultStrategy.moveOptions = function(options) {
-    options.avoidSKCreeps = true;
-    return options;
-};
 action.newTarget = function(creep){
     let flag;
     // TODO: remove  || creep.data.destiny.flagName (temporary backward compatibility)
@@ -55,12 +51,7 @@ action.step = function(creep){
             creep.handleError({errorCode: workResult, action: this, target: creep.target, range, creep});
         }
     }
-    if (creep.target.pos.roomName !== creep.room.name){
-        return Creep.action.travelling.assignRoom(creep, creep.target.pos.roomName);
-    }
-    else {
-        creep.travelTo(creep.target.pos);
-    }
+    creep.travelTo(creep.target.pos);
 };
 action.work = function(creep){
     creep.controllerSign();

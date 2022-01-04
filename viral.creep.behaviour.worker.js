@@ -8,8 +8,7 @@ mod.inflowActions = function (creep) {
         Creep.action.withdrawing,
         Creep.action.uncharging,
         Creep.action.harvesting,
-        Creep.action.reallocating,
-        Creep.action.pickingTombstones
+        Creep.action.reallocating
     ];
     if (creep.sum > creep.carry.energy) {
         priority.unshift(Creep.action.storing);

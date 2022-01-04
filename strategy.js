@@ -24,6 +24,8 @@ mod.decorateAgent = function(prototype, ...definitions) {
             return returnVal;
         }
         logError('handler returned undefined for args', {agent: this.name || this.id, strategyKey, strategyName, method, args:args.toString(), stack: new Error().stack});
+        global.logSystem(this.room.name, `suicide: ${this.name}`);
+        this.suicide();
     };
     prototype._strategyCache = {};
     prototype.strategyKey = function(ids) {
