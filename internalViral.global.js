@@ -50,4 +50,19 @@ mod.FLAG_COLOR = {
             secondaryColor: COLOR_BLUE,
         }
     },
+    rampart: {
+        color: COLOR_BROWN,
+        secondaryColor: COLOR_BROWN
+    },
+    command: {
+        road: {
+            color: COLOR_WHITE,
+            secondaryColor: COLOR_WHITE
+        },
+        wall: {
+            color: COLOR_WHITE,
+            secondaryColor: COLOR_GREY
+        },
+    }
+    
 };

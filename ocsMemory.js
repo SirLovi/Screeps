@@ -9,18 +9,23 @@ mod.activateSegment = (id, reset = false) => {
         }
         return;
     }
-    if (id < 0 || id > 99) return logError('RawMemory', 'cannot activate invalid segment ' + id);
+    if (id < 0 || id > 99)
+        return logError('RawMemory', 'cannot activate invalid segment ' + id);
     const numActive = _.size(RawMemory.segments);
-    if (OCSMemory.numSaved >= 10) return logError('RawMemory', '10 segments saved, cannot activate segment ' + id);
+    if (OCSMemory.numSaved >= 10)
+        return logError('RawMemory', '10 segments saved, cannot activate segment ' + id);
     if (!reset) {
-        if (numActive >= 10) return logError('RawMemory', '10 segments loaded, cannot activate segment ' + id);
-        if (numActive + OCSMemory.numSaved >= 10) return logError('RawMemory', 'combined loaded and saved exceeds limit(10), cannot activate segment ' + id);
+        if (numActive >= 10)
+            return logError('RawMemory', '10 segments loaded, cannot activate segment ' + id);
+        if (numActive + OCSMemory.numSaved >= 10)
+            return logError('RawMemory', 'combined loaded and saved exceeds limit(10), cannot activate segment ' + id);
     }
     OCSMemory.toActivate[id] = true;
 };
 mod.deactivateSegment = (id) => {
     if (id < 0 || id > 99) return logError('RawMemory', 'cannot deactivate invalid segment ' + id);
-    if (_.size(OCSMemory.toActivate) === 0) Object.keys(RawMemory.segments).forEach(id => OCSMemory.toActivate[id] = true);
+    if (_.size(OCSMemory.toActivate) === 0)
+        Object.keys(RawMemory.segments).forEach(id => OCSMemory.toActivate[id] = true);
     delete OCSMemory.toActivate[id];
 };
 mod.cacheValid = (id) => {
@@ -73,7 +78,8 @@ mod.saveSegment = (range, inputData) => {
                     const size = _.round((temp.length + 2) / 1024, 2);
                     return logError('RawMemory', `Cannot save data at key ${keyNum}, exceeds 100kb limit ${size}kb`);
                 }
-                if (global.DEBUG) logSystem('OCSMemory.saveSegment', 'Saving ' + _.round(encodedData.length / 1024, 2) + 'kb of data to segment ' + id);
+                // if (global.DEBUG)
+                //     global.logSystem('OCSMemory.saveSegment', 'Saving ' + _.round(encodedData.length / 1024, 2) + 'kb of data to segment ' + id);
                 RawMemory.segments[id] = encodedData + '}';
                 Memory.cacheValid[id] = Game.time;
                 encodedData = full && temp ? '{' + temp : '{';

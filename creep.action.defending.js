@@ -11,7 +11,7 @@ action.isValidTarget = function (target) {
         target.my == false);
 };
 action.newTarget = function (creep) {
-    var closestHostile = creep.pos.findClosestByRange(creep.room.hostiles, {
+    let closestHostile = creep.pos.findClosestByRange(creep.room.hostiles, {
         filter: creep.getStrategyHandler([action.name], 'priorityTargetFilter', creep)
     });
     if (!closestHostile) {

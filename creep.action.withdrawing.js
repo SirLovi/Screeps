@@ -4,7 +4,8 @@ action.isValidAction = function(creep){
     return creep.getStrategyHandler([action.name], 'isValidAction', creep);
 };
 action.isValidTarget = function(target){
-    if (target instanceof StructureTerminal && target.charge <= 0) return false;
+    if (target instanceof StructureTerminal && target.charge <= 0)
+        return false;
     return target && !!target.store && target.store[RESOURCE_ENERGY];
 };
 action.newTarget = function(creep) {
@@ -22,7 +23,23 @@ action.newTarget = function(creep) {
     return false;
 };
 action.work = function(creep){
-    return creep.withdraw(creep.target, RESOURCE_ENERGY);
+
+    // if (creep.room.name === 'E15S3')
+    //     global.logSystem(creep.room.name, `WITHDRAWING`);
+
+    let amount;
+
+    if (creep.target.structureType === STRUCTURE_TERMINAL)
+        amount = Math.min(Math.abs(creep.room.terminal.getNeeds('energy')), creep.carry['energy'])
+
+    else if (creep.target.structureType === STRUCTURE_STORAGE)
+        amount = Math.min(Math.abs(creep.room.storage.getNeeds('energy')), creep.carry['energy'])
+
+    // if (creep.room.name === 'E15S3') {
+    //     global.logSystem(creep.room.name, `target: ${creep.target.structureType} amount: ${amount}`);
+    // }
+
+    return creep.withdraw(creep.target, RESOURCE_ENERGY, amount);
 };
 action.assignDebounce = function(creep, outflowActions, target) {
     const withdrawTarget = target || action.newTarget(creep);

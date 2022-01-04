@@ -1,4 +1,4 @@
-/* https://gitlab.com/ScreepsCCC/public */  
+/* https://gitlab.com/ScreepsCCC/public */
 const cpuAtLoad = Game.cpu.getUsed();
 
 // check if a path is valid
@@ -142,6 +142,8 @@ global.install = () => {
         OCSMemory: load('ocsMemory'),
         Grafana: GRAFANA ? load('grafana') : undefined,
         Visuals: load('visuals'),
+        SegmentCommunications: load('segmentCommunications'),
+        CompoundManager: load('compoundManager')
     });
     _.assign(global.Util, {
         DiamondIterator: load('util.diamond.iterator'),
@@ -154,7 +156,6 @@ global.install = () => {
         claim: load("task.claim"),
         reserve: load("task.reserve"),
         pioneer: load("task.pioneer"),
-        pioneerSmall: load("task.pioneerSmall"),
         attackController: load("task.attackController"),
         robbing: load("task.robbing"),
         reputation: load("task.reputation"),
@@ -248,13 +249,15 @@ global.install = () => {
             towers: load("room.tower"),
             fillRoomOrders: load("room.fillRoomOrders"),
             boostProduction: load('room.boostProduction'),
-            boostAllocation: load("room.boostAllocation")
+            boostAllocation: load("room.boostAllocation"),
+            cleanRoomMemory: load("room.cleanMemory"),
+            // test: load("test"),
+            handleInvadersCore: load ("room.handleInvaderCore")
         },
     });
     global.inject(Spawn, load("spawn"));
 
     // Extend server objects
-    //global.extend();
     Extensions.extend();
     Creep.extend();
     Room.extend();
@@ -299,14 +302,16 @@ function wrapLoop(fn) {
         // + maintain full functionality including Memory watcher and console
 
         RawMemory._parsed = Memory;
+
+        // RawMemory.setPublicSegments([99]);
     };
-};
+}
 
 let cpuAtFirstLoop;
 module.exports.loop = wrapLoop(function () {
     const cpuAtLoop = Game.cpu.getUsed();
     if (Memory.pause) return;
-
+    
     if(Game.cpu.bucket == 10000) {
         console.log(`GENERATING PIXEL`);
         Game.cpu.generatePixel();
@@ -363,6 +368,8 @@ module.exports.loop = wrapLoop(function () {
         p.checkCPU('Room.analyze', PROFILING.ANALYZE_LIMIT);
         Population.analyze();
         p.checkCPU('Population.analyze', PROFILING.ANALYZE_LIMIT);
+        SegmentCommunications.analyze();
+        p.checkCPU('SegmentCommunications.analyze', PROFILING.ANALYZE_LIMIT);[]
         // custom analyze
         if( global.mainInjection.analyze ) global.mainInjection.analyze();
 
@@ -409,11 +416,14 @@ module.exports.loop = wrapLoop(function () {
 
         OCSMemory.cleanup(); // must come last
         p.checkCPU('OCSMemory.cleanup', PROFILING.ANALYZE_LIMIT);
-        if (ROOM_VISUALS && !Memory.CPU_CRITICAL) Visuals.run(); // At end to correctly display used CPU.
+        if (ROOM_VISUALS && !Memory.CPU_CRITICAL) Visuals.run(); // At end to correctly writePlanToMemory used CPU.
         p.checkCPU('visuals', PROFILING.EXECUTE_LIMIT);
 
-        if ( GRAFANA && Game.time % GRAFANA_INTERVAL === 0 ) Grafana.run();
+        Grafana.run();
         p.checkCPU('grafana', PROFILING.EXECUTE_LIMIT);
+
+        CompoundManager.run();
+        p.checkCPU('compoundManager', PROFILING.EXECUTE_LIMIT);
 
         Game.cacheTime = Game.time;
 

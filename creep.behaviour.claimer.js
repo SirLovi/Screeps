@@ -18,6 +18,16 @@ mod.run = function(creep) {
     }
     if( global.DEBUG && global.TRACE ) trace('Behaviour', {creepName:creep.name, run:creep.action && creep.action.name || 'none', [this.name]: 'run', Behaviour:this.name});
 };
+mod.strategies.defaultStrategy.moveOptions = function(options) {
+    options.avoidSKCreeps = true;
+    return options;
+};
+mod.strategies.claiming = {
+    moveOptions: function (options) {
+        options.avoidSKCreeps = true;
+        return options;
+    }
+};
 mod.actions = (creep) => {
     return [
         Creep.action.claiming,

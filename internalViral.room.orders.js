@@ -42,7 +42,7 @@ const mod = {
             if (container.structureType == STRUCTURE_LAB && resourceType != RESOURCE_ENERGY && amount > 0) {
                 // clear other resource types since labs only hold one at a time
                 let orders = this.memory.resources[STRUCTURE_LAB].find((s)=>s.id==containerId).orders;
-                for (var i=0;i<orders.length;i++) {
+                for (let i=0;i<orders.length;i++) {
                     if (orders[i].type != resourceType && orders[i].type != RESOURCE_ENERGY) {
                         orders[i].orderAmount = 0;
                         orders[i].orderRemaining = 0;
@@ -58,13 +58,13 @@ const mod = {
             if (!this.my || !data) return;
         
             // go through reallacation orders and reset completed orders
-            for(var structureType in data) {
-                for(var i=0;i<data[structureType].length;i++) {
+            for(let structureType in data) {
+                for(let i=0;i<data[structureType].length;i++) {
                     let structure = data[structureType][i];
                     // don't reset busy labs
                     if (structureType == STRUCTURE_LAB && structure.reactionState != LAB_IDLE) continue;
                     if (!structure.orders) continue;
-                    for(var j=0;j<structure.orders.length;j++) {
+                    for(let j=0;j<structure.orders.length;j++) {
                         let order = structure.orders[j];
                         if (order.orderRemaining <= 0) {
                             let baseAmount = 0;

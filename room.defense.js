@@ -46,7 +46,7 @@ mod.extend = function() {
             configurable: true,
             get: function() {
                 if( _.isUndefined(this._casualties) ){
-                    var isInjured = creep => creep.hits < creep.hitsMax &&
+                    let isInjured = creep => creep.hits < creep.hitsMax &&
                         (creep.towers === undefined || creep.towers.length == 0);
                     this._casualties = _.sortBy(_.filter(this.creeps, isInjured), 'hits');
                 }

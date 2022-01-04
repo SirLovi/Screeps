@@ -7,6 +7,92 @@ mod.run = function() {
     Memory.stats.cpu = Game.cpu;
     Memory.stats.cpu.used = Game.cpu.getUsed();
     Memory.stats.gcl = Game.gcl;
+    Memory.stats.empireMinerals = {
+        "H": 0,
+        "O": 0,
+        "L": 0,
+        "K": 0,
+        "Z": 0,
+        "U": 0,
+        "X": 0,
+        "G": 0,
+        "energy": 0,
+        "power": 0,
+        "ops": 0,
+        "silicon": 0,
+        "metal": 0,
+        "biomass": 0,
+        "mist": 0,
+        "OH": 0,
+        "ZK": 0,
+        "UL": 0,
+        "UH": 0,
+        "UO": 0,
+        "KL": 0,
+        "KO": 0,
+        "LH": 0,
+        "LO": 0,
+        "ZH": 0,
+        "ZO": 0,
+        "GH": 0,
+        "GO": 0,
+        "UH2O": 0,
+        "UHO2": 0,
+        "KH2O": 0,
+        "KHO2": 0,
+        "LH2O": 0,
+        "LHO2": 0,
+        "ZH2O": 0,
+        "ZHO2": 0,
+        "GH2O": 0,
+        "GHO2": 0,
+        "XUH2O": 0,
+        "XUHO2": 0,
+        "XKH2O": 0,
+        "XKHO2": 0,
+        "XLH2O": 0,
+        "XLHO2": 0,
+        "XZH2O": 0,
+        "XZHO2": 0,
+        "XGH2O": 0,
+        "XGHO2": 0,
+        "utrium_bar": 0,
+        "lemergium_bar": 0,
+        "zynthium_bar": 0,
+        "keanium_bar": 0,
+        "ghodium_melt": 0,
+        "oxidant": 0,
+        "reductant": 0,
+        "purifier": 0,
+        "battery": 0,
+        "composite": 0,
+        "crystal": 0,
+        "liquid": 0,
+        "wire": 0,
+        "switch": 0,
+        "transistor": 0,
+        "microchip": 0,
+        "circuit": 0,
+        "device": 0,
+        "cell": 0,
+        "phlegm": 0,
+        "tissue": 0,
+        "muscle": 0,
+        "organoid": 0,
+        "organism": 0,
+        "alloy": 0,
+        "tube": 0,
+        "fixtures": 0,
+        "frame": 0,
+        "hydraulics": 0,
+        "machine": 0,
+        "condensate": 0,
+        "concentrate": 0,
+        "extract": 0,
+        "spirit": 0,
+        "emanation": 0,
+        "essence": 0
+    };
     
     Memory.stats.market = {
         credits: Game.market.credits,
@@ -77,6 +163,7 @@ mod.storage = function(room, object) {
         object.store = _.sum(room.storage.store);
         object.resources = {};
         Object.keys(room.storage.store).forEach(resource => object.resources[resource] = room.storage.store[resource]);
+        Object.keys(room.storage.store).forEach(resource => Memory.stats.empireMinerals[resource] = (Memory.stats.empireMinerals[resource] + room.storage.store[resource]));
     }
 };
 
@@ -85,6 +172,7 @@ mod.terminal = function(room, object) {
         object.store = _.sum(room.terminal.store);
         object.resources = {};
         Object.keys(room.terminal.store).forEach(resource => object.resources[resource] = room.terminal.store[resource]);
+        Object.keys(room.terminal.store).forEach(resource => Memory.stats.empireMinerals[resource] = (Memory.stats.empireMinerals[resource] + room.terminal.store[resource]));
     }
 };
 

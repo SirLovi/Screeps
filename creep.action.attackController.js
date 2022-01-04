@@ -11,7 +11,7 @@ action.newTarget = function(creep){
         Flag.compare(flagEntry, FLAG_COLOR.invade.attackController)
     );
 
-    var flag;
+    let flag;
     if( creep.data.destiny ) flag = Game.flags[creep.data.destiny.targetName];
     if ( !flag ) flag = FlagDir.find(validColor, creep.pos, false, FlagDir.reserveMod, creep.name);
     
@@ -39,7 +39,7 @@ action.step = function(creep){
 
     let range = creep.pos.getRangeTo(creep.target);
     if( range <= this.targetRange ) {
-        var workResult = this.work(creep);
+        let workResult = this.work(creep);
         if( workResult != OK ) {
             creep.handleError({errorCode:workResult,action,target:creep.target,range,creep});
         }
@@ -48,7 +48,7 @@ action.step = function(creep){
     }
 };
 action.work = function(creep){
-    var workResult;
+    let workResult;
 
     creep.controllerSign();
 

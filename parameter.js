@@ -41,10 +41,74 @@ let mod = {
     COMPOUNDS_MANAGE_ENABLED: true,
     TERMINAL_BROKER_SELL: true,
 	TERMINAL_BROKER_SELL_ENERGY: false, // false for testing terminalBroker or reserve energy
+	TERMINAL_BROKER_TRANSFER_ENERGY: true,
 	COMPOUNDS_MANAGE_BUCKET: 300,
 	COMPOUNDS_MANAGE_TIMING: 5,
 	COMPOUNDS_MANAGE: { // if modified -> DELETE Memory.compoundsManage!!!!
 		G: {       // for Nukes
+			sell: false,
+			urgentAllocate: false,
+			allocateRooms: [],
+			roomThreshold: 5000,
+			reservedAmount: 5000,
+			storeTo: 'storage',
+			labRefilledAt: 1500,
+		},
+		H: {
+			sell: true,
+			urgentAllocate: false,
+			allocateRooms: [],
+			roomThreshold: 5000,
+			reservedAmount: 5000,
+			storeTo: 'storage',
+			labRefilledAt: 1500,
+		},
+		O: {
+			sell: true,
+			urgentAllocate: false,
+			allocateRooms: [],
+			roomThreshold: 5000,
+			reservedAmount: 5000,
+			storeTo: 'storage',
+			labRefilledAt: 1500,
+		},
+		L: {
+			sell: true,
+			urgentAllocate: false,
+			allocateRooms: [],
+			roomThreshold: 5000,
+			reservedAmount: 5000,
+			storeTo: 'storage',
+			labRefilledAt: 1500,
+		},
+		Z: {
+			sell: true,
+			urgentAllocate: false,
+			allocateRooms: [],
+			roomThreshold: 5000,
+			reservedAmount: 5000,
+			storeTo: 'storage',
+			labRefilledAt: 1500,
+		},
+		K: {
+			sell: true,
+			urgentAllocate: false,
+			allocateRooms: [],
+			roomThreshold: 5000,
+			reservedAmount: 5000,
+			storeTo: 'storage',
+			labRefilledAt: 1500,
+		},
+		U: {
+			sell: false,
+			urgentAllocate: false,
+			allocateRooms: [],
+			roomThreshold: 5000,
+			reservedAmount: 5000,
+			storeTo: 'storage',
+			labRefilledAt: 1500,
+		},
+		X: {
 			sell: false,
 			urgentAllocate: false,
 			allocateRooms: [],
@@ -423,7 +487,7 @@ let mod = {
     LIMIT_URGENT_REPAIRING: 750, // urgent repair when hits below
     GAP_REPAIR_DECAYABLE: 800, // decayables (e.g. roads) only get repaired when that much hits are missing
     MEMORY_RESYNC_INTERVAL: 20, // interval to reload spawns & towers present in a room
-    PROCESS_ORDERS_INTERVAL: 20, // interval to process room orders and run terminalBroker
+    PROCESS_ORDERS_INTERVAL: 101, // interval to process room orders and run terminalBroker
     TIME_REPORT: 28000, // ticks between room reports
     REPORT_MAX_LENGTH: 500,
     REPORTS_PER_LOOP: 18,
@@ -437,7 +501,7 @@ let mod = {
     USE_SUMMERTIME: true, // Please define isSummerTime in global.js to suit to your local summertime rules
     SPAWN_DEFENSE_ON_ATTACK: true, // This will attempt to store enough to have a defense and spawn troops when invaded.
     MANAGED_CONTAINER_TRIGGER: 0.25, // managed containers get filled below this relative energy amount and emptied when above 1-this value
-    ROUTE_ROOM_COST: { 'shard0':{'W58N36':99, 'W53N39': 99, 'W55N36': 99, 'W54N36': 99, 'W56N36': 99, 'W56N35': 99, 'W56N34': 99, 'W59N34': 99, 'W56N33': 99, 'W53N35': 99, 'W54N32': 99, 'W58N31': 99, 'W62N39': 99}}, // custom room routing cost: e.g. `{'shard0':{ 'W0N0':5, 'W4N4': 11 },'shard1':...}`. Affects bestSpawnRoomFor, Creep.Setup calculations, and travel cost predictions. Please call 'delete Memory.routeRange;' whenever you change this property.
+    ROUTE_ROOM_COST: { 'shard0':{'W58N36':99, 'W53N39': 99, 'W55N36': 99, 'W54N36': 99, 'W56N35': 99, 'W56N34': 99, 'W59N34': 99, 'W56N33': 99, 'W53N35': 99, 'W54N32': 99, 'W58N31': 99, 'W62N39': 99, 'W55N34': 99, 'W56N36': 99},'shard1':{}}, // custom room routing cost: e.g. `{'shard0':{ 'W0N0':5, 'W4N4': 11 },'shard1':...}`. Affects bestSpawnRoomFor, Creep.Setup calculations, and travel cost predictions. Please call 'delete Memory.routeRange;' whenever you change this property.
     TRAVELLING_BORDER_RANGE: 22, // room arrival distance for travelling and routes
     NOTIFICATE_INVADER: true, // Also log common 'Invader' hostiles
     NOTIFICATE_INTRUDER: true, // Log any hostiles in your rooms
@@ -458,6 +522,7 @@ let mod = {
         DRIVE_BY_BUILD_RANGE: 3, // A creep's max build distance is 3 but cpu can be saved by dropping the search distance to 1.
         DRIVE_BY_BUILDING: true, // Allows remote haulers to build roads and containers. Consider setting REMOTE_WORKER_MULTIPLIER to 0.
         DRIVE_BY_REPAIR_RANGE: 2, // range that remote haulers should search when trying to repair and move
+        DRIVE_BY_REPAIR_RANGE_ROAD: 2,
         MIN_LOAD: 0.75, // Haulers will return home as long as their ratio of carrying/capacity is above this amount.
         MIN_WEIGHT: 800, // Small haulers are a CPU drain.
         MULTIPLIER: 2, // Max number of haulers spawned per source in a remote mining room.
@@ -468,16 +533,17 @@ let mod = {
     PIONEER_UNOWNED: true, // True: pioneers may attempt to work in unowned rooms.
     PRIVATEERS_BUILD: false, // True: robbers may attempt to build
     DRIVE_BY_REPAIR_RANGE: 2, // range that creeps should search when trying to repair and move
+    DRIVE_BY_REPAIR_RANGE_ROAD: 2,
     REMOTE_WORKER_MULTIPLIER: 0, // Number of workers spawned per remote mining room.
     PLAYER_WHITELIST: ['SirLovi','IceDragon','Zolcsika'],
     // Don't attack. Must be a member of CCC for permanent whitelisting in git repository. But you can change your own copy... Please ask if you are interested in joining CCC :)
-    DEFENSE_BLACKLIST: ['W59N38'], // Don't defend those rooms (add room names). Blocks spawning via defense task (will not prevent offensive actions at all)
+    DEFENSE_BLACKLIST: [], // Don't defend those rooms (add room names). Blocks spawning via defense task (will not prevent offensive actions at all)
     CRITICAL_BUCKET_LEVEL: 0, // take action when the bucket drops below this value to prevent the bucket from actually running out
     CRITICAL_BUCKET_OVERFILL: 100, // Overfill the bucket by this amount before disabling CPU throttle, this can reduce thrashing because all creeps try to act at once
     CRITICAL_ROLES: [ 'worker', 'collapseWorker', 'melee', 'ranger', 'healer', 'miner', 'hauler', 'upgrader' ], // when the bucket drops below the critical bucket level only these creep roles will be executed
     ROBBER_REHOME: true, // May robbers choose closer storage for delivery?
     OBSERVER_OBSERVE_RANGE: 3, // the range for observers to look at
-    OBSERVER_OBSERVE_HIGHWAYS_ONLY: true, // the observers will only look at highways - changing this will require you to clear cached rooms
+    OBSERVER_OBSERVE_HIGHWAYS_ONLY: false, // the observers will only look at highways - changing this will require you to clear cached rooms
     COMPRESS_COST_MATRICES: false, // enable to compress cached cost matrices (1/5 the size, but currently about 2x CPU usage)
     ACTION_SAY: { // what gets said on creep.action.*.onAssignment
         ATTACK_CONTROLLER: String.fromCodePoint(0x1F5E1) + String.fromCodePoint(0x26F3), // 🗡⛳
@@ -540,7 +606,7 @@ let mod = {
     STORE_CHARGE_PURCHASE: 0.4,
     COMPOUNDS_TO_MAKE: {    // which compounds to make
         G: {                // for nukes
-            make: true,    // make it or not
+            make: false,    // make it or not
             roomThreshold: 5000,   // start producing when room.resourcesAll[compound] <= threshold
             amount: 5000,   // amount to make when room.resourcesAll <= threshold (keep producing, while room.resourcesAll[compound] < amount + threshold)
             rooms: []       // rooms involved, leave it empty for all rooms
@@ -552,7 +618,7 @@ let mod = {
             rooms: []
         },
         XGH2O: {        // +100% upgradeController effectiveness without increasing the energy cost
-            make: true,
+            make: false,
             roomThreshold: 15000,
             amount: 3000,
             rooms: []
@@ -622,6 +688,62 @@ let mod = {
     UNREGISTER_BOOSTLAB_AT: 450, // unregister boostLab when boostLab.mineralAmount < UNREGISTER_BOOSTLAB_AT
     COMPOUNDS_TO_ALLOCATE: { // if modified -> delete Memory.compoundsToAllocate
         G: {       // for Nukes
+	 		allocate: false,
+	 		allocateRooms: [],
+	 		roomThreshold: 5000,
+	 		amount: 5000,
+	 		storeTo: 'storage',
+	 		labRefilledAt: 1500,
+	 	},
+	 	H: {
+	 		allocate: true,
+	 		allocateRooms: [],
+	 		roomThreshold: 5000,
+	 		amount: 5000,
+	 		storeTo: 'storage',
+	 		labRefilledAt: 1500,
+	 	},
+	 	O: {
+	 		allocate: true,
+	 		allocateRooms: [],
+	 		roomThreshold: 5000,
+	 		amount: 5000,
+	 		storeTo: 'storage',
+	 		labRefilledAt: 1500,
+	 	},
+	 	L: {
+	 		allocate: true,
+	 		allocateRooms: [],
+	 		roomThreshold: 5000,
+	 		amount: 5000,
+	 		storeTo: 'storage',
+	 		labRefilledAt: 1500,
+	 	},
+	 	Z: {
+	 		allocate: true,
+	 		allocateRooms: [],
+	 		roomThreshold: 5000,
+	 		amount: 5000,
+	 		storeTo: 'storage',
+	 		labRefilledAt: 1500,
+	 	},
+	 	K: {
+	 		allocate: true,
+	 		allocateRooms: [],
+	 		roomThreshold: 5000,
+	 		amount: 5000,
+	 		storeTo: 'storage',
+	 		labRefilledAt: 1500,
+	 	},
+	 	U: {
+	 		allocate: true,
+	 		allocateRooms: [],
+	 		roomThreshold: 5000,
+	 		amount: 5000,
+	 		storeTo: 'storage',
+	 		labRefilledAt: 1500,
+	 	},
+	 	X: {       // for Nukes
 	 		allocate: true,
 	 		allocateRooms: [],
 	 		roomThreshold: 5000,
@@ -630,7 +752,7 @@ let mod = {
 	 		labRefilledAt: 1500,
 	 	},
         XGH2O : {       // +100% upgradeController effectiveness without increasing the energy cost
-            allocate: true, // allocate this compound
+            allocate: false, // allocate this compound
             allocateRooms: [], // rooms to allocate, leave it empty for all rooms
             roomThreshold: 5000, // allocating will start when compound is below threshold
             amount: 3000,  // amount to allocate
@@ -638,7 +760,7 @@ let mod = {
             labRefilledAt: 1500 // lab refilled below this amount, it is meaningless if storeTo = 'storage'
         },
         GH2O : {       // +80% upgradeController effectiveness without increasing the energy cost
-            allocate: true,
+            allocate: false,
             superior: 'XGH2O', // do not allocate when superior allocated or making with 10 labs
             allocateRooms: [],
             roomThreshold: 5000,

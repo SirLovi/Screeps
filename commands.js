@@ -1,7 +1,7 @@
 // useful commands
 
 // Removes all enemy structures in a set room
-destroyAllHostileStructures('<roomName>');
+destroyAllHostileStructures('W54N38');
 
 runAutobahn('W58N39',['W58N39','W58N39','W58N39']);
 
@@ -23,7 +23,6 @@ removeRoomRoadFlags('W59N38');
 removeConstructionSites('W59N38');
 
 _.forEach((Game.rooms["W54N38"].find(FIND_CREEPS)), s => s.suicide());
-
 _.forEach((Game.rooms["W5S53"].find(FIND_STRUCTURES, {filter: (i) => i.structureType == STRUCTURE_WALL })), s => s.destroy());
 
 // Recalculates ROUTE_ROOM_COST
@@ -84,7 +83,8 @@ delete Memory.modules;
 _.forEach(Memory, (v, k) => !['population'].includes(k) && delete Memory[k]);
 
 // create market order (replace [roomName] with target room or remove it for subscription tokens)
-Game.market.createOrder(type, resourceType, price, totalAmount, roomName);
+//Game.market.createOrder(type, resourceType, price, totalAmount, roomName);
+Game.market.createOrder({type, resourceType, price, totalAmount, roomName});
 
 //accept market sell or buy order
 Game.market.deal(orderId, amount, roomName);
@@ -106,7 +106,7 @@ Game.rooms['<roomName>'].placeOrder('<structure>', '<resource>', '<amount>');
 _.values(Game.structures).filter(i=>i.structureType==='lab').map(i=>i.room.setStore(i.id, RESOURCE_ENERGY, 2000));
 
 // Examine the low priority spawn queue in all rooms
-_.chain(Game.spawns).values().map(i=>i.room).unique().filter(i=>i.spawnQueueLow.length).map(i=>[`====${i.name}====>`,i.spawnQueueLow.map(j=>j.name)]).value();
+_.chain(Game.spawns).values().map(i=>i.room).unique().filter(i=>i.spawnQueueLow.length).map(i=>[`\n====${i.name}====>`,i.spawnQueueLow.map(j=>j.name)]).value();
 
 // Show histogram of remoteHauler weight
 JSON.stringify(_.chain(Game.creeps).filter(i=>i.data.creepType==='remoteHauler').groupBy('data.weight').mapValues(i=>i.length))

@@ -1,7 +1,7 @@
 let mod = {};
 module.exports = mod;
 mod.loop = function (room) {
-    var run = tower => this.run(tower);
+    let run = tower => this.run(tower);
     _.forEach(room.structures.towers, run);
 };
 mod.run = function (tower) {

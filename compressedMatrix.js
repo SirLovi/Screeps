@@ -38,11 +38,11 @@ CompressedMatrix.deserialize = function(data) {
     return matrix;
 };
 CompressedMatrix.compareEfficiency = function(count, costMatrix = new PathFinder.CostMatrix(), verbose=true) {
-    const threshold = verbose ? 0 : 5; // don't display for each unless verbose
+    const threshold = verbose ? 0 : 5; // don't writePlanToMemory for each unless verbose
     let serialized, stringified, normalStringified, compressedStringified;
     const p = Util.startProfiling();
     const total = Util.startProfiling();
-    for (var i = 0; i < count; i++) {
+    for (let i = 0; i < count; i++) {
         serialized = costMatrix.serialize();
         if (verbose) console.log('normal', serialized);
         p.checkCPU('normal-serialize', threshold, 'normal-serialize');

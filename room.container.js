@@ -49,7 +49,7 @@ mod.extend = function() {
                         let byType = c => c.controller == false;
                         this._in = _.filter(this.all, byType);
                         // add managed
-                        let isFull = c => c.sum >= (c.storeCapacity * (1-MANAGED_CONTAINER_TRIGGER));
+                        let isFull = c => c.sum >= (c.store.getCapacity() * (1-MANAGED_CONTAINER_TRIGGER));
                         this._in = this._in.concat(this.managed.filter(isFull));
                     }
                     return this._in;
@@ -62,7 +62,7 @@ mod.extend = function() {
                         let byType = c => c.controller == true;
                         this._out = _.filter(this.all, byType);
                         // add managed
-                        let isEmpty = c => c.sum <= (c.storeCapacity * MANAGED_CONTAINER_TRIGGER);
+                        let isEmpty = c => c.sum <= (c.store.getCapacity() * MANAGED_CONTAINER_TRIGGER);
                         this._out = this._out.concat(this.managed.filter(isEmpty));
                     }
                     return this._out;
@@ -72,7 +72,7 @@ mod.extend = function() {
                 configurable: true,
                 get: function() {
                     if( _.isUndefined(this._privateers) ){
-                        let byType = c => (c.source === false && !c.mineral && c.sum < c.storeCapacity);
+                        let byType = c => (c.source === false && !c.mineral && c.sum < c.store.getCapacity());
                         this._privateers = _.filter(this.all, byType);
                     }
                     return this._privateers;

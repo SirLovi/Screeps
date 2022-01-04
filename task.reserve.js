@@ -168,8 +168,8 @@ mod.nextAction = creep => {
         Creep.action.recycling
     ];
     //  console.log("bingo")
-    for(var iAction = 0; iAction < priority.length; iAction++) {
-        var action = priority[iAction];
+    for(let iAction = 0; iAction < priority.length; iAction++) {
+        let action = priority[iAction];
         if(action.isValidAction(creep) &&
             action.isAddableAction(creep) &&
             action.assign(creep)) {

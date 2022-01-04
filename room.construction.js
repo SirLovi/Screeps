@@ -11,7 +11,7 @@ mod.analyzeRoom = function(room, needMemoryResync) {
 };
 mod.extend = function() {
     // Construction related Room variables go here
-    Room.roomLayoutArray = [[,,,,,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION],[,,,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_TOWER,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD],[,,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_SPAWN,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD],[,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_TOWER,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD],[,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION],[STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_STORAGE,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION],[STRUCTURE_ROAD,STRUCTURE_TOWER,STRUCTURE_EXTENSION,STRUCTURE_SPAWN,STRUCTURE_ROAD,STRUCTURE_NUKER,STRUCTURE_LINK,STRUCTURE_TERMINAL,STRUCTURE_ROAD,STRUCTURE_OBSERVER,STRUCTURE_EXTENSION,STRUCTURE_TOWER,STRUCTURE_ROAD],[STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_POWER_SPAWN,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION],[,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION],[,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_TOWER,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD],[,,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_SPAWN,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD],[,,,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_TOWER,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD],[,,,,,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION]];
+    Room.roomLayoutArray = [[,,,,,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION],[,,,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_TOWER,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD],[,,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_SPAWN,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD],[,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_TOWER,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD],[,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION],[STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_NUKER,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION],[STRUCTURE_ROAD,STRUCTURE_TOWER,STRUCTURE_EXTENSION,STRUCTURE_SPAWN,STRUCTURE_ROAD,STRUCTURE_POWER_SPAWN,STRUCTURE_STORAGE,STRUCTURE_TERMINAL,STRUCTURE_ROAD,STRUCTURE_OBSERVER,STRUCTURE_EXTENSION,STRUCTURE_TOWER,STRUCTURE_ROAD],[STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_LINK,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION],[,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION],[,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_TOWER,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_EXTENSION,STRUCTURE_ROAD],[,,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_SPAWN,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD],[,,,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_TOWER,STRUCTURE_ROAD,STRUCTURE_EXTENSION,STRUCTURE_ROAD],[,,,,,STRUCTURE_EXTENSION,STRUCTURE_ROAD,STRUCTURE_EXTENSION]];
 
     // Room property extensions go here
     Object.defineProperties(Room.prototype, {
@@ -60,9 +60,26 @@ mod.extend = function() {
     };
 
     Room.prototype.roadConstruction = function( minDeviation = ROAD_CONSTRUCTION_MIN_DEVIATION ) {
-        const forced = ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name] && ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name].indexOf(this.name)!=-1;
-        if( (!ROAD_CONSTRUCTION_ENABLE && !forced) || Game.time % ROAD_CONSTRUCTION_INTERVAL != 0 ) return;
-        if( !forced && (_.isNumber(ROAD_CONSTRUCTION_ENABLE) && (!this.my || ROAD_CONSTRUCTION_ENABLE > this.controller.level))) return;
+
+
+
+        const forced = ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name] && ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name].indexOf(this.name)!==-1;
+
+        //console.log(`road construction status => enabled: ${ROAD_CONSTRUCTION_ENABLE} forced: ${forced} timing: ${Game.time % ROAD_CONSTRUCTION_INTERVAL === 0} gameTime: ${Game.time % 500}`);
+        //console.log(`return : ${ (!ROAD_CONSTRUCTION_ENABLE && !forced) || Game.time % ROAD_CONSTRUCTION_INTERVAL !== 0 }`);
+
+        if( (!ROAD_CONSTRUCTION_ENABLE && !forced) || Game.time % ROAD_CONSTRUCTION_INTERVAL !== 0 )  {
+            //console.log(`${ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name]}`);
+            return;
+        }
+        if( !forced && (_.isNumber(ROAD_CONSTRUCTION_ENABLE) && (!this.my || ROAD_CONSTRUCTION_ENABLE > this.controller.level))) {
+            //console.log(`road construction fail 2`);
+            return;
+        }
+
+        console.log(`road construction ON: ${this.name}`);
+
+
 
         let data = Object.keys(this.roadConstructionTrace)
             .map( k => {
@@ -74,6 +91,8 @@ mod.extend = function() {
             });
 
         let min = Math.max(ROAD_CONSTRUCTION_ABS_MIN, (data.reduce( (_sum, b) => _sum + b.n, 0 ) / data.length) * minDeviation);
+        //global.BB(data);
+        console.log(`ROAD_CONSTRUCTION_ABS_MIN: ${min}`);
         data = data.filter( e => {
             if (e.n >= min) {
                 let structures = this.lookForAt(LOOK_STRUCTURES,e.x,e.y);
@@ -96,7 +115,8 @@ mod.extend = function() {
     };
 
     Room.prototype.processConstructionFlags = function() {
-        if (!this.my || !Util.fieldOrFunction(SEMI_AUTOMATIC_CONSTRUCTION, this)) return;
+        //if (!this.my || !Util.fieldOrFunction(SEMI_AUTOMATIC_CONSTRUCTION, this)) return;
+        if (!this.controller || !Util.fieldOrFunction(SEMI_AUTOMATIC_CONSTRUCTION, this)) return;
         let sitesSize = _.size(Game.constructionSites);
         if (sitesSize >= 100) return;
         const LEVEL = this.controller.level;
@@ -162,28 +182,19 @@ mod.extend = function() {
         }
         
         // Roads
-        shortAmount = CONTROLLER_STRUCTURES[STRUCTURE_ROAD][LEVEL] - (this.structures.roads.all.length + _.filter(this.constructionSites, s => s.structureType === STRUCTURE_ROAD).length);
-        if (shortAmount > 0) {
-            FlagDir.filter(FLAG_COLOR.command.road, ...ARGS).splice(0, shortAmount).forEach(flag => {
-                CONSTRUCT(flag, STRUCTURE_ROAD);
-            });
-        }
+        FlagDir.filter(FLAG_COLOR.command.road, ...ARGS).forEach(flag => {
+            CONSTRUCT(flag, STRUCTURE_ROAD);
+        });
         
         // Walls
-        shortAmount = CONTROLLER_STRUCTURES[STRUCTURE_WALL][LEVEL] - (this.structures.walls.all.length + _.filter(this.constructionSites, s => s.structureType === STRUCTURE_WALL).length);
-        if (shortAmount > 0) {
-            FlagDir.filter(FLAG_COLOR.command.wall, ...ARGS).splice(0, shortAmount).forEach(flag => {
-                CONSTRUCT(flag, STRUCTURE_WALL);
-            });
-        }
+        FlagDir.filter(FLAG_COLOR.command.wall, ...ARGS).forEach(flag => {
+            CONSTRUCT(flag, STRUCTURE_WALL);
+        });
         
         // Ramparts
-        shortAmount = CONTROLLER_STRUCTURES[STRUCTURE_RAMPART][LEVEL] - (this.structures.ramparts.all.length + _.filter(this.constructionSites, s => s.structureType === STRUCTURE_RAMPART).length);
-        if (shortAmount > 0) {
-            FlagDir.filter(FLAG_COLOR.rampart, ...ARGS).splice(0, shortAmount).forEach(flag => {
-                CONSTRUCT(flag, STRUCTURE_RAMPART);
-            });
-        }
+        FlagDir.filter(FLAG_COLOR.rampart, ...ARGS).forEach(flag => {
+            CONSTRUCT(flag, STRUCTURE_RAMPART);
+        });
 
         // Storage
         if (!this.storage && CONTROLLER_STRUCTURES[STRUCTURE_STORAGE][LEVEL] > 0) {
@@ -253,8 +264,8 @@ mod.extend = function() {
 
         const [centerX, centerY] = [flag.pos.x, flag.pos.y];
 
-        const placed = [];
-        const sites = [];
+        //const placed = [];
+        //const sites = [];
 
         const failed = () => {
             flag.pos.newFlag(FLAG_COLOR.command.invalidPosition, 'NO_ROOM');
@@ -269,18 +280,25 @@ mod.extend = function() {
                 if (xPos >= 50 || xPos < 0 || yPos >= 50 || yPos < 0) return failed();
                 const pos = room.getPositionAt(xPos, yPos);
                 const structureType = layout[x] && layout[x][y];
-                if (structureType) {
-                    const flagColour = constructionFlags[structureType];
-                    placed.push({
-                        flagColour, pos
-                    });
+                if (structureType && (pos.lookFor(LOOK_FLAGS).length === 0) && !(Game.map.getTerrainAt(pos) === 'wall')) {
+                    //if (Game.map.getTerrainAt(pos) === 'wall') return failed();
+                    if (structureType === STRUCTURE_ROAD) {
+                        pos.newFlag(FLAG_COLOR.command.road);
+                    } else {
+                        const flagColour = constructionFlags[structureType];
+                        pos.newFlag(flagColour);
+                    }
                 }
             }
         }
-
+        /*
         placed.forEach(f => {
             f.pos.newFlag(f.flagColour);
         });
+        _.forEach(sites, p => {
+            if (_.size(Game.constructionSites) >= 100) return false;
+            p.createConstructionSite(STRUCTURE_ROAD);
+        });*/
 
         flag.remove();
     };

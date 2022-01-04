@@ -9,7 +9,7 @@ action.isValidTarget = function(target){
     if( target.structureType == STRUCTURE_LINK ){
         return target.energy < target.energyCapacity * 0.85;
     } else if( target.structureType == STRUCTURE_CONTAINER ) {
-        return target.sum < ((target.source === true && target.controller == true) ? target.storeCapacity * MANAGED_CONTAINER_TRIGGER : target.storeCapacity);
+        return target.sum < ((target.source === true && target.controller == true) ? target.store.getCapacity() * MANAGED_CONTAINER_TRIGGER : target.storeCapacity);
     }
     return false;
 };
@@ -27,7 +27,7 @@ action.isAddableTarget = function(target, creep){
             )
         )
     ) && (
-        (target.structureType == STRUCTURE_CONTAINER && (target.storeCapacity - target.sum) > Math.min(creep.carry.energy, 500)) ||
+        (target.structureType == STRUCTURE_CONTAINER && (target.store.getCapacity() - target.sum) > Math.min(creep.carry.energy, 500)) ||
         ( target.structureType == STRUCTURE_LINK )
     ) && (
         target.structureType != STRUCTURE_CONTAINER || !target.controller || creep.carry.energy == creep.sum // don't put minerals in upgrader container
@@ -44,13 +44,13 @@ action.newTarget = function(creep){
         }
     }
 
-    var that = this;
+    let that = this;
     if( creep.room.structures.container.out.length > 0 ) {
         let target = null;
         let maxFree = 0;
-        var emptyest = o => {
+        let emptyest = o => {
             if( that.isValidTarget(o, creep) && that.isAddableTarget(o, creep) ) {
-                let free = o.storeCapacity - o.sum;
+                let free = o.store.getCapacity() - o.sum;
                 if( free > maxFree ){
                     maxFree = free;
                     target = o;
@@ -66,7 +66,7 @@ action.work = function(creep){
     let workResult;
     if( creep.target.source === true && creep.target.controller == true ) {
         // don't overfill managed container'
-        let max = (creep.target.storeCapacity * MANAGED_CONTAINER_TRIGGER) - creep.target.sum;
+        let max = (creep.target.store.getCapacity() * MANAGED_CONTAINER_TRIGGER) - creep.target.sum;
         
         if( max < 1) workResult = ERR_FULL;
         else {
@@ -82,9 +82,9 @@ action.work = function(creep){
     creep.target = null;
     return workResult;
     /* container charging with minerals not supported currently
-    var workResult;
+    let workResult;
     if( creep.target.structureType == STRUCTURE_CONTAINER ) {
-        for(var resourceType in creep.carry) {
+        for(let resourceType in creep.carry) {
             if( creep.carry[resourceType] > 0 ){
                 workResult = creep.transfer(creep.target, resourceType);
                 if( workResult != OK ) break;

@@ -16,13 +16,9 @@ mod.extend = function(){
     Object.defineProperty(Structure.prototype, 'active', {
         configurable: true,
         get() {
-            if(!this.room.controller) {
-                return _.get(this.room.memory, ['structures', this.id, 'active'], true);
-            } else {
-                if (!this.room.owner) return false;
-                if (this.room.owner !== this.owner.username) return false;
-                return _.get(this.room.memory, ['structures', this.id, 'active'], true);
-            }
+            if (!this.room.owner) return false;
+            if (this.room.owner !== this.owner.username) return false;
+            return _.get(this.room.memory, ['structures', this.id, 'active'], true);
         },
     });
     Object.defineProperty(StructureTower.prototype, 'active', {
@@ -49,23 +45,11 @@ mod.extend = function(){
             return this.room.RCL > 1;
         },
     });
-    Object.defineProperty(StructureWall.prototype, 'isCriticallyFortifyable', {
-        configurable: true,
-        get() {
-            return (this.hits <= MIN_FORTIFY_LIMIT[this.room.controller.level]);
-        }
-    });
     Object.defineProperty(StructureRampart.prototype, 'active', {
         configurable: true,
         get() {
             return this.room.RCL > 1;
         },
-    });
-    Object.defineProperty(StructureRampart.prototype, 'isCriticallyFortifyable', {
-       configurable: true,
-       get() {
-           return (this.hits <= MIN_FORTIFY_LIMIT[this.room.controller.level]);
-       } 
     });
     Object.defineProperty(StructureContainer.prototype, 'active', {
         configurable: true,
@@ -295,17 +279,7 @@ mod.extend = function(){
     StructureStorage.prototype.getNeeds = function(resourceType) {
         var ret = 0;
         if (!this.room.memory.resources) return 0;
-        
-        if (_.isUndefined(this.room.memory.resources.storage)) {
-            let obj = {
-                id: this.id,
-                orders : []
-            };
-            this.room.memory.resources.storage = [];
-            this.room.memory.resources.storage.push(obj);
-
-        }
-
+        if (!this.room.memory.resources.storage) return 0;
 
         let storageData = this.room.memory.resources.storage[0];
         // look up resource and calculate needs
@@ -345,16 +319,7 @@ mod.extend = function(){
     StructureTerminal.prototype.getNeeds = function(resourceType) {
         var ret = 0;
         if (!this.room.memory.resources) return 0;
-        if (_.isUndefined(this.room.memory.resources.terminal)) {
-            let obj = {
-                id: this.id,
-                orders : []
-            };
-            this.room.memory.resources.terminal = [];
-            this.room.memory.resources.terminal.push(obj);
-
-        }
-
+        if (!this.room.memory.resources.terminal) return 0;
         let terminalData = this.room.memory.resources.terminal[0];
         // look up resource and calculate needs
         let order = null;
@@ -380,16 +345,7 @@ mod.extend = function(){
     });
     StructureContainer.prototype.getNeeds = function(resourceType) {
         if (!this.room.memory.resources) return 0;
-        if (_.isUndefined(this.room.memory.resources.container)) {
-            let obj = {
-                id: this.id,
-                orders : []
-            };
-            this.room.memory.resources.container = [];
-            this.room.memory.resources.container.push(obj);
-
-        }
-
+        if (!this.room.memory.resources.container) return 0;
 
         // look up resource and calculate needs
         let containerData = this.room.memory.resources.container.find( (s) => s.id == this.id );
@@ -408,19 +364,8 @@ mod.extend = function(){
     };
     StructureLab.prototype.getNeeds = function(resourceType) {
         if (!this.room.memory.resources) return 0;
-        if (_.isUndefined(this.room.memory.resources.lab)) {
-            let obj = {
-                id: this.id,
-                orders : []
-            };
-            this.room.memory.resources.lab = [];
-            this.room.memory.resources.lab.push(obj);
-
-        }
-
         let loadTarget = 0;
         let unloadTarget = 0;
-        let reaction = this.room.memory.resources.reactions;
 
         // look up resource and calculate needs
         let containerData = this.room.memory.resources.lab.find( (s) => s.id == this.id );
@@ -447,17 +392,7 @@ mod.extend = function(){
             space = this.mineralCapacity-this.mineralAmount;
             cap = this.mineralCapacity;
         }
-
-        if (containerData && reaction && reaction.orders.length > 0
-            && (this.id === reaction.seed_a || this.id === reaction.seed_b)
-            && (resourceType !== LAB_REACTIONS[reaction.orders[0].type][0] || resourceType !== LAB_REACTIONS[reaction.orders[0].type][1])) {
-
-            if (store > unloadTarget) {
-                return unloadTarget - store;
-            }
-        }
-
-        if( (store < Math.min(loadTarget,cap) / 2) || store < LAB_REACTION_AMOUNT ) return Math.min( loadTarget-store,space );
+        if( store < Math.min(loadTarget,cap) / 2 ) return Math.min( loadTarget-store,space );
         if( containerData && containerData.reactionType === this.mineralType ) {
             if( store > unloadTarget + ( cap - Math.min(unloadTarget,cap) ) / 2 ) return unloadTarget-store;
         } else {
@@ -467,7 +402,7 @@ mod.extend = function(){
     };
     StructurePowerSpawn.prototype.getNeeds = function(resourceType) {
         // if parameter is enabled then autofill powerSpawns
-        if( FILL_POWERSPAWN && !this.room.isCriticallyFortifyable) {
+        if( FILL_POWERSPAWN ) {
             if( resourceType == RESOURCE_ENERGY && this.energy < this.energyCapacity * 0.75 ) {
                 return this.energyCapacity - this.energy;
             }
