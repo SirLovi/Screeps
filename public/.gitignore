@@ -1,8 +1,12 @@
-### Project specific
-screeps.json
-dist/
-pack/
-pub/
+### ignore individual custom module overrides
+custom.*
+custom/*
+viral.*
+viral/*
+internal.*
+internal/*
+internalViral.*
+internalViral/*
 
 ### Dreamweaver template
 # DW Dreamweaver added files
@@ -71,6 +75,7 @@ Temporary Items
 nbproject/private/
 build/
 nbbuild/
+dist/
 nbdist/
 nbactions.xml
 nb-configuration.xml
