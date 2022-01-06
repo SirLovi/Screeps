@@ -6,6 +6,16 @@ mod.analyzeRoom = function (room, needMemoryResync) {
 		delete Memory.marketOrders;
 
 	if (Game.time % global.PROCESS_ORDERS_INTERVAL === 0 || room.name === 'sim') {
+
+		// TODO is it ok?
+		// if (room.name === acceptedRooms[0].name) {
+		// 	console.log(`RESET ACCEPTED ROOMS`);
+		// 	// for (let room of acceptedRooms) {
+		// 	// 	room._isReceivingEnergy = false;
+		// 	// }
+		// 	global._acceptedRooms = [];
+		// }
+
 		if (_.some(acceptedRooms, r => {
 			return r.name === room.name;
 		})) {
@@ -636,7 +646,7 @@ mod.extend = function () {
 				global.terminalCapacity * global.TARGET_STORAGE_SUM_RATIO > room.terminal.sum + global.ENERGY_BALANCE_TRANSFER_AMOUNT
 				&& global.storageCapacity * global.TARGET_STORAGE_SUM_RATIO > room.storage.sum + global.ENERGY_BALANCE_TRANSFER_AMOUNT
 				&& !room._isReceivingEnergy
-				&& room.storage.store.energy < global.MAX_STORAGE_ENERGY[room.controller.level]
+				&& room.storage.store.energy < global.MAX_STORAGE_ENERGY[room.controller.level] - global.ENERGY_BALANCE_TRANSFER_AMOUNT * global.TARGET_STORAGE_SUM_RATIO
 			);
 
 			let targetRooms = _.filter(global.acceptedRooms, requiresEnergy);

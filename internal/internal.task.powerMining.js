@@ -7,12 +7,12 @@ mod.handleFlagRemoved = flagName => {
     // check flag
     const flagMem = Memory.flags[flagName];
     if( flagMem && flagMem.task === mod.name && flagMem.roomName ){
-        // if there is still a powerMining flag in that room ignore. 
+        // if there is still a powerMining flag in that room ignore.
         const flags = FlagDir.filter(FLAG_COLOR.powerMining, new RoomPosition(25,25,flagMem.roomName), true);
-        if( flags && flags.length > 0 ) 
+        if( flags && flags.length > 0 )
             return;
         else {
-            // no more powerMining in that room. 
+            // no more powerMining in that room.
             // clear memory
             Task.clearMemory(mod.name, flagMem.roomName);
         }
@@ -118,7 +118,7 @@ mod.checkForRequiredCreeps = (flag) => {
                     task: mod.name, // taskName
                     targetName: flag.name, // targetName
                     type: Task.powerMining.creep.miner.behaviour // custom
-                }, 
+                },
                 { // spawn room selection params
                     targetRoom: roomName,
                     minEnergyCapacity: 3000,
@@ -144,7 +144,7 @@ mod.checkForRequiredCreeps = (flag) => {
                     task: mod.name, // taskName
                     targetName: flag.name, // targetName
                     type: Task.powerMining.creep.healer.behaviour // custom
-                }, 
+                },
                 { // spawn room selection params
                     targetRoom: roomName,
                     minEnergyCapacity: 3000
@@ -206,7 +206,7 @@ mod.checkForRequiredCreeps = (flag) => {
                 );
             }
         }
-    }    
+    }
 };
 mod.findSpawning = (roomName, type) => {
     let spawning = [];
@@ -304,7 +304,7 @@ mod.creep = {
             [HEAL]: 16,
             [MOVE]: 16,
         },
-        multiBody: [], 
+        multiBody: [],
         behaviour: 'powerHealer',
         queue: 'Medium'
     }
@@ -347,6 +347,6 @@ mod.strategies = {
                 minEnergyCapacity: 1500
             });
         },
-        
+
     },
 };

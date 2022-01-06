@@ -1,4 +1,4 @@
-var action = new Creep.Action('sourceKiller');
+let action = new Creep.Action('sourceKiller');
 module.exports = action;
 action.isValidAction = function(creep) {
     return creep.room.hostiles.length === 0;

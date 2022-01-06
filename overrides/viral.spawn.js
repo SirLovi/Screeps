@@ -105,10 +105,10 @@ mod.extend = function () {
                 destiny);
             this.newSpawn = {name: name};
             Creep.spawningStarted.trigger({spawn: this.name, name: name, body: body, destiny: destiny, spawnTime: body.length * CREEP_SPAWN_TIME});
-            if (global.CENSUS_ANNOUNCEMENTS) global.logSystem(this.pos.roomName, dye(CRAYON.birth, 'Good morning ' + name + '!'));
+            if (CENSUS_ANNOUNCEMENTS) global.logSystem(this.pos.roomName, dye(CRAYON.birth, 'Good morning ' + name + '!'));
             return true;
         }
-        if ((global.DEBUG || global.CENSUS_ANNOUNCEMENTS) && global.OFFSPRING_ANNOUNCEMENTS) global.logSystem(this.pos.roomName, dye(CRAYON.error, 'Offspring failed: ' + translateErrorCode(success) + '<br/> - body: ' + JSON.stringify(_.countBy(body)) + '<br/> - name: ' + name + '<br/> - behaviour: ' + behaviour + '<br/> - destiny: ' + destiny));
+        if ((global.DEBUG || CENSUS_ANNOUNCEMENTS) && OFFSPRING_ANNOUNCEMENTS) global.logSystem(this.pos.roomName, dye(CRAYON.error, 'Offspring failed: ' + translateErrorCode(success) + '<br/> - body: ' + JSON.stringify(_.countBy(body)) + '<br/> - name: ' + name + '<br/> - behaviour: ' + behaviour + '<br/> - destiny: ' + destiny));
         return false;
     };
 };
@@ -117,7 +117,7 @@ mod.register = function () {
 };
 mod.handleSpawningCompleted = function (creep) {
     if (global.DEBUG && global.TRACE) trace('Spawn', {behaviour: creep.data.creepType, creepName: creep.name, Spawn: 'Creep.spawningCompleted'});
-    if (global.CENSUS_ANNOUNCEMENTS) global.logSystem(creep.pos.roomName, dye(CRAYON.birth, 'Off to work ' + creep.name + '!'));
+    if (CENSUS_ANNOUNCEMENTS) global.logSystem(creep.pos.roomName, dye(CRAYON.birth, 'Off to work ' + creep.name + '!'));
 };
 mod.execute = function () {
     let run = spawn => {

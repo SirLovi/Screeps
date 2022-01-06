@@ -2,7 +2,7 @@ let action = new Creep.Action('storing');
 
 module.exports = action;
 action.isValidAction = function (creep) {
-	return ((creep.room.storage && creep.room.storage.isActive()) || (creep.room.terminal && creep.room.terminal.isActive())) && creep.sum > 0;
+	return creep.room.storage && creep.room.storage.isActive() && creep.room.terminal && creep.room.terminal.isActive() && creep.sum > 0;
 };
 action.isValidTarget = function (target) {
 	return target && target.store && target.active && target.sum < target.store.getCapacity() * global.TARGET_STORAGE_SUM_RATIO;
@@ -22,9 +22,6 @@ action.isValidMineralToTerminal = function (room, mineral) {
 
 	if (mineral === RESOURCE_ENERGY)
 		return false;
-		
-	if (!room.terminal)
-	    return;
 
 	let mineralIsCompound = global.isCompoundToManage(mineral);
 	let storedMineral = room.storage.store[mineral];
@@ -110,7 +107,6 @@ action.newTarget = function (creep) {
 		sendEnergyToTerminal = creep => (
 			creep.carry.energy > 0 &&
 			creep.room.storage.charge > 0.5 &&
-			creep.room.terminal &&
 			creep.room.terminal.store.energy < global.TERMINAL_ENERGY &&
 			creep.room.terminal.sum < creep.room.terminal.store.getCapacity());
 

@@ -4,14 +4,31 @@ let mod = {};
 
 mod.run = function () {
 
+	if (Game.time % global.GRAFANA_INTERVAL === 0) {
+
+		// reset global.rooms properties
+		delete global._acceptedRooms;
+		delete global._myRooms;
+		delete global._myRoomsName;
+
+		Memory.stats = {
+			tick: Game.time,
+			rooms: []
+		};
+
+		let myRooms = _.filter(Game.rooms, {'my': true});
+
+		for (let room of myRooms)
+			Memory.stats.rooms.push(room.name)
+
+	}
+
 	if (!global.GRAFANA || Game.time % global.GRAFANA_INTERVAL !== 0)
 		return;
 
-	Memory.stats = {
-		tick: Game.time,
+	Object.assign(Memory.stats, {
 		population: Object.keys(Memory.population).length,
 		empireMinerals: {},
-		rooms: [],
 		memory: global.round(RawMemory.get().length / 1024),
 		cpu: Game.cpu,
 		gcl: Game.gcl,
@@ -19,16 +36,13 @@ mod.run = function () {
 			credits: Game.market.credits,
 			numOrders: Game.market.orders ? Object.keys(Game.market.orders).length : 0,
 		}
-	};
+	});
 
 	Memory.stats.cpu.used = Game.cpu.getUsed();
 
-
 	// ROOMS
 
-	let myRooms = _.filter(Game.rooms, {'my': true});
-
-	for (let room of myRooms) {
+	for (let room of global.myRooms) {
 		// Memory.stats.rooms[room.name] = {
 		// 	name: room.name,
 		// 	spawns: {},
@@ -37,8 +51,6 @@ mod.run = function () {
 		// 	minerals: {},
 		// 	sources: {},
 		// };
-
-		Memory.stats.rooms.push(room.name)
 		mod.init(room);
 	}
 };

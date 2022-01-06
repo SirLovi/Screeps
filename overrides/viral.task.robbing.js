@@ -229,7 +229,7 @@ mod.nextAction = function (creep) {
             // Choose the closest
 
 
-            //console.log(`DEPOSIT: ${deposit}`);
+            console.log(`DEPOSIT: ${deposit}`);
 
             deposit = _(deposit).filter({'my': true});
             if (deposit.length > 0) {
@@ -340,14 +340,14 @@ mod.exploitNextRoom = function (creep) {
 
 
 
-         let flag = FlagDir.find(FLAG_COLOR.invade.robbing, new RoomPosition(25, 25, creep.data.homeRoom), false, FlagDir.exploitMod, creep.name);
-        //let flag = FlagDir.find(validColor, new RoomPosition(25, 25, creep.data.homeRoom), false, FlagDir.exploitMod, creep.name);
+        // let flag = FlagDir.find(FLAG_COLOR.invade.robbing, new RoomPosition(25, 25, creep.data.homeRoom), false, FlagDir.exploitMod, creep.name);
+        let flag = FlagDir.find(validColor, new RoomPosition(25, 25, creep.data.homeRoom), false, FlagDir.exploitMod, creep.name);
 
         // global.logSystem(creep.room.name, `FLAG: ${flag.name}`);
 
         // new flag found
         if (flag) {
-            //global.logSystem(creep.room.name, `TRAVELLING: ${flag.name}`);
+            global.logSystem(creep.room.name, `TRAVELLING: ${flag.name}`);
             // travelling
             if (Creep.action.travelling.assignRoom(creep, flag.pos.roomName)) {
                 Population.registerCreepFlag(creep, flag);

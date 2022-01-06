@@ -12,8 +12,6 @@ mod.creep = {
             RANGED_ATTACK,
             HEAL,
             MOVE,
-            MOVE,
-            MOVE,
             MOVE
         ],
         boostedBody: {
@@ -25,7 +23,6 @@ mod.creep = {
                 TOUGH,
                 RANGED_ATTACK,
                 HEAL,
-                MOVE,
                 MOVE,
                 MOVE
             ],

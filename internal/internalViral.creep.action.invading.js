@@ -16,7 +16,7 @@ mod.run = {
             creep.attacking = creep.attack(creep.target) == OK;
     },
     ranger: function(creep){
-        var range = creep.pos.getRangeTo(creep.target);
+        let range = creep.pos.getRangeTo(creep.target);
         if( !creep.flee ){
             if( creep.target instanceof Flag ){
                 creep.travelTo( creep.target );
@@ -33,7 +33,7 @@ mod.run = {
             }
         }
         // attack
-        var targets = creep.pos.findInRange(creep.room.hostiles, 3);
+        let targets = creep.pos.findInRange(creep.room.hostiles, 3);
         if(targets.length > 2) { // TODO: calc damage dealt
             if(CHATTY) creep.say('MassAttack');
             creep.attackingRanged = creep.rangedMassAttack() == OK;
@@ -104,5 +104,6 @@ mod.run = {
                 creep.attackingRanged = creep.rangedAttack(targets[0]) == OK;
             }
         }
-    }
+    },
+    trainLeader: function(creep){ Creep.action.invading.run['warrior'](creep); },
 };

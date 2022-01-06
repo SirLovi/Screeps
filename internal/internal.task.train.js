@@ -5,7 +5,7 @@ mod.name = 'train';
 mod.register = () => {};
 mod.checkFlag = (flag) => { 
     // 2xhealer flag - flag.compareTo(FLAG_COLOR.trainHeal) 
-    if (flag.compareTo(FLAG_COLOR.trainTurret)) {
+    if (flag.compareTo(FLAG_COLOR.trainTurret) || flag.compareTo(FLAG_COLOR.boostedTrain)) {
         Util.set(flag.memory, 'task', 'train');
         Util.set(flag.memory, 'type', 'trainTurret');
         Util.set(flag.memory, 'trainCount', 1);
@@ -109,6 +109,11 @@ mod.checkForRequiredCreeps = (flag) => {
             if (!_.some([memory.running, memory.spawning, memory.queued], q => _.some(q, {trainOrder: order}))) {
                 const definition = Object.assign({}, Task.train.creep[type]);
                 definition.name = 'T' + trainNum + '.' + order + '-' + definition.name;
+                let boosted = flag.compareTo(FLAG_COLOR.boostedTrain) ? true : false;
+                if(boosted){
+                    definition.fixedBody = definition.boostedBody.fixedBody;
+                    definition.multiBody = definition.boostedBody.multiBody;
+                }
                 Task.spawn(
                     definition, // creepDefinition
                     { // destiny
@@ -117,6 +122,7 @@ mod.checkForRequiredCreeps = (flag) => {
                         trainOrder: order, // which member am I?
                         trainNum, // which train is this?
                         type: definition.behaviour, // custom
+                        boosted: boosted,
                     }, 
                     { // spawn room selection params
                         targetRoom: roomName,
@@ -177,6 +183,10 @@ mod.creep = {
         queue: 'Low',
         fixedBody: [],
         multiBody: [MOVE, WORK],
+        boostedBody: {
+            fixedBody:[RANGED_ATTACK],
+            multiBody:[TOUGH,WORK,WORK,MOVE],
+        },
         minMulti: 25,
         maxMulti: 25,
         minAbsEnergyAvailable: 3750,
@@ -188,6 +198,10 @@ mod.creep = {
         queue: 'Low',
         fixedBody: [],
         multiBody: [MOVE, HEAL],
+        boostedBody: {
+            fixedBody:[],
+            multiBody:[TOUGH,HEAL,HEAL,MOVE],
+        },
         minMulti: 7,
         maxMulti: 25,
         minAbsEnergyAvailable: 3600,
@@ -199,6 +213,10 @@ mod.creep = {
         queue: 'Low',
         fixedBody: [],
         multiBody: [MOVE, RANGED_ATTACK],
+        boostedBody: {
+            fixedBody:[],
+            multiBody:[TOUGH,RANGED_ATTACK,RANGED_ATTACK,MOVE],
+        },
         minMulti: 18,
         maxMulti: 25,
         minAbsEnergyAvailable: 3600,
