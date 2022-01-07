@@ -33,7 +33,7 @@ mod.checkForRequiredCreeps = (flag) => {
             }, 
             { // spawn room selection params
                 targetRoom: flag.pos.roomName, 
-                minEnergyCapacity: 9750,
+                minEnergyCapacity: 3250,
                 maxRange: 5
             },
             creepSetup => { // onQueued callback
@@ -119,8 +119,8 @@ mod.nextAction = creep => {
         Creep.action.attackController,
         Creep.action.recycling
     ];
-    for(var iAction = 0; iAction < priority.length; iAction++) {
-        var action = priority[iAction];
+    for(let iAction = 0; iAction < priority.length; iAction++) {
+        let action = priority[iAction];
         if(action.isValidAction(creep) &&
             action.isAddableAction(creep) &&
             action.assign(creep)) {

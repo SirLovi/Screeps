@@ -1,5 +1,20 @@
 // useful commands
 
+// Removes all enemy structures in a set room
+destroyAllHostileStructures('<roomName>');
+
+// Removes all flags of set color
+removeFlagsByColor(COLOR_1, COLOR_2);
+
+// Lists constructionSites currently present
+listConstructionSites(filter);
+
+// Removes all flags with primary COLOR_CYAN (construction flags)
+removeConstructionFlags();
+
+// Recalculates ROUTE_ROOM_COST
+delete Memory.routeRange;
+
 // Recycle a creep
 Creep.action.recycling.assign(Game.creeps['<creepName>']);
 
@@ -23,7 +38,7 @@ Task.forceSpawn(Task.guard.creep.guard, {targetRoom: 'W0N0', allowTargetRoom: tr
 Memory.rooms['<roomName>'].spawnQueueLow = [0];
 // clear medium priority queue
 Memory.rooms['<roomName>'].spawnQueueMedium = [0];
-// clear high priority queue 
+// clear high priority queue
 Memory.rooms['<roomName>'].spawnQueueHigh = [0];
 
 // check if a specific creep type is in queue
@@ -39,7 +54,7 @@ Game.creeps['<creepName>'].move(RIGHT);
 // force recycle a Creep
 Game.creeps['<creepName>'].data.creepType="recycler";
 
-// To override a module file create a copy of an existing module and name it "custom.<originalModuleName>". Then call this method (without ".js"): 
+// To override a module file create a copy of an existing module and name it "custom.<originalModuleName>". Then call this method (without ".js"):
 getPath('<originalModuleName>', true);
 // To completely re-evaluate all modules:
 delete Memory.modules;
@@ -48,7 +63,7 @@ delete Memory.modules;
 _.forEach(Memory, (v, k) => !['population'].includes(k) && delete Memory[k]);
 
 // create market order (replace [roomName] with target room or remove it for subscription tokens)
-Game.market.createOrder(type, resourceType, price, totalAmount, roomName);
+Game.market.createOrder({type, resourceType, price, totalAmount, roomName});
 
 //accept market sell or buy order
 Game.market.deal(orderId, amount, roomName);

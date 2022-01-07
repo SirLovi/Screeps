@@ -21,7 +21,7 @@ module.exports = function(grunt) {
 
     // Override branch in screeps.json
     // grunt deploy --branch=<customBranch>
-    var branch = false;
+    let branch = false;
     if(grunt.option('branch')) branch = grunt.option('branch');
 
     const submodules = ['internal', 'public'];
@@ -165,7 +165,7 @@ module.exports = function(grunt) {
         },
         gitfetch: gitfetch,
     });
-    // 
+    //
     grunt.registerTask('switch-to-pack-deploy', function () {
         grunt.config.set('screeps.dist.src', ['pack/main.js']);
     });
@@ -175,6 +175,7 @@ module.exports = function(grunt) {
     grunt.registerTask('deploy', ['clean', 'copy:public', 'copy:internal', 'copy:overrides', 'screeps']);
     // clean deployment to directory
     grunt.registerTask('publish', ['clean', 'copy:public', 'copy:internal', 'copy:overrides', 'copy:publish']);
+    //grunt.registerTask('publish', ['clean', 'copy:public', 'copy:internal', 'copy:overrides']);
     // clean deployment (public only)
     grunt.registerTask('public-deploy', ['clean', 'copy:public', 'screeps']);
     // single file [experimental] (dry run)
@@ -213,7 +214,7 @@ module.exports = function(grunt) {
             optionOutput.gitcommit[subdir] = {
                 options: {
                     cwd: subdir,
-                    message: 'reintegrate ' + subdir + ' before branching to ' + branch,
+                    message: 'reintegrate ' + subdir + ' dirtyState branching to ' + branch,
                     allowEmpty: true,
                 }
             };

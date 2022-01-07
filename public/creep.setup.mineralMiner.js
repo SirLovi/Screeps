@@ -2,10 +2,11 @@ let setup = new Creep.Setup('mineralMiner');
 module.exports = setup;
 setup.minControllerLevel = 6;
 setup.maxCount = function(room) {
+    if (room.memory.noMineralMiners) return 0;
     let max = 0;
     let haulers = (room.population.typeCount.hauler || 0);
     if( haulers === 0 ) return 0;
-    if( room.storage && room.storage.sum < room.storage.storeCapacity * 0.9 ) {
+    if( room.storage && room.storage.sum < room.storage.store.getCapacity() * 0.9 ) {
         let add = mineral => {
             if(mineral.mineralAmount > 0) max++;
         };

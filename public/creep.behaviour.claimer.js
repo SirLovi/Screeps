@@ -3,15 +3,16 @@ module.exports = mod;
 const super_run = mod.run;
 mod.run = function(creep) {
     super_run.call(this, creep);
-    if( creep.hits < creep.hitsMax ) { // creep injured. move to next owned room
+    if (creep.hits < creep.hitsMax && (!creep.action || creep.action.name !== 'travelling')) { // creep injured. move to next owned room
         if (creep.data) {
-            if (!creep.data.nearestHome || !Game.rooms[creep.data.nearestHome]) creep.data.nearestHome = Room.bestSpawnRoomFor(creep.pos.roomName);
-            if (creep.data.nearestHome) {
-                let room = Game.rooms[creep.data.nearestHome];
-                if (room) {
-                    let range = creep.pos.getRangeTo(room.controller);
-                    if (range > 1) creep.travelTo( room.controller.pos );
+            if (!creep.data.nearestHome || !Game.rooms[creep.data.nearestHome]) {
+                const nearestSpawnRoom = Room.bestSpawnRoomFor(creep.pos.roomName);
+                if (nearestSpawnRoom) {
+                    creep.data.nearestHome = nearestSpawnRoom.name;
                 }
+            }
+            if (creep.data.nearestHome) {
+                Creep.action.travelling.assignRoom(creep, creep.data.nearestHome);
             }
         }
     }

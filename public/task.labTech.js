@@ -84,7 +84,7 @@ mod.handleSpawningCompleted = creep => {
     if (flag) {
         // calculate & set time required to spawn and send next substitute creep
         // TODO: implement better distance calculation
-        creep.data.predictedRenewal = creep.data.spawningTime + (routeRange(creep.data.homeRoom, flag.pos.roomName) * 50);
+        creep.data.predictedRenewal = creep.data.spawningTime;
         
         // get task memory
         const memory = Task.labTech.memory(flag);
@@ -130,6 +130,6 @@ mod.creep = {
         multiBody: [CARRY, CARRY, MOVE],
         name: "labTech",
         behaviour: "labTech",
-        queue: 'Low'
+        queue: 'Medium'
     },
 };

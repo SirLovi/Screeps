@@ -48,3 +48,8 @@ action.defaultStrategy.targetFilter = function(creep) {
         return target.my;
     }
 };
+action.defaultStrategy.moveOptions = function(options) {
+    // // allow routing in and through hostile rooms
+    // if (_.isUndefined(options.allowHostile)) options.allowHostile = true;
+    return options;
+};

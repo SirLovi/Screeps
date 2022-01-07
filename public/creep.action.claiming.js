@@ -46,7 +46,7 @@ action.step = function(creep){
 
     let range = creep.pos.getRangeTo(creep.target);
     if( range <= this.targetRange ) {
-        var workResult = this.work(creep);
+        let workResult = this.work(creep);
         if( workResult != OK ) {
             creep.handleError({errorCode: workResult, action: this, target: creep.target, range, creep});
         }
@@ -56,9 +56,16 @@ action.step = function(creep){
 action.work = function(creep){
     creep.controllerSign();
 
-    return creep.claimController(creep.target);
+    if( (creep.target.owner && !creep.target.my) ||
+        (creep.target.reservation && !Task.reputation.allyOwner(creep.target.reservation))){
+        workResult = creep.attackController(creep.target);
+    }
+    else {
+        workResult = creep.claimController(creep.target);
+    }
+    return workResult;
     /*
-    var workResult;
+    let workResult;
         workResult = creep.claimController(creep.target);
     if( creep.target.owner && !creep.target.my ){
         workResult = creep.attackController(creep.target);

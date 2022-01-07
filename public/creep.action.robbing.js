@@ -2,7 +2,7 @@ let action = new Creep.Action('robbing');
 module.exports = action;
 action.maxPerTarget = 2;
 action.maxPerAction = 10;
-action.isValidAction = function(creep){ 
+action.isValidAction = function(creep){
     return ( creep.sum < ( creep.carryCapacity * 0.95 ) && !creep.room.my);
 };
 action.isValidTarget = function(target){

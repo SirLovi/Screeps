@@ -14,7 +14,7 @@
  *                                   determines it is stuck and repaths.
  *   reportThreshold:   integer    The mimimum CPU used on pathing to console.log() warnings on CPU usage. Defaults to 50
  *
- * Examples: var Traveler = require('Traveler')();
+ * Examples: let Traveler = require('Traveler')();
  *           require('util.traveler')({exportTraveler: false, installTraveler: false, installPrototype: true, defaultStuckValue: 2});
  */
 module.exports = function(globalOpts = {}){
@@ -141,6 +141,22 @@ module.exports = function(globalOpts = {}){
                 roomCallback: callback,
                 swampCost: options.ignoreRoads ? 5 : 10,
             });
+            if (options.respectRamparts) {
+                // const start = Game.cpu.getUsed();
+                // search the path for a rampart
+                const room = Game.rooms[origPos.roomName];
+                // if we have ramparts in the room
+                if (room && room.find(FIND_MY_STRUCTURES, {filter: {structureType: STRUCTURE_RAMPART}}).length) {
+                    for (let i = 0; i < ret.path.length; i++) {
+                        if (_.filter(ret.path[i].lookFor(LOOK_STRUCTURES), {structureType: STRUCTURE_RAMPART}).length) {
+                            // rampart in the path
+                            ret.path = ret.path.slice(0, i+1);
+                            break;
+                        }
+                    }
+                }
+                // console.log('TravelerRespect used:', _.round(Game.cpu.getUsed() - start, 2));
+            }
             ret.route = allowedRooms && allowedRooms.route;
             return ret;
         }
@@ -233,9 +249,11 @@ module.exports = function(globalOpts = {}){
                     const route = ret.route && ret.route.length;
                     if (options.debug) {
                         if (options.range === 0) {
-                            console.log(`TRAVELER: incomplete path for ${creep.name} from ${creep.pos} to ${destPos}, destination may be blocked.`);
+                            global.logSystem(creep.room.name, `TRAVELER: incomplete path for ${creep.name} from ${creep.pos} to ${destPos}, destination may be blocked.`);
+                            // console.log(`TRAVELER: incomplete path for ${creep.name} from ${creep.pos} to ${destPos}, destination may be blocked.`);
                         } else {
-                            console.log(`TRAVELER: incomplete path for ${creep.name} from ${creep.pos} to ${destPos}, range ${options.range}. Route length ${route}.`);
+                            global.logSystem(creep.room.name, `TRAVELER: incomplete path for ${creep.name} from ${creep.pos} to ${destPos}, range ${options.range}. Route length ${route}.`);
+                            // console.log(`TRAVELER: incomplete path for ${creep.name} from ${creep.pos} to ${destPos}, range ${options.range}. Route length ${route}.`);
                         }
                     }
                     if (route > 1) {
@@ -378,6 +396,12 @@ module.exports = function(globalOpts = {}){
                 getStructureMatrix: room => Room.getStructureMatrix(room.name || room, options),
                 getCreepMatrix: room => room.getCreepMatrix(options.getStructureMatrix(room)),
             });
+            if (options.respectRamparts &&
+                this.room.situation.invasion &&
+                _.filter(this.pos.lookFor(LOOK_STRUCTURES), {my: true, structureType: STRUCTURE_RAMPART}).length) {
+                // don't move off a rampart if we're already on one while hostiles are present
+                return OK;
+            }
             return traveler.travelTo(this, destination, options);
         };
     }

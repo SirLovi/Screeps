@@ -73,7 +73,7 @@ mod.extend = function() {
     Room.prototype.processPower = function() {
         // run lab reactions WOO!
         let powerSpawns = this.find(FIND_MY_STRUCTURES, { filter: (s) => { return s.structureType == STRUCTURE_POWER_SPAWN; } } );
-        for (var i=0;i<powerSpawns.length;i++) {
+        for (let i=0;i<powerSpawns.length;i++) {
             // see if the reaction is possible
             let powerSpawn = powerSpawns[i];
             if (powerSpawn.energy >= POWER_SPAWN_ENERGY_RATIO && powerSpawn.power >= 1) {

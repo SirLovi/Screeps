@@ -12,18 +12,18 @@ let mod = {
     PROFILE: false, // enable CPU profiling
     PROFILING: {
         ANALYZE_LIMIT: 2, // profile warning levels
-        AVERAGE_USAGE: false, // display average creep & flag usage
-        BASIC_ONLY: true, // only display basic profiling information, disables all other profiling
+        AVERAGE_USAGE: false, // writePlanToMemory average creep & flag usage
+        BASIC_ONLY: true, // only writePlanToMemory basic profiling information, disables all other profiling
         BEHAVIOUR: false, // profile behaviour action assignment
-        CREEPS: false, // display creep profiling information
+        CREEPS: false, // writePlanToMemory creep profiling information
         CREEP_TYPE: '', // define a specific creep to profile, requires CREEPS=true
         EXECUTE_LIMIT: 5, // profile warning levels
-        FLAGS: false, // display flag profiling information
+        FLAGS: false, // writePlanToMemory flag profiling information
         FLUSH_LIMIT: 5, // profile warning levels
         MAIN: true, // profile main loop
         MIN_THRESHOLD: 0.5, // set the bar for checks that involve very low usage (warning, chatty!)
         REGISTER_LIMIT: 2, // profile warning levels
-        ROOMS: false, // display room and structure profiling information
+        ROOMS: false, // writePlanToMemory room and structure profiling information
         VISUALS: false, // profile visuals
         VISUALS_LIMIT: 0.2, // CPU usage in each part of visuals above this limit will be displayed
     },
@@ -35,16 +35,16 @@ let mod = {
     CENSUS_ANNOUNCEMENTS: true, // log birth and death
     SELL_NOTIFICATION: true, // send mail when selling minerals
     SPAWN_INTERVAL: 5, // loops between regular spawn probe
-    ROOM_VISUALS: false, // display basic room statistics with RoomVisuals
+    ROOM_VISUALS: true, // writePlanToMemory basic room statistics with RoomVisuals
     ROOM_VISUALS_ALL: false, // displays visuals in all rooms you have vision in. Only your rooms when false.
-    VISUALS: { // if ROOM_VISUALS is enabled, you can select what you want to display - All is a bit much for some people.
+    VISUALS: { // if ROOM_VISUALS is enabled, you can select what you want to writePlanToMemory - All is a bit much for some people.
         VISIBLE_ONLY: false, // depends on userscript: https://github.com/Esryok/screeps-browser-ext/blob/master/visible-room-tracker.user.js
         ROOM: true, // displays basic info relative to the room
         ROOM_GLOBAL: true, // displays basic info relative to your account - requires ROOM: true
         INFO_PIE_CHART: false, // replaces the info bars with pie charts
-        CPU: true, // display a graph containing CPU used, CPU limit, and bucket
-        ROOM_ORDERS: true, // display orders the room creates
-        ROOM_OFFERS: true, // display what a room will offer another
+        CPU: true, // writePlanToMemory a graph containing CPU used, CPU limit, and bucket
+        ROOM_ORDERS: true, // writePlanToMemory orders the room creates
+        ROOM_OFFERS: true, // writePlanToMemory what a room will offer another
         SPAWN: true, // displays creep name and spawn progress percentage when spawning
         CONTROLLER: true, // displays level, progress, and ticks to downgrade if active
         STORAGE: true, // displays storage contents
@@ -55,12 +55,15 @@ let mod = {
         MINERAL: true, // displays mineral amount, or ticks to regen
         SOURCE: true, // displays energy amount, or ticks to regen
         CREEP: true, // draws creep paths
-        WALL: false, // highlight weakest wall and display hits
-        RAMPART: false, // highlight weakest rampart and display hits
-        ROAD: false, // highlight weakest road and display hits
-        HEATMAP: false, // collects creep positioning to display a heatmap. WARNING: HIGH MEMORY USAGE
+        WALL: false, // highlight weakest wall and writePlanToMemory hits
+        RAMPART: false, // highlight weakest rampart and writePlanToMemory hits
+        ROAD: false, // highlight weakest road and writePlanToMemory hits
+        HEATMAP: false, // collects creep positioning to writePlanToMemory a heatmap. WARNING: HIGH MEMORY USAGE
         HEATMAP_INTERVAL: 2, // intervals between collections
         ACTION_ASSIGNMENT: true, // draws a line from a creep and it's new assignment
+        CONTAINER: true, // displays container amount of resources in x/2000 format
+        DRAW_ARROW: true, // draw arrow to the target
+        HIGHLIGHT_STRUCTURE: true // highlight target structure
     },
     // function parameters: room. expected result: boolean
     SEMI_AUTOMATIC_CONSTRUCTION: true, // enables semi-automatic construction. Will construct based on flags.
@@ -86,21 +89,104 @@ let mod = {
         7: 25000,
         8: 50000
     },
-    MAX_STORAGE_MINERAL:200000, // keep a max of each type of minerals in store
+    MAX_STORAGE_MINERAL: 200000, // keep a max of each type of minerals in store
+    MAX_STORAGE_NOT_ROOM_MINERAL: 20000, // amount of not room minerals
+    SELL_COMPOUND: {
+        XGH2O: {    // +100% upgradeController effectiveness without increasing the energy cost
+            sell: false, // sell or not
+            urgent: false, // false => sell price is the average price of the existing offers, true => sell price is lower then the lowest price
+            defaultPrice: 1, // sell price if there is no existing offers, and there is no order above it.
+            rooms: [], // affected rooms, empty array means all rooms
+            maxStorage: 50000 // selling starts above this amount
+        },
+        XUH2O: {    // +300% attack effectiveness
+            sell: false,
+            urgent: false,
+            defaultPrice: 1,
+            rooms: [],
+            maxStorage: 200000
+        },
+        XKHO2: {    // +300% rangedAttack and rangedMassAttack effectiveness
+            sell: false,
+            urgent: false,
+            defaultPrice: 1,
+            rooms: [],
+            maxStorage: 200000
+        },
+        XLHO2: {    // +300% heal and rangedHeal effectiveness
+            sell: false,
+            urgent: false,
+            defaultPrice: 1,
+            rooms: [],
+            maxStorage: 200000
+        },
+        XGHO2: {    // -70% damage taken
+            sell: false,
+            urgent: false,
+            defaultPrice: 1,
+            rooms: [],
+            maxStorage: 200000
+        },
+        XZH2O: {    // +300% dismantle effectiveness
+            sell: false,
+            urgent: false,
+            defaultPrice: 1,
+            rooms: [],
+            maxStorage: 200000
+        },
+        XKH2O: {    // +150 capacity
+            sell: false,
+            urgent: false,
+            defaultPrice: 1,
+            rooms: [],
+            maxStorage: 200000
+        },
+        XZHO2: {    // +300% fatigue decrease speed
+            sell: false,
+            urgent: false,
+            defaultPrice: 1,
+            rooms: [],
+            maxStorage: 200000
+        },
+        XUHO2: {    // +600% harvest effectiveness
+            sell: false,
+            urgent: false,
+            defaultPrice: 1,
+            rooms: [],
+            maxStorage: 200000
+        },
+        XLH2O: {    // +100% repair and build effectiveness without increasing the energy cost
+            sell: false,
+            urgent: false,
+            defaultPrice: 1,
+            rooms: [],
+            maxStorage: 200000
+        }
+    },
     ROOM_TRADING: true, // set this true to enable haulers within your colony to request resources from other rooms in your colony
     FILL_POWERSPAWN: true,
     MIN_MINERAL_SELL_AMOUNT: 20000,
     ENERGY_VALUE_CREDITS: 0.05, // assumed energy exchange rate (in credits) to determine best mineral sell offer
     //MAX_SELL_RANGE: 60,
     TERMINAL_ENERGY: 100000,
+    ENERGY_BALANCE_TRANSFER_AMOUNT: 50000,      // amount to transfer when balancing empire energy
+    TARGET_STORAGE_SUM_RATIO: 0.6,
+    AUTOMATED_RATIO_COUNT: false, // count average ratios according to the market. Sell and buy happens above/bellow the average
     MIN_SELL_RATIO: {
-        'H': 0.02,
-        'O': 0.02,
-        'U': 0.2,
-        'L': 0.2,
-        'K': 0.2,
-        'Z': 0.2,
-        'X': 0.2
+        'H': 0.1,
+        'O': 0.1,
+        'L': 0.1,
+        'U': 0.1,
+        'K': 0.1,
+        'Z': 0.1,
+        'X': 0.1
+    },
+    // prices for automated buy, adjust it to your shard prices
+    MAX_BUY_RATIO: {
+        'H': 0.3,
+        'O': 0.3,
+        'U': 0.3,
+        'X': 0.3
     },
     MAX_REPAIR_LIMIT: { // Limits how high structures get repaired by towers, regarding RCL
         1: 1000,
@@ -111,6 +197,16 @@ let mod = {
         6: 15000,
         7: 20000,
         8: 40000
+    },
+    MIN_FORTIFY_LIMIT: { // Minimum fortification level
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+        6: 0,
+        7: 0,
+        8: 1000000,     // focus is usually RCL growth, so 0 until 8
     },
     MAX_FORTIFY_LIMIT: { // Limits how high structures get repaired by creeps, regarding RCL
         1: 1000,
@@ -132,6 +228,7 @@ let mod = {
     REPORTS_PER_LOOP: 18,
     SEND_STATISTIC_REPORTS: true, // Set to true to receive room statistics per mail, otherwise set to false.
     ROAD_CONSTRUCTION_ENABLE: false, // Set to False to disable automatic road construction, or to a number to enable for owned rooms reaching that RC Level. WARNING: HIGH MEMORY USAGE
+    ROAD_CONSTRUCTION_FORCED_ROOMS: {'shard0':[]}, //Add room names to force automatic road construction regardless of ROAD_CONSTRUCTION_ENABLE e.g. {'shard0':['W0N0','W1N0'],'shard1':['W0N0', 'W1N0']}.
     ROAD_CONSTRUCTION_INTERVAL: 500,
     ROAD_CONSTRUCTION_MIN_DEVIATION: 1.2,
     ROAD_CONSTRUCTION_ABS_MIN: 3,
@@ -139,18 +236,18 @@ let mod = {
     USE_SUMMERTIME: true, // Please define isSummerTime in global.js to suit to your local summertime rules
     SPAWN_DEFENSE_ON_ATTACK: true, // This will attempt to store enough to have a defense and spawn troops when invaded.
     MANAGED_CONTAINER_TRIGGER: 0.25, // managed containers get filled below this relative energy amount and emptied when above 1-this value
-    ROUTE_ROOM_COST: {}, // custom room routing cost: e.g. `{ 'W4N4': 11 }`. Affects bestSpawnRoomFor, Creep.Setup calculations, and travel cost predictions. Please call 'delete Memory.routeRange;' whenever you change this property.
+    ROUTE_ROOM_COST: { 'shard0':{}}, // custom room routing cost: e.g. `{'shard0':{ 'W0N0':5, 'W4N4': 11 },'shard1':...}`. Affects bestSpawnRoomFor, Creep.Setup calculations, and travel cost predictions. Please call 'delete Memory.routeRange;' whenever you change this property.
     TRAVELLING_BORDER_RANGE: 22, // room arrival distance for travelling and routes
     NOTIFICATE_INVADER: false, // Also log common 'Invader' hostiles
     NOTIFICATE_INTRUDER: true, // Log any hostiles in your rooms
     NOTIFICATE_HOSTILES: true, // Log any hostiles - Ignores NOTIFICATE_INTRUDER and NOTIFICATE_INVADER
-    COMBAT_CREEPS_RESPECT_RAMPARTS: false, // causes own creeps not to leave through ramparts
+    COMBAT_CREEPS_RESPECT_RAMPARTS: false, // causes own creeps not to leave through ramparts when defending
     COST_MATRIX_VALIDITY: 1000,
     // function parameters: room. expected result: array
     CONSTRUCTION_PRIORITY: [STRUCTURE_SPAWN,STRUCTURE_EXTENSION,STRUCTURE_LINK,STRUCTURE_TERMINAL,STRUCTURE_STORAGE,STRUCTURE_TOWER,STRUCTURE_POWER_SPAWN,STRUCTURE_NUKER,STRUCTURE_OBSERVER,STRUCTURE_ROAD,STRUCTURE_CONTAINER,STRUCTURE_EXTRACTOR,STRUCTURE_LAB,STRUCTURE_WALL,STRUCTURE_RAMPART],
     CONTROLLER_SIGN: true,
     // function parameters: room. expected result: string
-    CONTROLLER_SIGN_MESSAGE: `Territory of ${_ME}, an Open Collaboration Society user! (https://github.com/ScreepsOCS)`,
+    CONTROLLER_SIGN_MESSAGE: `Territory of ${_ME}, a Collaborative Coder Coalition user! (https://gitlab.com/ScreepsCCC/public)`,
     CONTROLLER_SIGN_UPDATE: false, // Update sign message if user changes CONTROLLER_SIGN_MESSAGE
     MINERS_AUTO_BUILD: false, // miners and remoteMiners will build their own containers if they are missing.
     MINER_WORK_THRESHOLD: 50, // how long to wait before a miner checks for repairs/construction sites nearby again
@@ -168,10 +265,11 @@ let mod = {
     TASK_CREEP_CHECK_INTERVAL: 250, // Maximum number of ticks before a task checks to see if it needs to spawn new creeps
     REMOTE_RESERVE_HAUL_CAPACITY: 0.1, // Percent of allocated haul capacity before sending reservers.
     PIONEER_UNOWNED: false, // True: pioneers may attempt to work in unowned rooms.
+    PRIVATEERS_BUILD: false, // True: robbers may attempt to build
     DRIVE_BY_REPAIR_RANGE: 2, // range that creeps should search when trying to repair and move
     REMOTE_WORKER_MULTIPLIER: 1, // Number of workers spawned per remote mining room.
-    PLAYER_WHITELIST: ['cyberblast','SirLovi','Asku','Kazume','Noxeth','MrDave','Telemac','Xephael','Zoiah','fsck-u','FaceWound','forkmantis','Migaaresno','xAix1999','silentpoots','arguinyano','OokieCookie','OverlordQ','Nibinhilion','Crowsbane','Yew','BogdanBiv','s1akr','Pandabear41','Logmadr','Patrik','novice','Conquest','ofirl','GeorgeBerkeley','TTR','tynstar','K-C','Hoekynl','Sunri5e','AgOrange','distantcam','Lisp','bbdMinimbl','Twill','Logxen','miR','Spedwards','Krazyfuq','Icesory','chobobobo','deft-code','mmmd','DKPlugins','pavelnieks','buckley310','almaravarion','SSH','Perrytheplatypus','Jnesselr','ryagas','xXtheguy52Xx','SEATURTLEKING','DasBrain','C00k1e_93','Currency','Vykook','shedletsky','Aranatha','Montblanc','emb3r','Mudla','Vladthepaler','kikooo','CanisMinor','NekoSama','Dravo'],
-    // Don't attack. Must be a member of OCS for permanent whitelisting in git repository. But you can change your own copy... Please ask if you are interested in joining OCS :)
+    PLAYER_WHITELIST: ['norca','SirLovi','Asku','Kazume','Noxeth','MrDave','Telemac','Xephael','Zoiah','fsck-u','FaceWound','forkmantis','Migaaresno','xAix1999','silentpoots','arguinyano','OokieCookie','OverlordQ','Nibinhilion','Crowsbane','Yew','BogdanBiv','s1akr','Pandabear41','Logmadr','Patrik','novice','Conquest','ofirl','GeorgeBerkeley','TTR','tynstar','K-C','Hoekynl','Sunri5e','AgOrange','distantcam','Lisp','bbdMinimbl','Twill','Logxen','miR','Spedwards','Krazyfuq','Icesory','chobobobo','deft-code','mmmd','DKPlugins','pavelnieks','buckley310','almaravarion','SSH','Perrytheplatypus','Jnesselr','ryagas','xXtheguy52Xx','SEATURTLEKING','DasBrain','C00k1e_93','Currency','Vykook','shedletsky','Aranatha','Montblanc','emb3r','Mudla','Vladthepaler','kikooo','CanisMinor','NekoSama','Dravo', 'zolcsika'],
+    // Don't attack. Must be a member of CCC for permanent whitelisting in git repository. But you can change your own copy... Please ask if you are interested in joining CCC :)
     DEFENSE_BLACKLIST: [], // Don't defend those rooms (add room names). Blocks spawning via defense task (will not prevent offensive actions at all)
     CRITICAL_BUCKET_LEVEL: 1000, // take action when the bucket drops below this value to prevent the bucket from actually running out
     CRITICAL_BUCKET_OVERFILL: 200, // Overfill the bucket by this amount before disabling CPU throttle, this can reduce thrashing because all creeps try to act at once
@@ -211,6 +309,213 @@ let mod = {
         UNCHARGING: String.fromCodePoint(0x1F50B), // 🔋
         UPGRADING: String.fromCodePoint(0x1F5FD), // 🗽
         WITHDRAWING: String.fromCodePoint(0x1F4E4) + String.fromCodePoint(0xFE0E), // 📤
-    }
+        SAFEGEN: String.fromCodePoint(0x1F512), // 🔒
+    },
+    COOLDOWN: {
+        TOWER_URGENT_REPAIR: 10,
+        TOWER_REPAIR: 10 ,
+        CREEP_IDLE: 5
+    },
+    TOWER_REPAIR: true,
+    TOWER_URGENT_REPAIR: true,
+
+    // automatedBoostProduction
+    // rooms with storage, terminal and flower registered labs loaded with energy are needed for the whole process (energy needed for allocation only)
+    // it`s recommended to place a purple/white flag to spawn a labTech
+    // use _.values(Game.structures).filter(i => i.structureType === 'lab').map(i => i.room.setStore(i.id, RESOURCE_ENERGY, 2000));
+    // to fill labs with energy.
+    // if something goes wrong use Util.resetBoostProduction() to reset all rooms or Util.resetBoostProduction('roomName'), and MAKE_COMPOUNDS: false / ALLOCATE_COMPOUNDS: false to turn off the process;
+
+    // auto flower register labs
+    AUTO_REGISTER_LABS: false, // it needs MAKE_COMPOUNDS: true
+
+    // compounds making
+    MAKE_COMPOUNDS: false,
+    MAKE_COMPOUNDS_INTERVAL: 5,
+    MAKE_REACTIONS_WITH_3LABS: false,
+    CHECK_ORDERS_INTERVAL: 25,
+    PURCHASE_MINERALS: false,
+    STORE_CHARGE_PURCHASE: 0.6,
+    COMPOUNDS_TO_MAKE: {    // which compounds to make
+        G: {                // for nukes
+            make: false,    // make it or not
+            roomThreshold: 0,   // start producing when room.resourcesAll[compound] <= roomThreshold
+            amount: 5000,   // amount to make when room.resourcesAll <= roomThreshold (keep producing, while room.resourcesAll[compound] < amount + roomThreshold)
+            rooms: []       // rooms involved, leave it empty for all rooms
+        },
+        GH2O: {        // +80% upgradeController effectiveness without increasing the energy cost
+            make: false,
+            roomThreshold: 9000,
+            amount: 3000,
+            rooms: []
+        },
+        XGH2O: {        // +100% upgradeController effectiveness without increasing the energy cost
+            make: false,
+            roomThreshold: 9000,
+            amount: 3000,
+            rooms: []
+        },
+        XUH2O: {        // +300% attack effectiveness
+            make: false,
+            roomThreshold: 9000,
+            amount: 3000,
+            rooms: []
+        },
+        XKHO2: {        // +300% rangedAttack and rangedMassAttack effectiveness
+            make: false,
+            roomThreshold: 9000,
+            amount: 3000,
+            rooms: []
+        },
+        XLHO2: {        // +300% heal and rangedHeal effectiveness
+            make: false,
+            roomThreshold: 9000,
+            amount: 3000,
+            rooms: []
+        },
+        XUHO2: {        // +600% harvest effectiveness
+            make: false,
+            roomThreshold: 9000,
+            amount: 3000,
+            rooms: []
+        },
+        XKH2O: {        // +150 capacity
+            make: false,
+            roomThreshold: 9000,
+            amount: 3000,
+            rooms: []
+        },
+        XLH2O: {        // +100% repair and build effectiveness without increasing the energy cost
+            make: false,
+            roomThreshold: 9000,
+            amount: 3000,
+            rooms: []
+        },
+        XZH2O: {        // +300% dismantle effectiveness
+            make: false,
+            roomThreshold: 9000,
+            amount: 3000,
+            rooms: []
+        },
+        XZHO2: {        // +300% fatigue decrease speed
+            make: false,
+            roomThreshold: 9000,
+            amount: 3000,
+            rooms: []
+        },
+        XGHO2: {        // -70% damage taken
+            make: false,
+            roomThreshold: 9000,
+            amount: 3000,
+            rooms: []
+        }
+    },
+    TRADE_THRESHOLD: 1000,
+    MIN_OFFER_AMOUNT: 100,
+    MIN_COMPOUND_AMOUNT_TO_MAKE: 3000,
+
+    // compounds allocating
+    ALLOCATE_COMPOUNDS: false,
+    ALLOCATE_COMPOUNDS_INTERVAL: 200,
+    UNREGISTER_BOOSTLAB_AT: 450, // unregister boostLab when boostLab.mineralAmount < UNREGISTER_BOOSTLAB_AT
+    COMPOUNDS_TO_ALLOCATE: { // if modified -> delete Memory.compoundsToAllocate
+        XGH2O : {       // +100% upgradeController effectiveness without increasing the energy cost
+            allocate: false, // allocate this compound
+            allocateRooms: [], // rooms to allocate, leave it empty for all rooms
+            roomThreshold: 3000, // allocating will start when compound is below roomThreshold
+            amount: 1550,  // amount to allocate
+            storeTo: 'lab', // 'storage' or 'lab'
+            labRefilledAt: 500 // lab refilled below this amount, it is meaningless if storeTo = 'storage'
+        },
+        GH2O : {       // +80% upgradeController effectiveness without increasing the energy cost
+            allocate: false,
+            superior: 'XGH2O', // do not allocate when superior allocated or making with 10 labs
+            allocateRooms: [],
+            roomThreshold: 3000,
+            amount: 1550,
+            storeTo: 'lab',
+            labRefilledAt: 900
+        },
+        XUH2O : {       // +300% attack effectiveness
+            allocate: false,
+            allocateRooms: [],
+            roomThreshold: 3000,
+            amount: 3000,
+            storeTo: 'storage',
+            labRefilledAt: 500
+        },
+        XKHO2 : {       // +300% rangedAttack and rangedMassAttack effectiveness
+            allocate: false,
+            allocateRooms: [],
+            roomThreshold: 3000,
+            amount: 3000,
+            storeTo: 'storage',
+            labRefilledAt: 500
+        },
+        XLHO2 : {       // +300% heal and rangedHeal effectiveness
+            allocate: false,
+            allocateRooms: [],
+            roomThreshold: 3000,
+            amount: 3000,
+            storeTo: 'storage',
+            labRefilledAt: 500
+        },
+        XUHO2 : {       // +600% harvest effectiveness
+            allocate: false,
+            allocateRooms: [],
+            roomThreshold: 3000,
+            amount: 3000,
+            storeTo: 'storage',
+            labRefilledAt: 500
+        },
+        XKH2O : {       // +150 capacity
+            allocate: false,
+            allocateRooms: [],
+            roomThreshold: 3000,
+            amount: 3000,
+            storeTo: 'storage',
+            labRefilledAt: 500
+        },
+        XLH2O : {       // +100% repair and build effectiveness without increasing the energy cost
+            allocate: false,
+            allocateRooms: [],
+            roomThreshold: 3000,
+            amount: 3000,
+            storeTo: 'storage',
+            labRefilledAt: 500
+        },
+        XZH2O : {       // +300% dismantle effectiveness
+            allocate: false,
+            allocateRooms: [],
+            roomThreshold: 3000,
+            amount: 3000,
+            storeTo: 'storage',
+            labRefilledAt: 500
+        },
+        XZHO2 : {       // +300% fatigue decrease speed
+            allocate: false,
+            allocateRooms: [],
+            roomThreshold: 3000,
+            amount: 3000,
+            storeTo: 'storage',
+            labRefilledAt: 500
+        },
+        XGHO2 : {       //-70% damage taken
+            allocate: false,
+            allocateRooms: [],
+            roomThreshold: 15000,
+            amount: 3000,
+            storeTo: 'storage',
+            labRefilledAt: 500
+        },
+        power : {
+            allocate: false,
+            allocateRooms: [], // powers allocated between rooms with PowerSpawn only
+            roomThreshold: 100,
+            amount: 1000,
+            storeTo: 'storage',
+            labRefilledAt: 500
+        }
+    },
 };
 module.exports = mod;

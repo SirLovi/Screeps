@@ -1,12 +1,12 @@
 let mod = {};
 module.exports = mod;
 mod.tasks = [];
+mod.executeCache = {};
 mod.populate = function() {
     Task.addTasks(...[
         Task.attackController,
         Task.claim,
         Task.defense,
-        Task.delivery,
         Task.guard,
         Task.labTech,
         Task.mining,
@@ -14,6 +14,8 @@ mod.populate = function() {
         Task.reputation,
         Task.reserve,
         Task.robbing,
+        Task.safeGen,
+        Task.scheduler,
     ]);
 };
 mod.addTasks = (...task) => Task.tasks.push(...task);
@@ -38,6 +40,7 @@ mod.register = function () {
         // Extending of any other kind
         if (task.register) task.register();
         // Flag Events
+        if (task.execute && !Task.executeCache[task.name]) Task.executeCache[task.name] = {execute:task.execute};
         if (task.handleFlagFound) Flag.found.on(flag => task.handleFlagFound(flag));
         if (task.handleFlagRemoved) Flag.FlagRemoved.on(flagName => task.handleFlagRemoved(flagName));
         // Creep Events
@@ -53,6 +56,15 @@ mod.register = function () {
         if (task.handleKnownInvader) Room.knownInvader.on(invaderID => task.handleKnownInvader(invaderID));
         if (task.handleGoneInvader) Room.goneInvader.on(invaderID => task.handleGoneInvader(invaderID));
         if (task.handleRoomDied) Room.collapsed.on(room => task.handleRoomDied(room));
+    });
+};
+mod.execute = function(){
+    _.forEach(Task.executeCache, function(n, k){
+        try{
+            n.execute();
+        } catch(e){
+            console.log(`Error executing Task "${k}"<br>${e.stack || e.toString()}`);
+        }
     });
 };
 mod.memory = (task, s) => { // task:  (string) name of the task, s: (string) any selector for that task, could be room name, flag name, enemy name
@@ -127,7 +139,7 @@ mod.spawn = (creepDefinition, destiny, roomParams, onQueued) => {
         queueRoom: room.name
     };
     if( creepSetup.parts.length === 0 ) {
-        // creep has no body. 
+        // creep has no body.
         global.logSystem(flag.pos.roomName, dye(CRAYON.error, `${destiny.task} task tried to queue a zero parts body ${creepDefinition.behaviour} creep. Aborted.` ));
         return null;
     }

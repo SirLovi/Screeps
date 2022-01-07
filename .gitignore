@@ -3,6 +3,10 @@ screeps.json
 dist/
 pack/
 pub/
+notes/
+overrides/viral.parameter.js
+publish/
+lib/
 
 ### Dreamweaver template
 # DW Dreamweaver added files

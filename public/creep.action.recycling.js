@@ -13,6 +13,10 @@ action.newTarget = function(creep){
         // go to home spawn
         target = Game.spawns[creep.data.motherSpawn];
     }
+    if( target == null ){
+        // If home spawn doesn't exist
+        target = creep.pos.findClosestSpawn();
+    }
     return target;
 };
 action.work = function(creep){

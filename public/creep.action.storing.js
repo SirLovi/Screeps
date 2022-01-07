@@ -4,31 +4,31 @@ action.isValidAction = function(creep) {
     return creep.room.storage && creep.room.storage.isActive() && creep.sum > 0;
 };
 action.isValidTarget = function(target){
-    return ((target) && (target.store) && target.active && target.sum < target.storeCapacity);
+    return ((target) && (target.store) && target.active && target.sum < target.store.getCapacity());
 };
 action.isAddableTarget = function(target, creep){
     return ( target.my &&
-        (!target.targetOf || target.targetOf.length < this.maxPerTarget) && 
-        target.sum + creep.carry[RESOURCE_ENERGY] < target.storeCapacity);
+        (!target.targetOf || target.targetOf.length < this.maxPerTarget) &&
+        target.sum + creep.carry[RESOURCE_ENERGY] < target.store.getCapacity());
 };
 action.isValidMineralToTerminal = function(room){
     return ( room.storage.store[room.mineralType] &&
         room.storage.store[room.mineralType] > MAX_STORAGE_MINERAL*1.05 &&
-        ((room.terminal.sum - room.terminal.store.energy) + Math.max(room.terminal.store.energy, TERMINAL_ENERGY)) < room.terminal.storeCapacity);
+        ((room.terminal.sum - room.terminal.store.energy) + Math.max(room.terminal.store.energy, TERMINAL_ENERGY)) < room.terminal.store.getCapacity());
 };
 action.newTarget = function(creep){
     let roomMineralType = creep.room.mineralType;
+
     let sendMineralToTerminal = creep => (
         creep.carry[roomMineralType] &&
         creep.carry[roomMineralType] > 0 &&
         this.isValidMineralToTerminal(creep.room));
+
     let sendEnergyToTerminal = creep => (
         creep.carry.energy > 0 &&
         creep.room.storage.charge > 0.5 &&
         creep.room.terminal.store.energy < TERMINAL_ENERGY*0.95 &&
-        creep.room.terminal.sum  < creep.room.terminal.storeCapacity);
-        // &&
-        //(creep.room.terminal.storeCapacity - creep.room.terminal.sum) >= creep.carry[roomMineralType]);
+        creep.room.terminal.sum  < creep.room.terminal.store.getCapacity());
 
     if( creep.room.terminal && creep.room.terminal.active &&
         ( sendMineralToTerminal(creep) || sendEnergyToTerminal(creep) ) &&
@@ -40,11 +40,11 @@ action.newTarget = function(creep){
     return null;
 };
 action.work = function(creep){
-    var workResult;
-    for(var resourceType in creep.carry) {
+    let workResult;
+    for(let resourceType in creep.carry) {
         if( creep.carry[resourceType] > 0 ){
             workResult = creep.transfer(creep.target, resourceType);
-            if( workResult != OK ) break;
+            if( workResult !== OK ) break;
         }
     }
     delete creep.data.actionName;

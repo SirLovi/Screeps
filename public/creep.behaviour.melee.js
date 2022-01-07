@@ -26,3 +26,9 @@ mod.actions = (creep) => {
         Creep.action.guarding
     ];
 };
+mod.strategies.healing = {
+    moveOptions: function (options) {
+        options.respectRamparts = true;
+        return options;
+    }
+};

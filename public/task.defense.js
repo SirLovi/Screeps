@@ -8,7 +8,7 @@ mod.handleNewInvader = invaderCreep => {
     // ignore if on blacklist
     if( !SPAWN_DEFENSE_ON_ATTACK || DEFENSE_BLACKLIST.includes(invaderCreep.pos.roomName) ) return;
     // if not our room and not our reservation
-    
+
     if( !invaderCreep.room.my && !invaderCreep.room.reserved ) {
         // if it is not our exploiting target
     let validColor = flagEntry => (
@@ -16,24 +16,24 @@ mod.handleNewInvader = invaderCreep => {
     (flagEntry.color == FLAG_COLOR.claim.color )
     );
         let flag = FlagDir.find(validColor, invaderCreep.pos, true);
-        
+
         if( !flag )
             return; // ignore invader
-    } 
+    }
     // check room threat balance
     if( invaderCreep.room.defenseLevel.sum > invaderCreep.room.hostileThreatLevel ) {
         // room can handle that
         return;
     } else {
         // order a defender for each invader (if not happened yet)
-        invaderCreep.room.hostiles.forEach(Task.defense.orderDefenses);            
+        invaderCreep.room.hostiles.forEach(Task.defense.orderDefenses);
     }
 };
 // When an invader leaves a room
 mod.handleGoneInvader = invaderId => {
     // check if invader died or in an other room (requires vision)
     let invader = Game.getObjectById(invaderId);
-    if( !invader ) { 
+    if( !invader ) {
         // Invader not found anymore
         // remove queued creeps
         let taskMemory = Task.defense.memory(invaderId);
@@ -63,7 +63,7 @@ mod.handleCreepDied = creepName => {
         return;
     // check if the invader is still there
     let invader = Game.getObjectById(creepMemory.destiny.invaderId);
-    if( !invader ) 
+    if( !invader )
         return;
 
     // remove died creep from mem
@@ -89,7 +89,7 @@ mod.creep = {
             [RANGED_ATTACK]: 2,
             [TOUGH]: 1,
         },
-        name: "defender", 
+        name: "defender",
         behaviour: "ranger"
     },
 };
@@ -109,22 +109,22 @@ mod.orderDefenses = invaderCreep => {
     }
 
     // analyze invader threat and create something bigger
-    while( remainingThreat > 0 ){        
+    while( remainingThreat > 0 ){
         let orderId = global.guid();
         Task.defense.creep.defender.queue = invaderCreep.room.my ? 'High' : 'Medium';
         Task.defense.creep.defender.minThreat = (remainingThreat * 1.1);
-      
+
         let queued = Task.spawn(
             Task.defense.creep.defender, { // destiny
-                task: 'defense', 
+                task: 'defense',
                 targetName: invaderId,
-                invaderId: invaderId, 
-                spottedIn: invaderCreep.pos.roomName, 
+                invaderId: invaderId,
+                spottedIn: invaderCreep.pos.roomName,
                 order: orderId
             }, { // spawn room selection params
-                targetRoom: invaderCreep.pos.roomName, 
-                maxRange: 4, 
-                minEnergyCapacity: 800, 
+                targetRoom: invaderCreep.pos.roomName,
+                maxRange: 4,
+                minEnergyCapacity: 800,
                 allowTargetRoom: true
             },
             creepSetup => { // callback onQueued

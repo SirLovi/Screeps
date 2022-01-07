@@ -121,7 +121,7 @@ mod.handleCreepDied = name => {
     // get flag which caused request of that creep
     const flag = Game.flags[mem.destiny.targetName];
     if (flag) {
-        const memory = Task.delivery.memory(flag);
+        const memory = Task.delivery.memory(flag.pos.roomName);
         Task.validateRunning(memory, flag, mod.name, {roomName: flag.pos.roomName, deadCreep: name});
     }
 };

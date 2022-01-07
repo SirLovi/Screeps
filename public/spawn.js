@@ -33,7 +33,7 @@ mod.extend = function(){
     };
     Spawn.prototype.createCreepBySetup = function(setup){
         if( global.DEBUG && global.TRACE ) trace('Spawn',{setupType:this.type, rcl:this.room.controller.level, energy:this.room.energyAvailable, maxEnergy:this.room.energyCapacityAvailable, Spawn:'createCreepBySetup'}, 'creating creep');
-        var params = setup.buildParams(this);
+        let params = setup.buildParams(this);
         if( this.create(params.parts, params.name, params.setup) )
             return params;
         return null;
@@ -43,7 +43,7 @@ mod.extend = function(){
         if (!queue) return null;
         else if (Memory.CPU_CRITICAL && spawnDelay[level] === queue.length) return null;
         let params;
-        for (const index in queue) {
+        for (let index = 0; index < queue.length; index++) {
             const entry = queue[index];
             if (Memory.CPU_CRITICAL && !CRITICAL_ROLES.includes(entry.behaviour)) continue;
             else params = queue.splice(index, 1)[0];
@@ -72,9 +72,9 @@ mod.extend = function(){
             queue.unshift(params);
             return true;
         }
-        var completeName;
-        var stumb = params.name;
-        for (var son = 1; (completeName == null) || Game.creeps[completeName] || Memory.population[completeName]; son++) {
+        let completeName;
+        let stumb = params.name;
+        for (let son = 1; (completeName == null) || Game.creeps[completeName] || Memory.population[completeName]; son++) {
             completeName = params.name + '-' + son;
         }
         params.name = completeName;
@@ -87,24 +87,24 @@ mod.extend = function(){
     };
     Spawn.prototype.create = function(body, name, behaviour, destiny){
         if( body.length == 0 ) return false;
-        var newName = this.createCreep(body, name, null);
-        if( name == newName || translateErrorCode(newName) === undefined ){
+        let success = this.spawnCreep(body, name);
+        if( success == OK ){
             let cost = 0;
             body.forEach(function(part){
                 cost += BODYPART_COST[part];
             });
             this.room.reservedSpawnEnergy += cost;
             Population.registerCreep(
-                newName,
+                name,
                 behaviour,
                 cost,
                 this.room,
                 this.name,
                 body,
                 destiny); 
-            this.newSpawn = {name: newName};
-            Creep.spawningStarted.trigger({spawn: this.name, name: newName, body: body, destiny: destiny, spawnTime: body.length * CREEP_SPAWN_TIME});
-            if(CENSUS_ANNOUNCEMENTS) global.logSystem(this.pos.roomName, dye(CRAYON.birth, 'Good morning ' + newName + '!') );
+            this.newSpawn = {name: name};
+            Creep.spawningStarted.trigger({spawn: this.name, name: name, body: body, destiny: destiny, spawnTime: body.length * CREEP_SPAWN_TIME});
+            if(CENSUS_ANNOUNCEMENTS) global.logSystem(this.pos.roomName, dye(CRAYON.birth, 'Good morning ' + name + '!') );
             return true;
         }
         if( global.DEBUG || CENSUS_ANNOUNCEMENTS ) global.logSystem(this.pos.roomName, dye(CRAYON.error, 'Offspring failed: ' + translateErrorCode(newName) + '<br/> - body: ' + JSON.stringify(_.countBy(body)) + '<br/> - name: ' + name + '<br/> - behaviour: ' + behaviour + '<br/> - destiny: ' + destiny) );

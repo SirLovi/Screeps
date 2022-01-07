@@ -554,7 +554,7 @@ let mod = {
 	TERMINAL_ENERGY: 100000,
 	ENERGY_BALANCE_TRANSFER_AMOUNT: 50000,      // amount to transfer when balancing empire energy
 	TARGET_STORAGE_SUM_RATIO: 0.9,
-	PROCESS_ORDERS_INTERVAL: 99, // interval to process room orders and run terminalBroker
+	PROCESS_ORDERS_INTERVAL: 299, // interval to process room orders and run terminalBroker
 	// RESET_ACCEPTED_ROOMS: 50,
 	COMPOUNDS_MANAGE_TIMING: 5,
 	COMPOUNDS_MANAGE: { // if modified -> DELETE Memory.compoundsManage!!!!
@@ -708,8 +708,8 @@ let mod = {
 			['admon', 99],
 			['likeafox', 99],
 		],
-		sendAndRequestTiming: 98,
-		trackTiming: 99,
+		sendAndRequestTiming: 298,
+		trackTiming: 299,
 		acceptableMinerals: ['energy', 'X', 'O', 'H', 'L', 'U', 'K', 'Z'], // Acceptable array is the resources you are willing to trade out.
 		minAmount: 300000, // The minimum you have of the above mineral before you trade.
 	},

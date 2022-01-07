@@ -32,7 +32,7 @@ action.determineSpot = function(creep, source) {
             invalid.push(entry.determinatedSpot);
     };
     _.forEach(Memory.population, findInvalid);
-    const containerSpot = (source.container && source.container.pos.isNearTo(source)
+    const containerSpot = (source.container && source.container.structureType === STRUCTURE_CONTAINER && source.container.pos.isNearTo(source)
         && !_.some(invalid,{x:source.container.pos.x, y:source.container.pos.y})) ? source.container.pos : null;
     let spots = [];
     let args;
@@ -106,7 +106,7 @@ action.work = function(creep) {
         if (creep.sum > minCarry) {
             if (creep.target.link && creep.target.link.energy < creep.target.link.energyCapacity) {
                 creep.transfer(creep.target.link, RESOURCE_ENERGY);
-            } else if (creep.target.container && creep.target.container.sum < creep.target.container.storeCapacity) {
+            } else if (creep.target.container && creep.target.container.sum < creep.target.container.store.getCapacity()) {
                 const transfer = r => {
                     if (creep.carry[r] > 0) creep.transfer(creep.target.container, r);
                 };
@@ -207,14 +207,14 @@ action.maintain = function(creep) {
         }
         if (!creep.data.buildChecked || Game.time - creep.data.buildChecked > MINER_WORK_THRESHOLD) {
             let buildTarget = Game.getObjectById(creep.data.buildTarget);
-            if (!buildTarget || buildTarget.progress === buildTarget.progressMax) {
+            if (!buildTarget || buildTarget.progress === buildTarget.progressTotal) {
                 buildTarget = creep.pos.findInRange(creep.room.myConstructionSites, 3, {
-                    filter: s => (s.structureType === STRUCTURE_CONTAINER || s.structureType === STRUCTURE_ROAD) && s.progress < s.progressMax
+                    filter: s => (s.structureType === STRUCTURE_CONTAINER || s.structureType === STRUCTURE_ROAD) && s.progress < s.progressTotal
                 })[0];
             }
             if (buildTarget) {
                 creep.data.buildTarget = buildTarget.id;
-                if (global.DEBUG && global.TRACE) trace('Action', {actionName:this.name, method: 'maintain', creepName:creep.name, pos:creep.pos, buildTarget: buildTarget.id, progress: buildTarget.progress/buildTarget.progressMax});
+                if (global.DEBUG && global.TRACE) trace('Action', {actionName:this.name, method: 'maintain', creepName:creep.name, pos:creep.pos, buildTarget: buildTarget.id, progress: buildTarget.progress/buildTarget.progressTotal});
                 return creep.build(buildTarget);
             } else {
                 delete creep.data.buildTarget;

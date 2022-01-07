@@ -28,7 +28,7 @@ function getBoostPartType(mineralType) {
 action.getBoostPartType = getBoostPartType;
 
 function canBoostType(creep, type) {
-    return !_(creep.body).filter({type}).every(part => part.boost);
+    return !_(creep.body).filter({ type }).every(part => part.boost);
 }
 action.canBoostType = canBoostType;
 
@@ -52,7 +52,7 @@ const super_isAddableTarget = action.isAddableTarget;
 function isAddableTarget(target, creep) {
     const boostPartType = this.getBoostPartType(target.mineralType);
     // mineralType is a boosting compound
-    return super_isAddableTarget.apply(this, [target, creep]) && this.isValidMineralType(target.mineralType) &&
+    return super_isAddableTarget.apply(this, [target, creep]) && creep.getStrategyHandler([action.name], 'isValidMineralType', target.mineralType) &&
         // creep has active body parts matching the mineralType's boost
         creep.hasActiveBodyparts(boostPartType) &&
         // can further boost parts of the mineralType's boost
@@ -61,8 +61,9 @@ function isAddableTarget(target, creep) {
 action.isAddableTarget = isAddableTarget;
 
 function newTarget(creep) {
-    return _(creep.room.structures.all)
+    return _(creep.room.structures.labs.all)
         .filter(this.isValidTarget)
+        .filter(lab => this.isAddableTarget(lab, creep))
         .min(lab => creep.pos.getRangeTo(lab));
 }
 action.newTarget = newTarget;
@@ -76,3 +77,15 @@ function onAssignment(creep) {
     if (SAY_ASSIGNMENT) creep.say(ACTION_SAY.BOOSTING, global.SAY_PUBLIC);
 }
 action.onAssignment = onAssignment;
+
+action.defaultStrategy.isValidMineralType = function(mineralType) {
+    for (const category in BOOSTS) {
+        for (const compound in BOOSTS[category]) {
+            if (mineralType === compound) {
+                // console.log(compound);
+                return true;
+            }
+        }
+    }
+    return false;
+};

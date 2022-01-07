@@ -4,10 +4,11 @@ mod.analyzeRoom = function(room, needMemoryResync) {
     if (needMemoryResync) {
         room.saveObserver();
         // to re-evaluate rooms, in case parameters are changed
-        if (room.structures.observer) room.initObserverRooms();
+        if (room.structures.observer)
+            room.initObserverRooms();
     }
 };
-mod.executeRoom = function(roomName) {
+mod.executeRoom = function(memory, roomName) {
     const p = Util.startProfiling('Room.observers.executeRoom', {enabled:PROFILING.ROOMS});
     const room = Game.rooms[roomName];
     if (room) {
@@ -85,7 +86,7 @@ mod.extend = function() {
                 const room = hor + vert;
                 if (OBSERVER_OBSERVE_HIGHWAYS_ONLY && !Room.isHighwayRoom(room)) continue; // we only want highway rooms
                 if (room in Game.rooms && Game.rooms[room].my) continue; // don't bother adding the room to the array if it's owned by us
-                if (!Game.map.isRoomAvailable(room)) continue; // not an available room
+                if (!Game.map.getRoomStatus(room) === 'normal') continue; // not an available room
                 this.memory.observer.rooms.push(room);
             }
         }
@@ -96,7 +97,8 @@ mod.extend = function() {
         [this.memory.observer.id] = this.find(FIND_MY_STRUCTURES, {
             filter: s => s instanceof StructureObserver
         }).map(s => s.id);
-        if (_.isUndefined(this.memory.observer.id)) delete this.memory.observer;
+        if (_.isUndefined(this.memory.observer.id))
+            delete this.memory.observer;
     };
     // New Room methods go here
 };

@@ -60,8 +60,26 @@ mod.extend = function() {
     };
 
     Room.prototype.roadConstruction = function( minDeviation = ROAD_CONSTRUCTION_MIN_DEVIATION ) {
-        if( !ROAD_CONSTRUCTION_ENABLE || Game.time % ROAD_CONSTRUCTION_INTERVAL != 0 ) return;
-        if( _.isNumber(ROAD_CONSTRUCTION_ENABLE) && (!this.my || ROAD_CONSTRUCTION_ENABLE > this.controller.level)) return;
+
+
+
+        const forced = ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name] && ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name].indexOf(this.name)!==-1;
+
+        //console.log(`road construction status => enabled: ${ROAD_CONSTRUCTION_ENABLE} forced: ${forced} timing: ${Game.time % ROAD_CONSTRUCTION_INTERVAL === 0} gameTime: ${Game.time % 500}`);
+        //console.log(`return : ${ (!ROAD_CONSTRUCTION_ENABLE && !forced) || Game.time % ROAD_CONSTRUCTION_INTERVAL !== 0 }`);
+
+        if( (!ROAD_CONSTRUCTION_ENABLE && !forced) || Game.time % ROAD_CONSTRUCTION_INTERVAL !== 0 )  {
+            //console.log(`${ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name]}`);
+            return;
+        }
+        if( !forced && (_.isNumber(ROAD_CONSTRUCTION_ENABLE) && (!this.my || ROAD_CONSTRUCTION_ENABLE > this.controller.level))) {
+            //console.log(`road construction fail 2`);
+            return;
+        }
+
+        console.log(`road construction ON: ${this.name}`);
+
+
 
         let data = Object.keys(this.roadConstructionTrace)
             .map( k => {
@@ -73,6 +91,8 @@ mod.extend = function() {
             });
 
         let min = Math.max(ROAD_CONSTRUCTION_ABS_MIN, (data.reduce( (_sum, b) => _sum + b.n, 0 ) / data.length) * minDeviation);
+        //global.BB(data);
+        console.log(`ROAD_CONSTRUCTION_ABS_MIN: ${min}`);
         data = data.filter( e => {
             if (e.n >= min) {
                 let structures = this.lookForAt(LOOK_STRUCTURES,e.x,e.y);

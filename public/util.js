@@ -1,7 +1,7 @@
 // All methods require a JSDoc comment describing it.
 // http://usejsdoc.org/
 module.exports = {
-    
+
     /**
      * Gets currently visible rooms.
      * Dependant on userscript: {@link https://github.com/Esryok/screeps-browser-ext/blob/master/visible-room-tracker.user.js Visible Room Tracker}
@@ -18,7 +18,7 @@ module.exports = {
                 visibleRooms.push(roomName);
             }
         }
-        
+
         return visibleRooms;
     },
     /**
@@ -44,7 +44,7 @@ module.exports = {
         }
         return number.toString();
     },
-    
+
     /**
      * Pad a number with a character
      * @param {Number} number - The number to pad
@@ -59,7 +59,7 @@ module.exports = {
         const padString = _.times(padLength, n => padCharacter).join('');
         return padString + number;
     },
-    
+
     /**
      * Gets a property from an object and optionally sets the default
      * @param {Object} object - The object
@@ -77,7 +77,7 @@ module.exports = {
         }
         return r;
     },
-    
+
     /**
      * Checks if all the arguments passed are equal.
      * @param {...*} args
@@ -87,7 +87,7 @@ module.exports = {
         if (args.length <= 1) return true;
         return args.every((v, i, a) => _.isEqual(v, a[0]));
     },
-    
+
     /**
      * Sets a property on an object, optionally if the property doesn't already exist
      * @param {Object} object - The object
@@ -102,7 +102,7 @@ module.exports = {
         }
         _.set(object, path, value);
     },
-    
+
     /**
      * Calls a function if it exists
      * @param {Function} toCall - The function to call
@@ -112,7 +112,7 @@ module.exports = {
     callIfExists(toCall, ...args) {
         if (toCall) return toCall(...args);
     },
-    
+
     /**
      * Returns the result of the function or the value passed
      * @param {*} value
@@ -122,7 +122,7 @@ module.exports = {
     fieldOrFunction(value, ...args) {
         return typeof value === 'function' ? value(...args) : value;
     },
-    
+
     /**
      * Checks if the value is an object or function
      * @param {*} value - The value to check
@@ -132,7 +132,7 @@ module.exports = {
         if (value === null) return false;
         return typeof value === 'function' || typeof value === 'object';
     },
-    
+
     /**
      * Translates an error code to the type
      * @param {Number} code - The error code / constant
@@ -157,7 +157,7 @@ module.exports = {
             15: 'ERR_GCL_NOT_ENOUGH',
         }[code * -1];
     },
-    
+
     /**
      * Returns a HTML formatted string with the style applied
      * @param {Object|string} style - Either a colour string or an object with CSS properties
@@ -177,7 +177,7 @@ module.exports = {
         }
         return msg;
     },
-    
+
     /**
      * Logs an error to console
      * @param {string} message - A string describing the error
@@ -191,7 +191,7 @@ module.exports = {
             console.log(msg, Util.stack());
         }
     },
-    
+
     /**
      * Log an error for a creep's action, given an error code
      * @param {Creep} creep - The creep causing the error
@@ -208,7 +208,7 @@ module.exports = {
         }
         console.log(Util.dye(CRAYON.error, message), Util.stack());
     },
-    
+
     /**
      * Log text as a system message showing a "referrer" as a label
      * @param {string} roomName - The name of the room being logged from
@@ -216,7 +216,7 @@ module.exports = {
      */
     logSystem(roomName, ...message) {
         const text = Util.dye(CRAYON.system, roomName);
-        console.log(Util.dye(CRAYON.system, `<a href="/a/#!/room/${roomName}">${text}</a> &gt;`), ...message, Util.stack());
+        console.log(Util.dye(CRAYON.system, `<a href="/a/#!/room/${Game.shard.name}/${roomName}">${text}</a> &gt;`), ...message, Util.stack());
     },
 
     /**
@@ -253,7 +253,7 @@ module.exports = {
         }
         if (!(Memory.debugTrace[category] === true || _(entityWhere).reduce(reduceMemoryWhere, 1) === true)) return;
         if (Memory.debugTrace.no && _(entityWhere).pairs().some(noMemoryWhere) === true) return;
-        
+
         let msg = message;
         let key;
         if (message.length === 0 && category) {
@@ -262,7 +262,7 @@ module.exports = {
                 key = leaf;
                 leaf = entityWhere[leaf];
             } while (entityWhere[leaf] && leaf !== category);
-            
+
             if (leaf && leaf !== category) {
                 if (typeof leaf === 'string') {
                     msg = [leaf];
@@ -271,10 +271,10 @@ module.exports = {
                 }
             }
         }
-        
+
         console.log(Game.time, Util.dye(CRAYON.error, category), ...msg, Util.dye(CRAYON.birth, JSON.stringify(entityWhere)), Util.stack());
     },
-    
+
     /**
      * Converts the date to local time
      * @param {Date} date - Server date
@@ -286,7 +286,7 @@ module.exports = {
         if (USE_SUMMERTIME && isSummerTime(date)) offset++;
         return new Date(date.getTime() + (3600000 * offset));
     },
-    
+
     /**
      * Formats the date object to a date-time string
      * @param {Date} date - The date to format
@@ -296,7 +296,7 @@ module.exports = {
         const pad = Util.pad;
         return pad(date.getFullYear(), 0, 4) + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate()) + ' ' + Util.toTimeString(date);
     },
-    
+
     /**
      * Formats the date object to a time string
      * @param {Date} date - The date to format
@@ -306,7 +306,7 @@ module.exports = {
         const pad = Util.pad;
         return pad(date.getHours()) + ':' + pad(date.getMinutes()) + ':' + pad(date.getSeconds());
     },
-    
+
     /**
      * Checks if it's summertime/daylight savings in the date provided
      * @param {Date} date - A date object to check
@@ -328,10 +328,10 @@ module.exports = {
                 configurable: true,
             });
         }
-        
+
         return date.dst;
     },
-    
+
     /**
      * Adds a Game object to an array by providing the object ID
      * @param {Array<*>} array - The array to add the object to
@@ -344,7 +344,7 @@ module.exports = {
         if (obj) array.push(obj);
         return array;
     },
-    
+
     /**
      * Sends room statistics via. game email
      */
@@ -360,7 +360,7 @@ module.exports = {
             _.forEach(mails, Game.notify);
         }
     },
-    
+
     /**
      * Get the distance between two points.
      * @param {RoomPosition|Object} point1 - The first point
@@ -370,7 +370,7 @@ module.exports = {
     getDistance(point1, point2) {
         return Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2));
     },
-    
+
     /**
      * Gets the distances between two rooms, respecting natural walls
      * @param {string} fromRoom - Starting room
@@ -379,18 +379,18 @@ module.exports = {
      */
     routeRange(fromRoom, toRoom) {
         if (fromRoom === toRoom) return 0;
-        
+
         return Util.get(Memory, `routeRange.${fromRoom}.${toRoom}`, function() {
             const room = fromRoom instanceof Room ? fromRoom : Game.rooms[fromRoom];
             if (!room) return Room.roomDistance(fromRoom, toRoom, false);
-            
+
             const route = room.findRoute(toRoom, false, false);
             if (!route) return Room.roomDistance(fromRoom, toRoom, false);
-            
+
             return route === ERR_NO_PATH ? Infinity : route.length;
         });
     },
-    
+
     /**
      * Paves the room utilising Brown/Brown Pavement Art flags
      * @param {string} roomName - The room to pave
@@ -405,7 +405,7 @@ module.exports = {
         const remote = f => f.remove();
         flags.forEach(remove);
     },
-    
+
     /**
      * Unpaves the room
      * @param {string} roomName - The room to unpave
@@ -422,7 +422,7 @@ module.exports = {
         delete Memory.pavementArt[roomName];
         return true;
     },
-    
+
     /**
      * Iterates over all your structures and adds them to a layout array, and returns the JSON.
      * @param {RoomPosition|Object} pos - A room position of the top left corner of the layout
@@ -449,7 +449,7 @@ module.exports = {
         const re = new RegExp(Object.keys(replacementMap).join('|'), 'g');
         return JSON.stringify(layout).replace(re, match => replacementMap[match]);
     },
-    
+
     /**
      * Generate a GUID. Note: This is not guaranteed to be 100% unique.
      * @returns {string}
@@ -461,7 +461,7 @@ module.exports = {
             return v.toString(16);
         });
     },
-    
+
     /**
      * Checks if a specific creep type is in queue, either globally or for a room
      * @param {Object|String} opts - Behaviour if string, else an object with either behaviour, setup, or name. Optionally a room name.
@@ -478,7 +478,7 @@ module.exports = {
             if (opts.setup) return q.setup === opts.setup;
         });
     },
-    
+
     /**
      * List the current memory usage of a given path in memory in kb
      * @param {string} key - The location in memory to check eg 'rooms.E1S1.statistics'
@@ -504,7 +504,7 @@ module.exports = {
     resetProfiler() {
         Util.loadProfiler(true);
     },
-    
+
     /**
      * Load existing profiling data or intialize to defaults.
      * @param {Boolean} [reset=false] - Optionally reset all profiling data
@@ -521,7 +521,7 @@ module.exports = {
         }
         global.profiler = Memory.profiler;
     },
-    
+
     /**
      * Creates and returns a profiling object, use checkCPU to compare usage between calls
      * @param {string} name - The name to use when reporting
@@ -639,4 +639,45 @@ module.exports = {
 
         return (amount - max) * chargeScale + 1;
     },
+
+    resetBoostProduction (roomName) {
+
+        let data;
+
+        for (let room of myRooms) {
+
+            if ((roomName === undefined || room.name === roomName)) {
+
+                data = room.memory.resources;
+
+                console.log(room.name);
+
+                if (!_.isUndefined(data)) {
+
+                    data.offers = [];
+                    data.orders = [];
+
+                    if (data.terminal[0])
+                        data.terminal[0].orders = [];
+
+                    if (data.storage[0])
+                        data.storage[0].orders = [];
+
+                    if (data.reactions)
+                        data.reactions.orders = [];
+
+                    if (data.lab) {
+                        data.lab = [];
+                        _.values(Game.structures).filter(i => i.structureType === 'lab').map(i => i.room.setStore(i.id, RESOURCE_ENERGY, 2000));
+                    }
+                    delete data.boostTiming;
+                    delete data.seedCheck;
+                } else
+                    console.log(`${room.name} has no memory.resources`);
+            }
+        }
+        if (roomName === undefined)
+            delete Memory.boostTiming;
+
+    }
 };

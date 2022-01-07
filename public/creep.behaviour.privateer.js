@@ -8,12 +8,19 @@ const super_run = mod.run;
 mod.run = function(creep) {
     super_run.call(this, creep);
     if (creep.hits < creep.hitsMax && (!creep.action || creep.action.name !== 'travelling')) { // creep injured. move to next owned room
-        if (!creep.data.nearestHome || !Game.rooms[creep.data.nearestHome]) creep.data.nearestHome = Room.bestSpawnRoomFor(creep.pos.roomName);
-        if (creep.data.nearestHome) {
-            Creep.action.travelling.assignRoom(creep, creep.data.homeRoom);
-            return;
+        if (creep.data) {
+            if (!creep.data.nearestHome || !Game.rooms[creep.data.nearestHome]) {
+                const nearestSpawnRoom = Room.bestSpawnRoomFor(creep.pos.roomName);
+                if (nearestSpawnRoom) {
+                    creep.data.nearestHome = nearestSpawnRoom.name;
+                }
+            }
+            if (creep.data.nearestHome) {
+                Creep.action.travelling.assignRoom(creep, creep.data.nearestHome);
+            }
         }
     }
+    if( global.DEBUG && global.TRACE ) trace('Behaviour', {creepName:creep.name, run:creep.action && creep.action.name || 'none', [this.name]: 'run', Behaviour:this.name});
 };
 mod.nextAction = function(creep){
     let carrySum = creep.sum;
@@ -75,15 +82,15 @@ mod.nextAction = function(creep){
                 // energy available
                 else {
                     // harvesting or picking
-                    var actions = [
+                    let actions = [
                         Creep.action.dismantling,
                         Creep.action.picking,
                         Creep.action.robbing,
                         Creep.action.harvesting
                     ];
                     // TODO: Add extracting (if extractor present) ?
-                    for(var iAction = 0; iAction < actions.length; iAction++) {
-                        var action = actions[iAction];
+                    for(let iAction = 0; iAction < actions.length; iAction++) {
+                        let action = actions[iAction];
                         if(action.isValidAction(creep) &&
                             action.isAddableAction(creep) &&
                             action.assign(creep))
@@ -97,9 +104,9 @@ mod.nextAction = function(creep){
             }
             // carrier full
             else {
-                var actions = [Creep.action.building];
-                for(var iAction = 0; iAction < actions.length; iAction++) {
-                    var action = actions[iAction];
+                let actions = [Creep.action.building];
+                for(let iAction = 0; iAction < actions.length; iAction++) {
+                    let action = actions[iAction];
                     if(action.isValidAction(creep) &&
                         action.isAddableAction(creep) &&
                         action.assign(creep))
@@ -146,6 +153,6 @@ mod.exploitNextRoom = function(creep){
 mod.strategies.withdrawing = {
     name: `withdrawing-${mod.name}`,
     isValidAction: function(creep) {
-        return false;
+        return true;
     },
 };

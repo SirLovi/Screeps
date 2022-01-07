@@ -1,7 +1,7 @@
 const mod = {};
 module.exports = mod;
 mod.analyzeRoom = function(room) {
-    if (room.hostiles.length > 0) room.processInvaders();
+    if (room.hostiles.length || (room.memory.hostileIds && room.memory.hostileIds.length)) room.processInvaders();
 };
 const triggerNewInvaders = creep => {
     // create notification
@@ -46,7 +46,7 @@ mod.extend = function() {
             configurable: true,
             get: function() {
                 if( _.isUndefined(this._casualties) ){
-                    var isInjured = creep => creep.hits < creep.hitsMax &&
+                    let isInjured = creep => creep.hits < creep.hitsMax &&
                         (creep.towers === undefined || creep.towers.length == 0);
                     this._casualties = _.sortBy(_.filter(this.creeps, isInjured), 'hits');
                 }
@@ -155,9 +155,9 @@ mod.extend = function() {
 
         let registerHostileLeave = id => {
             const creep = Game.getObjectById(id);
-            const stillHostile = !creep || Task.reputation.hostileOwner(creep);
+            const stillHostile = creep && Task.reputation.hostileOwner(creep);
             // for each known invader
-            if( !that.hostileIds.includes(id) && !stillHostile ) { // not found anymore or no longer hostile
+            if (!stillHostile) {
                 // save to trigger subscribers later
                 that.goneInvader.push(id);
                 // update statistics

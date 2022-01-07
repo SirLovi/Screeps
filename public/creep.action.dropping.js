@@ -42,7 +42,7 @@ action.work = function(creep) {
                      o.type == LOOK_CREEPS ||
                     (o.type == LOOK_STRUCTURES && OBSTACLE_OBJECT_TYPES.includes(o.structure.structureType) ));
             };
-            let look = creep.room.lookAt(target);
+            let look = creep.room.lookAt(creep.target);
             if (!_.some(look, invalidObject)) {
                 return ret;
             }

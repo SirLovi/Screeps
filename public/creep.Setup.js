@@ -43,7 +43,7 @@ let Setup = function(typeName){
     this._maxWeight = this.rclProperty('maxWeight');
 
     this.buildParams = function(spawn){
-        var memory = {
+        let memory = {
             setup: null,
             name: null,
             parts: [],
@@ -57,7 +57,7 @@ let Setup = function(typeName){
         memory.cost = Creep.bodyCosts(memory.parts);
         memory.mother = spawn.name;
         memory.home = spawn.pos.roomName;
-        for( var son = 1; memory.name == null || Game.creeps[memory.name] || Memory.population[memory.name]; son++ ) {
+        for( let son = 1; memory.name == null || Game.creeps[memory.name] || Memory.population[memory.name]; son++ ) {
             memory.name = this.type + '-' + memory.cost + '-' + son;
         }
         return memory;
@@ -127,24 +127,22 @@ let Setup = function(typeName){
         }
         return existingWeight;
     };
-    this.parts = function(room){
-        let fixedBody = this.SelfOrCall(this._fixedBody, room);
-        let multiBody = this.SelfOrCall(this._multiBody, room);
-        let min = this.SelfOrCall(this._minMulti, room);
-        let maxMulti = this.SelfOrCall(this._maxMulti, room);
-        let maxWeight = this.SelfOrCall(this._maxWeight, room);
-        let maxMultiWeight;
-        if( maxWeight ){
-            let existingWeight = this.existingWeight(room);
-            maxMultiWeight = maxWeight - existingWeight;
+    this.parts = function(room) {
+        const fixedBody = this.SelfOrCall(this._fixedBody, room);
+        const multiBody = this.SelfOrCall(this._multiBody, room);
+        const minMulti = this.SelfOrCall(this._minMulti, room);
+        const maxMulti = this.SelfOrCall(this._maxMulti, room);
+        const maxWeight = this.SelfOrCall(this._maxWeight, room);
+        let maxCreepWeight;
+        if (maxWeight) {
+            const existingWeight = this.existingWeight(room);
+            maxCreepWeight = maxWeight - existingWeight;
         }
         if (global.DEBUG && global.TRACE) trace('Setup', {setupType:this.type, room:room.name, Setup:'parts',
-                                                maxWeight: maxMultiWeight, minMulti: min, maxMulti});
+                                                maxWeight, minMulti, maxMulti});
         return Creep.compileBody(room, {
-            fixedBody, multiBody,
-            maxWeight: maxMultiWeight,
-            minMulti: min,
-            maxMulti: maxMulti,
+            fixedBody, multiBody, minMulti, maxMulti,
+            maxWeight: maxCreepWeight,
             currentEnergy: true,
             sort: this.sortedParts,
         });
