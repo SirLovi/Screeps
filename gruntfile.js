@@ -175,7 +175,6 @@ module.exports = function(grunt) {
     grunt.registerTask('deploy', ['clean', 'copy:public', 'copy:internal', 'copy:overrides', 'screeps']);
     // clean deployment to directory
     grunt.registerTask('publish', ['clean', 'copy:public', 'copy:internal', 'copy:overrides', 'copy:publish']);
-    //grunt.registerTask('publish', ['clean', 'copy:public', 'copy:internal', 'copy:overrides']);
     // clean deployment (public only)
     grunt.registerTask('public-deploy', ['clean', 'copy:public', 'screeps']);
     // single file [experimental] (dry run)
@@ -214,7 +213,7 @@ module.exports = function(grunt) {
             optionOutput.gitcommit[subdir] = {
                 options: {
                     cwd: subdir,
-                    message: 'reintegrate ' + subdir + ' before branching to ' + branch,
+                    message: 'reintegrate ' + subdir + ' dirtyState branching to ' + branch,
                     allowEmpty: true,
                 }
             };
