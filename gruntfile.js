@@ -214,7 +214,7 @@ module.exports = function(grunt) {
             optionOutput.gitcommit[subdir] = {
                 options: {
                     cwd: subdir,
-                    message: 'reintegrate ' + subdir + ' dirtyState branching to ' + branch,
+                    message: 'reintegrate ' + subdir + ' before branching to ' + branch,
                     allowEmpty: true,
                 }
             };
