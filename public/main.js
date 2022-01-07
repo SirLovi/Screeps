@@ -217,8 +217,7 @@ global.install = () => {
             ranger: load("creep.behaviour.ranger"),
             upgrader: load("creep.behaviour.upgrader"),
             worker: load("creep.behaviour.worker"),
-            safeGen: load("creep.behaviour.safeGen"),
-            recycler: load("creep.behaviour.recycler"),
+            safeGen: load("creep.behaviour.safeGen")
         },
         setup: {
             hauler: load("creep.setup.hauler"),
