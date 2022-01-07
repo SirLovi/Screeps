@@ -1,16 +1,17 @@
-let action = new Creep.Action('guarding');
-module.exports = action;
-action.isAddableAction = function () {
+let mod = new Creep.Action('guarding');
+module.exports = mod;
+mod.isAddableAction = function () {
     return true;
 };
-action.isAddableTarget = function () {
+mod.isAddableTarget = function () {
     return true;
 };
-action.reachedRange = 0;
-action.newTarget = function (creep) {
+mod.reachedRange = 0;
+mod.newTarget = function (creep) {
 
     let flag;
-    if (creep.data.destiny) flag = Game.flags[creep.data.destiny.flagName];
+    if (creep.data.destiny)
+        flag = Game.flags[creep.data.destiny.flagName];
     if (!flag) {
         flag = FlagDir.find(FLAG_COLOR.defense, creep.pos, false, FlagDir.rangeMod, {
             rangeModPerCrowd: 400
@@ -18,37 +19,30 @@ action.newTarget = function (creep) {
         });
     }
 
-    if (Room.isSKRoom(creep.pos.roomName) && creep.pos.roomName === creep.flag.pos.roomName) {
+    // if (Room.isSKRoom(creep.pos.roomName) && creep.pos.roomName === creep.flag.pos.roomName) {
+    if (Room.isSKRoom(creep.pos.roomName) && creep.pos.roomName === flag.pos.roomName) {
 
         let SKCreeps = [],
-            anotherHostiles = [];
-
-        if (!_.isUndefined(creep.room.hostiles) && creep.room.hostiles.length > 0) {
-            anotherHostiles = _.filter(creep.room.hostiles, hostile => {
+            otherHostiles = _.filter(creep.room.hostiles, hostile => {
                 return hostile.owner.username !== 'Source Keeper';
             });
-        }
 
-        if (_.isUndefined(creep.room.hostiles) || creep.room.hostiles.length === 0) {
-
-            //global.logSystem(creep.room.name, `GUARD GO TO KEEP LAIR!`);
-            return _.min(creep.room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_KEEPER_LAIR}), 'ticksToSpawn');
-
-        } else if (anotherHostiles.length === 0) {
+        if (otherHostiles.length === 0) {
 
             SKCreeps = _.filter(creep.room.hostiles, hostile => {
                 return hostile.owner.username === 'Source Keeper' && (!hostile.targetOf || hostile.targetOf.length === 0);
             });
-            //global.logSystem(creep.room.name, `GUARD ATTACKING AN SK creep!`);
-            //global.logSystem(creep.room.name, `${creep.pos.findClosestByPath(SKCreeps).name}`);
+
             if (SKCreeps.length > 1)
                 return creep.pos.findClosestByPath(SKCreeps);
             else if (SKCreeps.length === 1)
                 return SKCreeps[0];
+            else if (SKCreeps.length === 0)
+                return _.min(creep.room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_KEEPER_LAIR}), 'ticksToSpawn');
 
-        } else if (anotherHostiles.length > 0) {
+        } else if (otherHostiles.length > 0) {
             //global.logSystem(creep.room.name, `GUARD ATTACKING A HOSTILE creep!`);
-            return creep.pos.findClosestByPath(anotherHostiles);
+            return creep.pos.findClosestByPath(otherHostiles);
         }
     }
 
@@ -60,7 +54,7 @@ action.newTarget = function (creep) {
     if (flag) Population.registerCreepFlag(creep, flag);
     return flag;
 };
-action.work = function (creep) {
+mod.work = function (creep) {
     if (creep.data.flagName)
         return OK;
     else return ERR_INVALID_ARGS;
