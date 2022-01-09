@@ -1,5 +1,5 @@
 {
-  "name": "ccc.internal.package",
+  "name": "screeps.ai",
   "main": "main.js",
   "private": true,
   "devDependencies": {
