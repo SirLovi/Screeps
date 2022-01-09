@@ -51,4 +51,8 @@ mod.flush = function(){
     // occurs when a room's level has increased or decreased
     // param: room
     Room.RCLChange = new LiteEvent();
+
+    // occurs when a room is nuked
+    // param: room
+    Room.nuked = new LiteEvent();
 };

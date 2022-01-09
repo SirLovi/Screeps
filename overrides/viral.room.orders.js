@@ -7,15 +7,6 @@ mod.analyzeRoom = function (room, needMemoryResync) {
 
 	if (Game.time % global.PROCESS_ORDERS_INTERVAL === 0 || room.name === 'sim') {
 
-		// TODO is it ok?
-		// if (room.name === acceptedRooms[0].name) {
-		// 	console.log(`RESET ACCEPTED ROOMS`);
-		// 	// for (let room of acceptedRooms) {
-		// 	// 	room._isReceivingEnergy = false;
-		// 	// }
-		// 	global._acceptedRooms = [];
-		// }
-
 		if (_.some(acceptedRooms, r => {
 			return r.name === room.name;
 		})) {

@@ -162,6 +162,7 @@ global.install = () => {
         labTech: load("task.labTech"),
         safeGen: load("task.safeGen"),
         scheduler: load("task.scheduler"),
+        train: load("task.train")
     });
     Creep.Action = load("creep.Action");
     Creep.Behaviour = load("creep.Behaviour");

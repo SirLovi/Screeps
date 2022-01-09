@@ -1,50 +1,72 @@
+'use strict';
+
 let mod = {};
 
-mod.run = function() {
-    
-    Memory.stats = { tick: Game.time };
-    
-    Memory.stats.cpu = Game.cpu;
-    Memory.stats.cpu.used = Game.cpu.getUsed();
-    Memory.stats.gcl = Game.gcl;
-    
-    Memory.stats.market = {
-        credits: Game.market.credits,
-        numOrders: Game.market.orders ? Object.keys(Game.market.orders).length : 0,
-    };
-    
-    // ROOMS
-    Memory.stats.rooms = {};
-    
-    for (let roomName in Game.rooms) {
-        const room = Game.rooms[roomName];
-        if (!room) continue;
-        if (!room.my) continue;
-        Memory.stats.rooms[room.name] = {
-            name: room.name,
-            spawns: {},
-            storage: {},
-            terminal: {},
-            minerals: {},
-            sources: {},
+mod.run = function () {
+
+    if (Game.time % global.GRAFANA_INTERVAL === 0) {
+
+        // reset global.rooms properties
+        delete global._acceptedRooms;
+        delete global._myRooms;
+        delete global._myRoomsName;
+
+        Memory.stats = {
+            tick: Game.time,
+            rooms: []
         };
-        
-        mod.init(room, Memory.stats.rooms[room.name]);
+
+        let myRooms = _.filter(Game.rooms, {'my': true});
+
+        for (let room of myRooms)
+            Memory.stats.rooms.push(room.name)
+
     }
-    
+
+    if (!global.GRAFANA || Game.time % global.GRAFANA_INTERVAL !== 0)
+        return;
+
+    Object.assign(Memory.stats, {
+        population: Object.keys(Memory.population).length,
+        empireMinerals: {},
+        memory: global.round(RawMemory.get().length / 1024),
+        cpu: Game.cpu,
+        gcl: Game.gcl,
+        market: {
+            credits: Game.market.credits,
+            numOrders: Game.market.orders ? Object.keys(Game.market.orders).length : 0,
+        }
+    });
+
+    Memory.stats.cpu.used = Game.cpu.getUsed();
+
+    // ROOMS
+
+    for (let room of global.myRooms) {
+        // Memory.stats.rooms[room.name] = {
+        // 	name: room.name,
+        // 	spawns: {},
+        // 	storage: {},
+        // 	terminal: {},
+        // 	minerals: {},
+        // 	sources: {},
+        // };
+        mod.init(room);
+    }
 };
 
-mod.init = function(room, object) {
-    mod.controller(room, object);
-    mod.energy(room, object);
-    mod.spawns(room, object.spawns);
-    mod.storage(room, object.storage);
-    mod.terminal(room, object.terminal);
-    mod.minerals(room, object.minerals);
-    mod.sources(room, object.sources);
+mod.init = function (room) {
+    // mod.controller(room, object);
+    // mod.storage(room, object.storage);
+    mod.empireMineral(room);
+    // mod.energy(room, object);
+    // mod.spawns(room, object.spawns);
+    // mod.terminal(room, object.terminal);
+    // mod.minerals(room, object.minerals);
+    // mod.sources(room, object.sources);
 };
 
-mod.controller = function(room, object) {
+mod.controller = function (room, object) {
     if (room.controller) {
         object.controller = {
             level: room.controller.level,
@@ -54,14 +76,36 @@ mod.controller = function(room, object) {
     }
 };
 
-mod.energy = function(room, object) {
+mod.energy = function (room, object) {
     object.energy = {
         available: room.energyAvailable,
         capacityAvailable: room.energyCapacityAvailable,
+    };
+
+    Memory.stats.empireEnergy = Memory.stats.empireMinerals['energy'];
+
+};
+
+mod.empireMineral = function (room) {
+    if (room.storage && room.terminal) {
+        for (const mineral in room.resourcesAll) {
+            if (!Memory.stats.empireMinerals[mineral])
+                Memory.stats.empireMinerals[mineral] = 0;
+            Memory.stats.empireMinerals[mineral] += room.resourcesAll[mineral];
+        }
     }
 };
 
-mod.spawns = function(room, object) {
+mod.storage = function (room, object) {
+    if (room.storage) {
+        object.store = _.sum(room.storage.store);
+        object.resources = {};
+        Object.keys(room.storage.store).forEach(resource => object.resources[resource] = room.storage.store[resource]);
+    }
+
+};
+
+mod.spawns = function (room, object) {
     if (room.structures.spawns) {
         room.structures.spawns.forEach(spawn => {
             object[spawn.name] = {
@@ -72,15 +116,7 @@ mod.spawns = function(room, object) {
     }
 };
 
-mod.storage = function(room, object) {
-    if (room.storage) {
-        object.store = _.sum(room.storage.store);
-        object.resources = {};
-        Object.keys(room.storage.store).forEach(resource => object.resources[resource] = room.storage.store[resource]);
-    }
-};
-
-mod.terminal = function(room, object) {
+mod.terminal = function (room, object) {
     if (room.terminal) {
         object.store = _.sum(room.terminal.store);
         object.resources = {};
@@ -88,7 +124,7 @@ mod.terminal = function(room, object) {
     }
 };
 
-mod.minerals = function(room, object) {
+mod.minerals = function (room, object) {
     if (room.minerals) {
         room.minerals.forEach(mineral => object[mineral.id] = {
             id: mineral.id,
@@ -100,7 +136,7 @@ mod.minerals = function(room, object) {
     }
 };
 
-mod.sources = function(room, object) {
+mod.sources = function (room, object) {
     if (room.sources) {
         room.sources.forEach(source => object[source.id] = {
             id: source.id,
@@ -110,7 +146,5 @@ mod.sources = function(room, object) {
         });
     }
 };
-
-
 
 module.exports = mod;

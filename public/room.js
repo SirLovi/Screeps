@@ -256,6 +256,38 @@ mod.extend = function () {
 	};
 
 	Object.defineProperties(Room.prototype, {
+		'allyCreeps': {
+			configurable: true,
+			get: function () {
+				if (_.isUndefined(this._allyCreeps)) {
+					this._allyCreeps = this.find(FIND_CREEPS, {filter: Task.reputation.allyOwner});
+				}
+				return this._allyCreeps;
+			},
+		},
+		'casualties': {
+			configurable: true,
+			get: function () {
+				if (_.isUndefined(this._casualties)) {
+					let isInjured = creep => creep.hits < creep.hitsMax &&
+						(creep.towers === undefined || creep.towers.length == 0);
+					this._casualties = _.chain(this.allyCreeps).filter(isInjured).sortBy('hits').value();
+				}
+				return this._casualties;
+			},
+		},
+		'fuelable': {
+			configurable: true,
+			get: function () {
+				if (_.isUndefined(this._fuelables)) {
+					let that = this;
+					let factor = that.room.situation.invasion ? 0.9 : 0.82;
+					let fuelable = target => (target.energy < (target.energyCapacity * factor));
+					this._fuelables = _.sortBy(_.filter(this.towers, fuelable), 'energy'); // TODO: Add Nuker
+				}
+				return this._fuelables;
+			},
+		},
 		'flags': {
 			configurable: true,
 			get() {
@@ -1232,7 +1264,6 @@ mod.extend = function () {
 					// }
 
 
-
 					// making terminal orders if it does not exist
 					let ordered = global.sumCompoundType(terminalMemory.orders, 'orderRemaining'),
 						terminalResources = (ordered[offer.type] || 0) + (terminal.store[offer.type] || 0);
@@ -1341,7 +1372,7 @@ mod.extend = function () {
 						if (returnValue.readyOffersFound > 0) {
 							candidates.push({
 								room: offer.room,
-								readyOffers: returnValue.readyOffersFound
+								readyOffers: returnValue.readyOffersFound,
 							});
 						}
 						testedRooms.push(offer.room);
@@ -1458,7 +1489,6 @@ mod.extend = function () {
 
 				if (currentRoom.terminal.isActive() === false || currentRoom.storage.isActive() === false || Game.getObjectById(currentRoom.memory.labs[0].id).isActive() === false)
 					return false;
-
 
 
 				let data = currentRoom.memory.resources.reactions,
@@ -1725,7 +1755,7 @@ mod.extend = function () {
 							// collect compounds if it can not be ordered
 							else if ((ingredient.length > 1 || ingredient === 'G') && that.resourcesAllButMe(ingredient) < ingredientAmount)
 								compoundArray.push({
-						 			compound: ingredient,
+									compound: ingredient,
 									amount: ingredientAmount,
 								});
 						}
@@ -1933,7 +1963,7 @@ mod.extend = function () {
 		}
 	};
 
-	Room.prototype.launchAvailableNuke = function(targetPos) {
+	Room.prototype.launchAvailableNuke = function (targetPos) {
 
 		let isAvailable = function (nuker, room, target) {
 
@@ -1941,7 +1971,7 @@ mod.extend = function () {
 				return false;
 
 			if (!nuker.isActive())
-			    return false;
+				return false;
 
 			if (_.isUndefined(target.roomName)) {
 				console.log(`targetRoom: ${targetRoom} not visible`);
@@ -1980,7 +2010,7 @@ mod.extend = function () {
 			}
 		}
 
-	}
+	};
 
 	RoomPosition.prototype.findClosestByPathFinder = function (goals, itr = _.identity) {
 		let mapping = _.map(goals, itr);
@@ -2359,12 +2389,15 @@ mod.getStructureMatrix = function (roomName, options) {
 	return matrix;
 };
 mod.validFields = function (roomName, minX, maxX, minY, maxY, checkWalkable = false, where = null) {
-	const room = Game.rooms[roomName];
-	const look = checkWalkable ? room.lookAtArea(minY, minX, maxY, maxX) : null;
+	const
+		room = Game.rooms[roomName],
+		look = checkWalkable ? room.lookAtArea(minY, minX, maxY, maxX) : null;
+
 	let fields = [];
+
 	for (let x = minX; x <= maxX; x++) {
 		for (let y = minY; y <= maxY; y++) {
-			if (x > 1 && x < 48 && y > 1 && y < 48) {
+			if (x >= 1 && x <= 48 && y >= 1 && y <= 48) {
 				if (!checkWalkable || room.isWalkable(x, y, look)) {
 					let p = new RoomPosition(x, y, roomName);
 					if (!where || where(p))
