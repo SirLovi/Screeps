@@ -98,8 +98,8 @@ const Behaviour = function(name) {
     this.run = function(creep) {
         // Assign next Action
         if (this.invalidAction(creep)) {
-            if (creep.data.destiny && creep.data.destiny.task && Task[creep.data.destiny.task] && Task[creep.data.destiny.task].nextAction) {
-                Task[creep.data.destiny.task].nextAction(creep);
+            if (creep.data.destiny && creep.data.destiny.task && global.Task[creep.data.destiny.task] && global.Task[creep.data.destiny.task].nextAction) {
+                global.Task[creep.data.destiny.task].nextAction(creep);
             }
             else {
                 this.nextAction(creep);
