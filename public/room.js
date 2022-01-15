@@ -754,15 +754,23 @@ mod.extend = function () {
 	};
 
 	Room.prototype.recordMove = function (creep) {
-		if (!ROAD_CONSTRUCTION_ENABLE &&
-			(!ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name] ||
-				(ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name] &&
-					ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name].indexOf(this.name) == -1)))
+		if (!global.ROAD_CONSTRUCTION_ENABLE &&
+			(!global.ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name] ||
+				(global.ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name] &&
+					global.ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name].indexOf(this.name) === -1)))
 			return;
+
+		if (creep.creepType === 'remoteHauler'
+			&& creep.sum / creep.carryCapacity < global.REMOTE_HAULER.MIN_LOAD
+			&& creep.roomName !== creep.homeRoom)
+
+			return;
+
+
 		let x = creep.pos.x;
 		let y = creep.pos.y;
-		if (x == 0 || y == 0 || x == 49 || y == 49 ||
-			creep.carry.energy == 0 || creep.data.actionName == 'building')
+		if (x === 0 || y === 0 || x === 49 || y === 49 ||
+			creep.carry.energy === 0 || creep.data.actionName === 'building')
 			return;
 
 		let key = `${String.fromCharCode(32 + x)}${String.fromCharCode(32 + y)}_x${x}-y${y}`;
@@ -775,10 +783,10 @@ mod.extend = function () {
 		if (!look) look = this.lookAt(x, y);
 		else look = look[y][x];
 		let invalidObject = o => {
-			return ((o.type == LOOK_TERRAIN && o.terrain == 'wall') ||
+			return ((o.type === LOOK_TERRAIN && o.terrain === 'wall') ||
 				OBSTACLE_OBJECT_TYPES.includes(o[o.type].structureType));
 		};
-		return look.filter(invalidObject).length == 0;
+		return look.filter(invalidObject).length === 0;
 	};
 
 	Room.prototype.exits = function (findExit, point) {
@@ -2351,7 +2359,8 @@ mod.getCachedStructureMatrix = function (roomName) {
 		const mem = Room.pathfinderCache[roomName];
 		const ttl = Game.time - mem.updated;
 		if (mem.version === Room.COSTMATRIX_CACHE_VERSION && (mem.serializedMatrix || mem.costMatrix) && !mem.stale && ttl < COST_MATRIX_VALIDITY) {
-			if (global.DEBUG && global.TRACE) trace('PathFinder', {roomName: roomName, ttl, PathFinder: 'CostMatrix'}, 'cached costmatrix');
+			if (global.DEBUG && global.TRACE)
+				global.trace('PathFinder', {roomName: roomName, ttl, PathFinder: 'CostMatrix'}, 'cached costmatrix');
 			return true;
 		}
 		return false;

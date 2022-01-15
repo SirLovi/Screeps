@@ -193,7 +193,7 @@ action.maintain = function(creep) {
             let repairTarget = Game.getObjectById(creep.data.repairTarget);
             if (!repairTarget || repairTarget.hits === repairTarget.hitsMax) {
                 repairTarget = creep.pos.findInRange(FIND_STRUCTURES, 3, {
-                    filter: s => (s.structureType === STRUCTURE_CONTAINER || s.structureType === STRUCTURE_ROAD) && s.hits < s.hitsMax
+                    filter: s => s.structureType === STRUCTURE_CONTAINER && s.hits < s.hitsMax
                 })[0];
             }
             if (repairTarget) {

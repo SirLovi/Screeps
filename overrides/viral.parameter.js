@@ -158,17 +158,17 @@ let mod = {
 	CONTROLLER_SIGN_MESSAGE: `[YP] claimed by Zolcsika`,
 	CONTROLLER_SIGN_UPDATE: true, // Update sign message if user changes CONTROLLER_SIGN_MESSAGE
 	MINERS_AUTO_BUILD: true, // miners and remoteMiners will build their own containers if they are missing.
-	MINER_WORK_THRESHOLD: 50, // how long to wait before a miner checks for repairs/construction sites nearby again
+	MINER_WORK_THRESHOLD: 5, // how long to wait before a miner checks for repairs/construction sites nearby again
 	REMOTE_HAULER: {
 		ALLOW_OVER_CAPACITY: 2450, // Hauler capacity rounds up by MIN_WEIGHT, or this number value.
-		DRIVE_BY_BUILD_ALL: false, // If REMOTE_HAULER.DRIVE_BY_BUILDING is enabled then this option will allow remote haulers will drive-by-build any of your structures.
+		DRIVE_BY_BUILD_ALL: true, // If REMOTE_HAULER.DRIVE_BY_BUILDING is enabled then this option will allow remote haulers will drive-by-build any of your structures.
 		DRIVE_BY_BUILD_RANGE: 1, // A creep's max build distance is 3 but cpu can be saved by dropping the search distance to 1.
 		DRIVE_BY_BUILDING: true, // Allows remote haulers to build roads and containers. Consider setting REMOTE_WORKER_MULTIPLIER to 0.
 		DRIVE_BY_REPAIR_RANGE: 1, // range that remote haulers should search when trying to repair and move
 		DRIVE_BY_REPAIR_RANGE_ROAD: 0,
 		MIN_LOAD: 0.75, // Haulers will return home as long as their ratio of carrying/capacity is above this amount.
 		MIN_WEIGHT: 800, // Small haulers are a CPU drain.
-		MULTIPLIER: 4, // Max number of haulers spawned per source in a remote mining room.
+		MULTIPLIER: 1, // Max number of haulers spawned per source in a remote mining room.
 		REHOME: true, // May haulers choose closer storage for delivery?
 	},
 	TASK_CREEP_CHECK_INTERVAL: 250, // Maximum number of ticks before a task checks to see if it needs to spawn new creeps
@@ -269,7 +269,7 @@ let mod = {
 	TERMINAL_ENERGY: 100000,
 	ENERGY_BALANCE_TRANSFER_AMOUNT: 50000,      // amount to transfer when balancing empire energy
 	TARGET_STORAGE_SUM_RATIO: 0.9,
-	PROCESS_ORDERS_INTERVAL: 299, // interval to process room orders and run terminalBroker
+	PROCESS_ORDERS_INTERVAL: 249, // interval to process room orders and run terminalBroker
 	// RESET_ACCEPTED_ROOMS: 50,
 	COMPOUNDS_MANAGE_TIMING: 5,
 	COMPOUNDS_MANAGE: { // if modified -> DELETE Memory.compoundsManage!!!!
@@ -422,6 +422,7 @@ let mod = {
 			['Geir1983', 99],
 			['admon', 99],
 			['likeafox', 99],
+			['SirLovi', 99]
 		],
 		sendAndRequestTiming: 298,
 		trackTiming: 299,

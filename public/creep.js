@@ -354,13 +354,7 @@ mod.extend = function(){
 
             let repairTarget = _(this.pos.findInRange(FIND_STRUCTURES, repairRange)).find(s => Room.shouldRepair(this.room, s));
 
-
-            // global.logSystem(this.room.name, `${global.json(repairTarget)}`);
-
             if (repairTarget) {
-
-                // if (this.room.name === 'E22S19')
-                //     global.logSystem(this.room.name, `ALERT FOR REPAIR ${this.name} REPAIRS: ${repairTarget.structureType} RANGE: ${repairRange}`);
 
                 if( global.DEBUG && global.TRACE )
                     trace('Creep', {creepName:this.name, Action:'repairing', Creep:'repairNearby'}, repairTarget.pos);

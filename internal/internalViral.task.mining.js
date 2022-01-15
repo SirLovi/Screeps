@@ -25,14 +25,14 @@ mod.setupCreep = function(roomName, definition) {
     }
 };
 mod.heal = function(roomName, partChange) {
-    let memory = Task.mining.memory(roomName);
+    let memory = global.Task.mining.memory(roomName);
     memory.healSize = (memory.healSize || 0) + (partChange || 0);
     return `Task.${this.name}: healing capacity for ${roomName} ${memory.healSize >= 0 ? 'increased' : 'decreased'} to ${Math.abs(memory.healSize)} per miner.`;
 };
 mod.strategies = {
     miner: {
         setup: function (roomName) {
-            return Task.mining.setupCreep(roomName, Room.isCenterNineRoom(roomName) ? Task.mining.creep.SKMiner : Task.mining.creep.miner);
+            return global.Task.mining.setupCreep(roomName, Room.isCenterNineRoom(roomName) ? global.Task.mining.creep.SKMiner : global.Task.mining.creep.miner);
         }
     },
     hauler: {
