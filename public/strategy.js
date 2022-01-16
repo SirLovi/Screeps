@@ -4,16 +4,19 @@ const mod = {};
 module.exports = mod;
 
 mod.decorateAgent = function(prototype, ...definitions) {
-    if (!prototype.customStrategy) prototype.customStrategy = function(ids) {};
-    if (!prototype.staticCustomStrategy) prototype.staticCustomStrategy = function(ids) {};
+    if (!prototype.customStrategy)
+        prototype.customStrategy = function(ids) {};
+    if (!prototype.staticCustomStrategy)
+        prototype.staticCustomStrategy = function(ids) {};
     prototype.getStrategyHandler = function(ids, method, ...args) {
         const currentStrategy = this.currentStrategy || this.strategy(ids);
         const returnValOrMethod = currentStrategy[method];
         const strategyKey = currentStrategy.key;
         const strategyName = currentStrategy.name;
-        if (global.DEBUG && global.TRACE) trace('Strategy', {agent:this.name, strategyKey, strategyName, method});
+        if (global.DEBUG && global.TRACE)
+            global.trace('Strategy', {agent:this.name, strategyKey, strategyName, method});
         if (returnValOrMethod === undefined) {
-            logError('strategy handler returned undefined', {agent: this.name || this.id, strategyKey, strategyName, method, stack: new Error().stack});
+            global.Util.logError('strategy handler returned undefined', {agent: this.name || this.id, strategyKey, strategyName, method, stack: new Error().stack});
             return;
         }
         if (args.length === 0) {
@@ -23,7 +26,7 @@ mod.decorateAgent = function(prototype, ...definitions) {
         if (returnVal !== undefined) {
             return returnVal;
         }
-        logError('handler returned undefined for args', {agent: this.name || this.id, strategyKey, strategyName, method, args:args.toString(), stack: new Error().stack});
+        global.Util.logError('handler returned undefined for args', {agent: this.name || this.id, strategyKey, strategyName, method, args:args.toString(), stack: new Error().stack});
         global.logSystem(this.room.name, `suicide: ${this.name}`);
         this.suicide();
     };
@@ -54,7 +57,7 @@ mod.decorateAgent = function(prototype, ...definitions) {
         );
 
         if (!strategy) {
-            logError('no strategy', {agent: this.name || this.id, key});
+            global.Util.logError('no strategy', {agent: this.name || this.id, key});
             return {};
         }
         mod.putCachedStrategy(this, key, strategy);

@@ -760,23 +760,26 @@ mod.extend = function () {
 					global.ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name].indexOf(this.name) === -1)))
 			return;
 
-		if (creep.creepType === 'remoteHauler'
+		if (creep.data.creepType === 'remoteHauler'
 			&& creep.sum / creep.carryCapacity < global.REMOTE_HAULER.MIN_LOAD
-			&& creep.roomName !== creep.homeRoom)
+			&& creep.data.roomName !== creep.data.homeRoom)
 
 			return;
 
 
 		let x = creep.pos.x;
 		let y = creep.pos.y;
-		if (x === 0 || y === 0 || x === 49 || y === 49 ||
-			creep.carry.energy === 0 || creep.data.actionName === 'building')
+
+		if (x === 0 || y === 0 || x === 49 || y === 49
+			|| creep.carry.energy === 0 || creep.data.actionName === 'building')
 			return;
 
 		let key = `${String.fromCharCode(32 + x)}${String.fromCharCode(32 + y)}_x${x}-y${y}`;
+
 		if (!this.roadConstructionTrace[key])
 			this.roadConstructionTrace[key] = 1;
-		else this.roadConstructionTrace[key]++;
+		else
+			this.roadConstructionTrace[key]++;
 	};
 
 	Room.prototype.isWalkable = function (x, y, look) {

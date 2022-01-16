@@ -10,9 +10,7 @@ mod.analyzeRoom = function (room, needMemoryResync) {
 	room.roadConstruction();
 };
 
-mod.terrain = function () {
-	return Game.map.getRoomTerrain(Room.name);
-}
+
 
 mod.extend = function () {
 
@@ -62,6 +60,16 @@ mod.extend = function () {
 				return this.memory.roadConstructionTrace;
 			},
 		},
+		'terrain': {
+			configurable: true,
+			get: function () {
+				if (_.isUndefined(this._terrain)) {
+					this._terrain = Game.map.getRoomTerrain(this.name);
+				}
+				return this._terrain
+			},
+
+		}
 	});
 
 	Room.prototype.getBestConstructionSiteFor = function (pos, filter = null) {
@@ -306,8 +314,11 @@ mod.extend = function () {
 				const structureType = layout[x] && layout[x][y];
 
 				if (structureType) {
-					global.logSystem(Room.name, `TEST Room.terrain: ${mod.terrain().get(xPos, yPos)}`);
-					if (mod.terrain().get(xPos, yPos) === 'wall')
+					let roomTerrain = Game.rooms[Room.name].terrain.get(xPos, yPos)
+
+					global.logSystem(Room.name, `TEST Room.terrain: ${roomTerrain}`);
+
+					if (roomTerrain === TERRAIN_MASK_WALL)
 						return failed();
 					if (structureType === STRUCTURE_ROAD) {
 						sites.push(pos);
