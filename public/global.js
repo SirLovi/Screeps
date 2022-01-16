@@ -881,8 +881,8 @@ mod.selectOrders = function (roomName, type, amount, mineral) {
 			if (o.ratio <= 0 && !isFreeSpace && o.resourceType !== RESOURCE_ENERGY) {
 
 				// bad deal, but we have no storage/terminal space
-				// 1550: hauler carryCapacity
-				let freeSpaceNeed = global.ENERGY_BALANCE_TRANSFER_AMOUNT + 1550 * 2 - terminalFreeSpace;
+				// 1200: hauler carryCapacity
+				let freeSpaceNeed = global.ENERGY_BALANCE_TRANSFER_AMOUNT + 1200 * 2 - terminalFreeSpace;
 
 				console.log(`BAD DEAL WANTED for freeSpace: ${freeSpaceNeed} ${mineral}`);
 

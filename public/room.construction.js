@@ -166,7 +166,7 @@ mod.extend = function () {
 			this.countMySites();
 
 			if (Memory.rooms.myTotalSites < MAX_CONSTRUCTION_SITES) {
-				console.log(`ROAD_CONSTRUCTION_ABS_MIN: ${min} ROAD_CONSTRUCTION_ABS_MAX: ${max}`);
+				console.log(`MySites: ${Memory.rooms.myTotalSites} ROAD_CONSTRUCTION_ABS_MIN: ${min} ROAD_CONSTRUCTION_ABS_MAX: ${max}`);
 				_.forEach(data, setSite);
 			}
 
