@@ -115,8 +115,7 @@ mod.extend = function () {
 			// 	Memory.rooms.roomsToCheck = Object.keys(Memory.rooms).length;
 
 
-			let data = Object.keys(this.roadConstructionTrace)
-			.map(k => {
+			let data = Object.keys(this.roadConstructionTrace).map(k => {
 				return { // convert to [{key,n,x,y}]
 					'n': this.roadConstructionTrace[k], // count of steps on x,y coordinates
 					'x': k.charCodeAt(0) - 32, // extract x from key
@@ -130,12 +129,17 @@ mod.extend = function () {
 			if (max < min)
 				return;
 
+			// filtering manually placed structures/constructionSites
 			data = data.filter(coord => {
 
 				let availableSpot = () => {
 					let structures = this.lookForAt(LOOK_STRUCTURES, coord.x, coord.y);
-					return (structures.length === 0 || structures[0].structureType === STRUCTURE_RAMPART)
-						&& this.lookForAt(LOOK_CONSTRUCTION_SITES, coord.x, coord.y).length === 0;
+					let constructionSites = this.lookForAt(LOOK_CONSTRUCTION_SITES, coord.x, coord.y);
+					return (structures.length === 0
+							|| _.some(structures, 'structureType', STRUCTURE_RAMPART)
+							|| _.some(structures, 'structureType', STRUCTURE_CONTAINER))
+						&& !_.some(structures, 'structureType', STRUCTURE_ROAD)
+						&& constructionSites.length === 0;
 				};
 
 				if (coord.n === max) {

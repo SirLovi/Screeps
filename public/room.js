@@ -798,12 +798,15 @@ mod.extend = function () {
 					global.ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name].indexOf(this.name) === -1)))
 			return;
 
+		// remoteHauler can make footPrint only if he`s going home with full of energy (REMOTE_HAULER.MIN_LOAD)
 		if (creep.data.creepType === 'remoteHauler'
 			&& creep.sum / creep.carryCapacity < global.REMOTE_HAULER.MIN_LOAD
 			&& creep.data.roomName !== creep.data.homeRoom)
 
 			return;
 
+		// remoteMiner can not make a footPrint, when he`s not at home (if he has been attacked, he will go far away)
+		// TODO they go too far when attacked by invaders or sourceKeeper (where are they going? Flag?)
 		if (creep.data.creepType === 'remoteMiner'
 			&& creep.data.roomName !== creep.data.homeRoom)
 
@@ -817,11 +820,14 @@ mod.extend = function () {
 			return;
 
 
-		let lookForRoad = () => {
-			return _.some(creep.room.lookForAt(LOOK_STRUCTURES, x, y), 'structureType', STRUCTURE_ROAD)
+		let footPrintEnabled = () => {
+			let lookForStructures = creep.room.lookForAt(LOOK_STRUCTURES, x, y);
+			let lookForConstructionSites = creep.room.lookForAt(LOOK_CONSTRUCTION_SITES, x, y);
+			return !_.some(lookForStructures, 'structureType', STRUCTURE_ROAD)
+				&& lookForConstructionSites.length === 0;
 		};
 
-		if (!lookForRoad()) {
+		if (footPrintEnabled()) {
 
 			let key = `${String.fromCharCode(32 + x)}${String.fromCharCode(32 + y)}_x${x}-y${y}`;
 
