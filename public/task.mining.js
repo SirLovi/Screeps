@@ -306,7 +306,7 @@ mod.creep = {
 	},
 	hauler: {
 		fixedBody: {
-			[CARRY]: 6,
+			[CARRY]: 4,
 			[MOVE]: 3,
 			[WORK]: 1,
 		},

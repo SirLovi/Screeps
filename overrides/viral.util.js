@@ -120,8 +120,8 @@ viralUtil.resetBoostProduction = function (roomName) {
 };
 
 viralUtil.cleanTrace = function () {
-	for (let room of myRooms)
-		delete room.memory.roadConstructionTrace;
+	for (let room in Memory.rooms)
+		delete Memory.rooms[room].roadConstructionTrace;
 
 };
 

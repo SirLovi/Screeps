@@ -168,10 +168,10 @@ let mod = {
 		DRIVE_BY_REPAIR_RANGE_ROAD: 0,
 		MIN_LOAD: 0.75, // Haulers will return home as long as their ratio of carrying/capacity is above this amount.
 		MIN_WEIGHT: 800, // Small haulers are a CPU drain.
-		MULTIPLIER: 2, // Max number of haulers spawned per source in a remote mining room.
+		MULTIPLIER: 1, // Max number of haulers spawned per source in a remote mining room.
 		REHOME: true, // May haulers choose closer storage for delivery?
 	},
-	TASK_CREEP_CHECK_INTERVAL: 50, // Maximum number of ticks before a task checks to see if it needs to spawn new creeps
+	TASK_CREEP_CHECK_INTERVAL: 250, // Maximum number of ticks before a task checks to see if it needs to spawn new creeps
 	REMOTE_RESERVE_HAUL_CAPACITY: 0.1, // Percent of allocated haul capacity before sending reservers.
 	PIONEER_UNOWNED: false, // True: pioneers may attempt to work in unowned rooms.
 	PRIVATEERS_BUILD: true, // True: robbers may attempt to build

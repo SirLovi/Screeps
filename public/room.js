@@ -548,9 +548,9 @@ mod.extend = function () {
 			get: function () {
 				if (_.isUndefined(this._reserved)) {
 					if (this.controller) {
-						const myName = _.find(Game.spawns).owner.username;
-						this._reserved = this.controller.my || (this.controller.reservation
-							&& this.controller.reservation.username === myName);
+						// const myName = global.ME;
+						// this._reserved = this.controller.my || (this.controller.reservation && this.controller.reservation.username === myName);
+						this._reserved = this.controller.my || this.myReservation;
 					} else {
 						this._reserved = false;
 					}
@@ -582,6 +582,42 @@ mod.extend = function () {
 					}
 				}
 				return this._reservation;
+			},
+		},
+		'isCenterRoom': {
+			configurable: true,
+			get: function () {
+				if (_.isUndefined(this._isCenterRoom)) {
+					this._isCenterRoom = mod.isCenterRoom(this.name);
+				}
+				return this._isCenterRoom;
+			},
+		},
+		'isCenterNineRoom': {
+			configurable: true,
+			get: function () {
+				if (_.isUndefined(this._isCenterNineRoom)) {
+					this._isCenterNineRoom = mod.isCenterNineRoom(this.name);
+				}
+				return this._isCenterNineRoom;
+			},
+		},
+		'isControllerRoom': {
+			configurable: true,
+			get: function () {
+				if (_.isUndefined(this._isControllerRoom)) {
+					this._isControllerRoom = mod.isControllerRoom(this.name);
+				}
+				return this._isControllerRoom;
+			},
+		},
+		'isSKRoom': {
+			configurable: true,
+			get: function () {
+				if (_.isUndefined(this._isSKRoom)) {
+					this._isSKRoom = mod.isSKRoom(this.name);
+				}
+				return this._isSKRoom;
 			},
 		},
 		'ally': {
@@ -715,8 +751,10 @@ mod.extend = function () {
 		if (!_.isUndefined(this.memory.myTotalSites) && numSites !== this.memory.myTotalSites) {
 			Room.costMatrixInvalid.trigger(this);
 		}
-		if (numSites > 0) this.memory.myTotalSites = numSites;
-		else delete this.memory.myTotalSites;
+		if (numSites > 0)
+			this.memory.myTotalSites = numSites;
+		else
+			delete this.memory.myTotalSites;
 	};
 
 	Room.prototype.countMyStructures = function () {
@@ -762,6 +800,11 @@ mod.extend = function () {
 
 		if (creep.data.creepType === 'remoteHauler'
 			&& creep.sum / creep.carryCapacity < global.REMOTE_HAULER.MIN_LOAD
+			&& creep.data.roomName !== creep.data.homeRoom)
+
+			return;
+
+		if (creep.data.creepType === 'remoteMiner'
 			&& creep.data.roomName !== creep.data.homeRoom)
 
 			return;
@@ -2068,8 +2111,10 @@ mod.flush = function () {
 mod.totalSitesChanged = function () {
 	const numSites = _.size(Game.constructionSites);
 	const oldSites = Memory.rooms.myTotalSites || 0;
-	if (numSites > 0) Memory.rooms.myTotalSites = numSites;
-	else delete Memory.rooms.myTotalSites;
+	if (numSites > 0)
+		Memory.rooms.myTotalSites = numSites;
+	else
+		delete Memory.rooms.myTotalSites;
 	return oldSites && oldSites !== numSites;
 };
 mod.totalStructuresChanged = function () {
@@ -2127,8 +2172,10 @@ mod.analyze = function () {
 				if (Room._ext[key].analyzeRoom)
 					Room._ext[key].analyzeRoom(room, needMemoryResync);
 			}
-			if (totalSitesChanged) room.countMySites();
-			if (totalStructuresChanged) room.countMyStructures();
+			if (totalSitesChanged)
+				room.countMySites();
+			if (totalStructuresChanged)
+				room.countMyStructures();
 			room.checkRCL();
 		} catch (err) {
 			Game.notify('Error in room.js (Room.prototype.loop) for "' + room.name + '" : ' + err.stack ? err + '<br/>' + err.stack : err);

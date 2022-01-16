@@ -9,9 +9,6 @@ mod.analyzeRoom = function (room, needMemoryResync) {
 	}
 	room.roadConstruction();
 };
-
-
-
 mod.extend = function () {
 
 	// Construction related Room variables go here
@@ -59,6 +56,9 @@ mod.extend = function () {
 				}
 				return this.memory.roadConstructionTrace;
 			},
+			set : function (value) {
+
+			}
 		},
 		'terrain': {
 			configurable: true,
@@ -102,10 +102,15 @@ mod.extend = function () {
 			//console.log(`${ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name]}`);
 			return;
 		}
-		if (!forced && (_.isNumber(global.ROAD_CONSTRUCTION_ENABLE) && (!this.my || global.ROAD_CONSTRUCTION_ENABLE > this.controller.level))) {
-			//console.log(`road construction fail 2`);
-			return;
+		if (!forced && _.isNumber(global.ROAD_CONSTRUCTION_ENABLE)) {
+
+			if (!this.my && !this.myReservation && !this.isCenterNineRoom)
+				return;
+
+			if (this.my && global.ROAD_CONSTRUCTION_ENABLE < this.controller.level)
+				return;
 		}
+
 
 		console.log(`road construction ON: ${this.name}`);
 
@@ -133,18 +138,31 @@ mod.extend = function () {
 		});
 
 
-		global.BB(data);
+		// global.BB(data);
 
 		// build roads on all most frequent used fields
 		let setSite = pos => {
+
+			if (Memory.rooms.myTotalSites >= 100)
+				return;
+
 			if (global.DEBUG)
 				global.logSystem(this.name, `Constructing new road at ${pos.x}'${pos.y} (${pos.n} traces)`);
+
 			this.createConstructionSite(pos.x, pos.y, STRUCTURE_ROAD);
+
+			Memory.rooms.myTotalSites++
+
 		};
-		_.forEach(data, setSite);
+
+		this.countMySites();
+
+		if (Memory.rooms.myTotalSites < 100)
+			_.forEach(data, setSite);
 
 		// clear old data
-		this.roadConstructionTrace = {};
+		// this.roadConstructionTrace = {};
+		delete this.memory.roadConstructionTrace;
 	};
 
 	Room.prototype.processConstructionFlags = function () {
