@@ -95,13 +95,9 @@ mod.extend = function () {
 
 		const forced = global.ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name] && global.ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name].indexOf(this.name) !== -1;
 
-		//console.log(`road construction status => enabled: ${ROAD_CONSTRUCTION_ENABLE} forced: ${forced} timing: ${Game.time % ROAD_CONSTRUCTION_INTERVAL === 0} gameTime: ${Game.time % 500}`);
-		//console.log(`return : ${ (!ROAD_CONSTRUCTION_ENABLE && !forced) || Game.time % ROAD_CONSTRUCTION_INTERVAL !== 0 }`);
-
-		if ((!global.ROAD_CONSTRUCTION_ENABLE && !forced) || Game.time % global.ROAD_CONSTRUCTION_INTERVAL !== 0) {
-			//console.log(`${ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name]}`);
+		if ((!global.ROAD_CONSTRUCTION_ENABLE && !forced) || Game.time % global.ROAD_CONSTRUCTION_INTERVAL !== 0 || Memory.rooms.myTotalSites >= MAX_CONSTRUCTION_SITES)
 			return;
-		}
+
 		if (!forced && _.isNumber(global.ROAD_CONSTRUCTION_ENABLE)) {
 
 			if (!this.my && !this.myReservation && !this.isCenterNineRoom)
@@ -111,58 +107,73 @@ mod.extend = function () {
 				return;
 		}
 
+		if (this.roadConstructionTrace && Object.keys(this.roadConstructionTrace).length > 0) {
 
-		console.log(`road construction ON: ${this.name}`);
+			console.log(`road construction ON: ${this.name}`);
 
-
-		let data = Object.keys(this.roadConstructionTrace)
-		.map(k => {
-			return { // convert to [{key,n,x,y}]
-				'n': this.roadConstructionTrace[k], // count of steps on x,y coordinates
-				'x': k.charCodeAt(0) - 32, // extract x from key
-				'y': k.charCodeAt(1) - 32, // extract y from key
-			};
-		});
-
-		let min = Math.max(global.ROAD_CONSTRUCTION_ABS_MIN, (data.reduce((_sum, b) => _sum + b.n, 0) / data.length) * minDeviation);
-
-		console.log(`ROAD_CONSTRUCTION_ABS_MIN: ${min}`);
-		data = data.filter(e => {
-			if (e.n >= min) {
-				let structures = this.lookForAt(LOOK_STRUCTURES, e.x, e.y);
-				return (structures.length === 0 || structures[0].structureType === STRUCTURE_RAMPART)
-					&& this.lookForAt(LOOK_CONSTRUCTION_SITES, e.x, e.y).length === 0;
-			} else {
-				return false;
-			}
-		});
+			// if (_.isUndefined(Memory.rooms.roomsToCheck))
+			// 	Memory.rooms.roomsToCheck = Object.keys(Memory.rooms).length;
 
 
-		// global.BB(data);
+			let data = Object.keys(this.roadConstructionTrace)
+			.map(k => {
+				return { // convert to [{key,n,x,y}]
+					'n': this.roadConstructionTrace[k], // count of steps on x,y coordinates
+					'x': k.charCodeAt(0) - 32, // extract x from key
+					'y': k.charCodeAt(1) - 32, // extract y from key
+				};
+			});
 
-		// build roads on all most frequent used fields
-		let setSite = pos => {
+			let min = Math.max(global.ROAD_CONSTRUCTION_ABS_MIN, (data.reduce((_sum, b) => _sum + b.n, 0) / data.length) * minDeviation);
+			let max = _.max(data, 'n').n;
 
-			if (Memory.rooms.myTotalSites >= 100)
+			if (max < min)
 				return;
 
-			if (global.DEBUG)
-				global.logSystem(this.name, `Constructing new road at ${pos.x}'${pos.y} (${pos.n} traces)`);
+			data = data.filter(coord => {
 
-			this.createConstructionSite(pos.x, pos.y, STRUCTURE_ROAD);
+				let availableSpot = () => {
+					let structures = this.lookForAt(LOOK_STRUCTURES, coord.x, coord.y);
+					return (structures.length === 0 || structures[0].structureType === STRUCTURE_RAMPART)
+						&& this.lookForAt(LOOK_CONSTRUCTION_SITES, coord.x, coord.y).length === 0;
+				};
 
-			Memory.rooms.myTotalSites++
+				if (coord.n === max) {
+					return availableSpot();
+				} else {
+					return false;
+				}
+			});
 
-		};
 
-		this.countMySites();
+			global.BB(data);
 
-		if (Memory.rooms.myTotalSites < 100)
-			_.forEach(data, setSite);
+			// build roads on all most frequent used fields
+			let setSite = pos => {
 
-		// clear old data
-		// this.roadConstructionTrace = {};
-		delete this.memory.roadConstructionTrace;
+				if (Memory.rooms.myTotalSites >= MAX_CONSTRUCTION_SITES)
+					return false;
+
+				if (global.DEBUG)
+					global.logSystem(this.name, `Constructing new road at ${pos.x}'${pos.y} (${pos.n} traces)`);
+
+				this.createConstructionSite(pos.x, pos.y, STRUCTURE_ROAD);
+
+				Memory.rooms.myTotalSites++;
+
+			};
+
+			this.countMySites();
+
+			if (Memory.rooms.myTotalSites < MAX_CONSTRUCTION_SITES) {
+				console.log(`ROAD_CONSTRUCTION_ABS_MIN: ${min} ROAD_CONSTRUCTION_ABS_MAX: ${max}`);
+				_.forEach(data, setSite);
+			}
+
+			// clear old data
+			// this.roadConstructionTrace = {};
+			delete this.memory.roadConstructionTrace;
+		}
 	};
 
 	Room.prototype.processConstructionFlags = function () {

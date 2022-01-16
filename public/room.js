@@ -809,7 +809,6 @@ mod.extend = function () {
 
 			return;
 
-
 		let x = creep.pos.x;
 		let y = creep.pos.y;
 
@@ -817,12 +816,20 @@ mod.extend = function () {
 			|| creep.carry.energy === 0 || creep.data.actionName === 'building')
 			return;
 
-		let key = `${String.fromCharCode(32 + x)}${String.fromCharCode(32 + y)}_x${x}-y${y}`;
 
-		if (!this.roadConstructionTrace[key])
-			this.roadConstructionTrace[key] = 1;
-		else
-			this.roadConstructionTrace[key]++;
+		let lookForRoad = () => {
+			return _.some(creep.room.lookForAt(LOOK_STRUCTURES, x, y), 'structureType', STRUCTURE_ROAD)
+		};
+
+		if (!lookForRoad()) {
+
+			let key = `${String.fromCharCode(32 + x)}${String.fromCharCode(32 + y)}_x${x}-y${y}`;
+
+			if (!this.roadConstructionTrace[key])
+				this.roadConstructionTrace[key] = 1;
+			else
+				this.roadConstructionTrace[key]++;
+		}
 	};
 
 	Room.prototype.isWalkable = function (x, y, look) {
