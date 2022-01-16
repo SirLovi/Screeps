@@ -296,7 +296,7 @@ mod.creep = {
 	miner: {
 		fixedBody: {
 			[MOVE]: 1,
-			[WORK]: 5,
+			[WORK]: 4,
 		},
 		multiBody: [MOVE, MOVE, WORK, CARRY],
 		maxMulti: 1,
@@ -307,10 +307,10 @@ mod.creep = {
 	hauler: {
 		fixedBody: {
 			[CARRY]: 5,
-			[MOVE]: 3,
+			[MOVE]: 4,
 			[WORK]: 1,
 		},
-		multiBody: [CARRY, CARRY, MOVE],
+		multiBody: [CARRY, MOVE],
 		behaviour: 'remoteHauler',
 		queue: 'Low',
 	},
