@@ -33,7 +33,7 @@ action.work = function(creep){
         amount = Math.min(Math.abs(creep.room.terminal.getNeeds('energy')), creep.carry['energy'])
 
     else if (creep.target.structureType === STRUCTURE_STORAGE)
-        amount = Math.min(Math.abs(creep.room.terminal.getNeeds('energy')), creep.carry['energy'])
+        amount = Math.min(Math.abs(creep.room.storage.getNeeds('energy')), creep.carry['energy'])
 
     // if (creep.room.name === 'E15S3') {
     //     global.logSystem(creep.room.name, `target: ${creep.target.structureType} amount: ${amount}`);

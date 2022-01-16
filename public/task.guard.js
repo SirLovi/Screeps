@@ -2,7 +2,7 @@
 let mod = {};
 module.exports = mod;
 mod.name = 'guard';
-mod.minControllerLevel = 3;
+mod.minControllerLevel = 2;
 // hook into events
 mod.register = () => {};
 // for each flag
@@ -25,6 +25,8 @@ mod.creep = {
             ATTACK,
             RANGED_ATTACK,
             HEAL,
+            MOVE,
+            MOVE,
             MOVE,
             MOVE
         ],
@@ -72,7 +74,7 @@ mod.checkForRequiredCreeps = (flag) => {
             },
             { // spawn room selection params
                 targetRoom: flag.pos.roomName,
-                minEnergyCapacity: 1800,
+                minEnergyCapacity: 130,
                 rangeRclRatio: 3, // stronger preference of higher RCL rooms
                 allowTargetRoom: true
                 //explicit: 'E23S24'
