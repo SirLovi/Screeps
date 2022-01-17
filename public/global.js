@@ -236,7 +236,7 @@ for (let a in REACTIONS) {
 mod.MEM_SEGMENTS = {
 	COSTMATRIX_CACHE: {
 		start: 98,
-		end: 90,
+		end: 89,
 	},
 };
 // mod.ENERGY_VALUE_CREDITS = global.energyPrice;
@@ -774,7 +774,7 @@ mod.marketOrders = function (roomName, mineral, orderType, type) {
 
 	let avgPrice = function (order, mineral, type) {
 
-		global.logSystem(roomName, `avgPrice is RUNNING`);
+		global.logSystem(roomName, `avgPrice is RUNNING for ${mineral}`);
 
 		order = Object.assign(order, {
 			avgPrice: mod.weightedMeanArrayOfObject(order.orders, 'price'),
@@ -791,7 +791,7 @@ mod.marketOrders = function (roomName, mineral, orderType, type) {
 			Memory.marketOrders[type][mineral].orders = Game.market.getAllOrders({resourceType: mineral, type: orderType});
 			if (mineral === 'energy') {
 				Memory.marketOrders[type][mineral].orders = _.filter(Memory.marketOrders[type][mineral].orders, order => {
-					return order.price > 0.05;
+					return order.price > global.MIN_SELL_PRICE;
 				});
 				avgPrice(Memory.marketOrders[type][mineral], mineral, type);
 			}
@@ -848,23 +848,18 @@ mod.selectOrders = function (roomName, type, amount, mineral) {
 
 	return _.filter(Memory.marketOrders[type][mineral].orders, o => {
 
-		// we can`t afford min amount
-		// let changeAmount = function (sellEnergy = false) {
-		//
-		// 	let distance = Game.map.getRoomLinearDistance(roomName, o.roomName, true);
-		//
-		// 	if (sellEnergy) {
-		// 		let euler = Math.exp(distance / 30);
-		// 		o.transactionAmount = Math.floor((amount * euler) / (2 * euler - 1));
-		//
-		// 	} else {
-		// 		let euler = 1 - Math.exp(-distance / 30);
-		// 		o.transactionAmount = Math.floor((terminalEnergy * global.TARGET_STORAGE_SUM_RATIO) / euler);
-		// 	}
-		//
-		// 	o.transactionCost = Game.market.calcTransactionCost(o.transactionAmount, o.roomName, roomName);
-		// 	o.credits = o.transactionAmount * o.price;
-		// };
+		// count avg energy price for order
+		let energyPrice = function () {
+			let avgEnergyPrice = Memory.marketOrders.buy.energy.avgPrice,
+				transactionAmount = 100,
+				credits = transactionAmount * avgEnergyPrice,
+				transactionCost = Game.market.calcTransactionCost(transactionAmount, o.roomName, roomName);
+
+				o.energyTransactionPrice = transactionCost * avgEnergyPrice;
+
+			return (credits - o.energyTransactionPrice) / transactionAmount;
+
+		}
 
 		// we want to buy
 		let sellOrders = function () {
@@ -937,9 +932,9 @@ mod.selectOrders = function (roomName, type, amount, mineral) {
 				o.credits = o.transactionAmount * o.price;
 			}
 
-			let avgEnergyPrice = Memory.marketOrders.buy.energy.avgPrice;
+			o.avgEnergyPrice = energyPrice();
 
-			o.transactionPrice = o.transactionCost * avgEnergyPrice;
+			o.transactionPrice = o.transactionCost * o.avgEnergyPrice;
 
 			o.ratio = (o.credits - o.transactionPrice) / o.transactionAmount;
 
@@ -948,8 +943,8 @@ mod.selectOrders = function (roomName, type, amount, mineral) {
 			if (o.ratio <= 0 && !isFreeSpace && o.resourceType !== RESOURCE_ENERGY) {
 
 				// bad deal, but we have no storage/terminal space
-				// 1550: hauler carryCapacity
-				let freeSpaceNeed = global.ENERGY_BALANCE_TRANSFER_AMOUNT + 1550 * 2 - terminalFreeSpace;
+				// 1200: hauler carryCapacity
+				let freeSpaceNeed = global.ENERGY_BALANCE_TRANSFER_AMOUNT + 1200 * 2 - terminalFreeSpace;
 
 				console.log(`BAD DEAL WANTED for freeSpace: ${freeSpaceNeed} ${mineral}`);
 
