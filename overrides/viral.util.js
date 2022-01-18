@@ -103,6 +103,37 @@ viralUtil.resetBoostProduction = function (roomName) {
 				data.offers = [];
 				data.orders = [];
 
+				if ((_.isUndefined(room.memory.resources.terminal) || room.memory.resources.terminal.length === 0) && room.terminal) {
+					room.memory.resources.terminal = [];
+					room.memory.resources.terminal.push({
+							id: room.terminal.id,
+							orders: []
+						}
+					);
+				}
+
+				if ((_.isUndefined(room.memory.resources.storage) || room.memory.resources.storage.length === 0) && room.storage) {
+					room.memory.resources.storage = [];
+					room.memory.resources.storage.push({
+							id: room.storage.id,
+							orders: []
+						}
+					);
+				}
+
+				if (_.isUndefined(room.memory.resources.container)) {
+					room.memory.resources.container = [];
+				}
+
+				if (_.isUndefined(room.memory.resources.lab)) {
+					room.memory.resources.lab = [];
+				}
+
+				if (_.isUndefined(room.memory.resources.reactions)) {
+					room.memory.resources.reactions = {};
+				}
+
+
 				if (data.terminal[0])
 					data.terminal[0].orders = [];
 

@@ -12,8 +12,10 @@ global.removeFlagsByColor('<COLOR_1>', '<COLOR_2>');
 // Lists constructionSites currently present
 global.listConstructionSites(filter);
 
+global.removeConstructionFlags();
+
 // Removes all flags with primary COLOR_CYAN (construction flags)
-global.removeRoomConstructionFlags('roomName');
+global.removeRoomConstructionFlags('<roomName>');
 
 global.removeRoomRoadFlags('<roomName>');
 
@@ -38,6 +40,9 @@ _.forEach(Memory.rooms, r => delete r.roadConstructionTrace);
 
 // remove all construction Sites
 _.forEach(Game.constructionSites, s => s.remove());
+
+// remove all road construction Sites
+_.forEach(Game.constructionSites, s => s.structureType === STRUCTURE_ROAD ? s.remove() : null);
 
 // spawn something...
 Game.spawns['<spawnName>'].createCreepBySetup(Creep.setup.worker);

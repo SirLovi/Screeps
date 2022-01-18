@@ -5,7 +5,9 @@ mod.inflowActions = (creep) => {
         Creep.action.uncharging,
         Creep.action.picking,
         Creep.action.withdrawing,
-        Creep.action.reallocating
+        Creep.action.reallocating,
+        Creep.action.reallocating,
+        Creep.action.pickingTombstones
     ];
 };
 mod.outflowActions = (creep) => {
@@ -13,7 +15,7 @@ mod.outflowActions = (creep) => {
         Creep.action.feeding,
         Creep.action.charging,
         Creep.action.fueling,
-        Creep.action.storing
+        Creep.action.storing,
     ];
     if ( creep.sum > creep.carry.energy ||
             ( !creep.room.situation.invasion &&

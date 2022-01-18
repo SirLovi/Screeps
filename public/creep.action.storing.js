@@ -19,6 +19,9 @@ mod.isValidMineralToTerminal = function (room, mineral) {
     if (mineral === RESOURCE_ENERGY)
         return false;
 
+    if(!room.storage || !room.terminal)
+        return false;
+
     let mineralIsCompound = global.isCompoundToManage(mineral);
     let storedMineral = room.storage.store[mineral];
     let ret;

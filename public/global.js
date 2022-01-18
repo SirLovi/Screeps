@@ -156,9 +156,9 @@ mod.FLAG_COLOR = {
 		secondaryColor: COLOR_BROWN,
 	},
 	rampart: {
-        color: COLOR_BLUE,
-        secondaryColor: COLOR_BLUE,
-    },
+		color: COLOR_BROWN,
+		secondaryColor: COLOR_BROWN,
+	},
 	// COLOR_GREY
 	// COLOR_WHITE
 	command: { // command api
@@ -192,13 +192,13 @@ mod.FLAG_COLOR = {
 			secondaryColor: COLOR_BLUE,
 		},
 		road: {
-            color: COLOR_WHITE,
-            secondaryColor: COLOR_WHITE,
-        },
-        wall: {
-            color: COLOR_WHITE,
-            secondaryColor: COLOR_GREY,
-        },
+			color: COLOR_WHITE,
+			secondaryColor: COLOR_WHITE,
+		},
+		wall: {
+			color: COLOR_WHITE,
+			secondaryColor: COLOR_GREY,
+		},
 	},
 };
 mod.DECAY_AMOUNT = {
@@ -312,7 +312,7 @@ mod.removeConstructionFlags = function () {
 	}
 	return `Removed ${removeFlags.length} construction flags.`;
 };
-mod.runAutobahn = function(roomName, roomsParsed) {
+mod.runAutobahn = function (roomName, roomsParsed) {
 
 	const autobahn = Autobahn;
 
@@ -333,34 +333,34 @@ mod.runAutobahn = function(roomName, roomsParsed) {
 	for (let i = 0; i < network.length; i++) {
 		let pos = network[i];
 		//Game.rooms[pos.roomName].createConstructionSite(pos, STRUCTURE_ROAD);
-		if((pos.lookFor(LOOK_FLAGS).length === 0) && (pos.lookFor(LOOK_CONSTRUCTION_SITES).length === 0)){
+		if ((pos.lookFor(LOOK_FLAGS).length === 0) && (pos.lookFor(LOOK_CONSTRUCTION_SITES).length === 0)) {
 			pos.newFlag(global.FLAG_COLOR.command.road);
 		}
 	}
 };
 mod.removeRoomRoadFlags = function (roomName) {
-let room = Game.rooms[roomName];
-let removeFlags = _.filter(room.find(FIND_FLAGS), flag => flag.color === COLOR_WHITE && flag.secondaryColor === COLOR_WHITE);
-for (let flag of removeFlags) {
-	flag.remove();
-}
-return `Removed ${removeFlags.length} road flags.`;
+	let room = Game.rooms[roomName];
+	let removeFlags = _.filter(room.find(FIND_FLAGS), flag => flag.color === COLOR_WHITE && flag.secondaryColor === COLOR_WHITE);
+	for (let flag of removeFlags) {
+		flag.remove();
+	}
+	return `Removed ${removeFlags.length} road flags.`;
 };
 mod.removeRoomConstructionFlags = function (roomName) {
-let room = Game.rooms[roomName];
-let removeFlags = _.filter(room.find(FIND_FLAGS), flag => flag.color === COLOR_CYAN || flag.color === COLOR_WHITE);
-for (let flag of removeFlags) {
-	flag.remove();
-}
-return `Removed ${removeFlags.length} construction flags.`;
+	let room = Game.rooms[roomName];
+	let removeFlags = _.filter(room.find(FIND_FLAGS), flag => flag.color === COLOR_CYAN || flag.color === COLOR_WHITE);
+	for (let flag of removeFlags) {
+		flag.remove();
+	}
+	return `Removed ${removeFlags.length} construction flags.`;
 };
 mod.removeConstructionSites = function (roomName) {
-let room = Game.rooms[roomName];
-let removeSites = room.find(FIND_CONSTRUCTION_SITES);
-for (let site of removeSites) {
-	site.remove();
-}
-return `Removed ${removeSites.length} construction sites.`;
+	let room = Game.rooms[roomName];
+	let removeSites = room.find(FIND_CONSTRUCTION_SITES);
+	for (let site of removeSites) {
+		site.remove();
+	}
+	return `Removed ${removeSites.length} construction sites.`;
 };
 mod.listConstructionSites = function (filter) {
 	let msg = `${_.keys(Game.constructionSites).length} construction sites currently present: `;
@@ -855,11 +855,11 @@ mod.selectOrders = function (roomName, type, amount, mineral) {
 				credits = transactionAmount * avgEnergyPrice,
 				transactionCost = Game.market.calcTransactionCost(transactionAmount, o.roomName, roomName);
 
-				o.energyTransactionPrice = transactionCost * avgEnergyPrice;
+			o.energyTransactionPrice = transactionCost * avgEnergyPrice;
 
 			return (credits - o.energyTransactionPrice) / transactionAmount;
 
-		}
+		};
 
 		// we want to buy
 		let sellOrders = function () {

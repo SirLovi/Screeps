@@ -1,11 +1,11 @@
 let action = new Creep.Action('building');
 module.exports = action;
-action.maxPerTarget = 3;
+action.maxPerTarget = 8;
 action.targetRange = 3;
 action.reachedRange = function(creep) {
     return creep.getStrategyHandler([action.name], 'reachedRange', creep);
 };
-action.maxPerAction = 3;
+action.maxPerAction = 5;
 action.isValidAction = function(creep){
     return ( creep.carry.energy > 0 );
 };
@@ -14,7 +14,7 @@ action.isAddableAction = function(creep){
 };
 action.isValidTarget = function(target){
     return (target != null && (target.my || Task.reputation.allyOwner(target)) && target.progress && target.progress < target.progressTotal);
-};  
+};
 action.isAddableTarget = function(target) {
     //  our site?
     return target && (target.my || Task.reputation.allyOwner(target)) && (!target.targetOf || target.targetOf.length < this.maxPerTarget);

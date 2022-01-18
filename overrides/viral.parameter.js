@@ -175,7 +175,7 @@ let mod = {
 	REMOTE_RESERVE_HAUL_CAPACITY: 0.1, // Percent of allocated haul capacity before sending reservers.
 	PIONEER_UNOWNED: false, // True: pioneers may attempt to work in unowned rooms.
 	PRIVATEERS_BUILD: true, // True: robbers may attempt to build
-	DRIVE_BY_REPAIR_RANGE: 1, // range that creeps should search when trying to repair and move
+	DRIVE_BY_REPAIR_RANGE: 3, // range that creeps should search when trying to repair and move
 	DRIVE_BY_REPAIR_RANGE_ROAD: 0,
 	REMOTE_WORKER_MULTIPLIER: 0, // Number of workers spawned per remote mining room.
 	PLAYER_WHITELIST: ['Geir1983', 'admon', 'likeafox', 'Orlet', 'omnomwombat', 'SirLovi'],
