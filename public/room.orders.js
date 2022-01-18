@@ -13,10 +13,44 @@ mod.analyzeRoom = function (room, needMemoryResync) {
 mod.extend = function () {
 
 	Room.prototype.updateResourceOrders = function () {
+
+		if (this.my && _.isUndefined(this.memory.resources)) {
+			this.memory.resources = {};
+		}
+		
 		let data = this.memory.resources;
+
 		if (!this.my || !data) return;
 
-		let rcl = this.controller.level;
+		if ((_.isUndefined(data.terminal) || data.terminal.length === 0) && this.terminal) {
+			data.terminal = [];
+			data.terminal.push({
+				id: this.terminal.id,
+				orders: []
+			}
+			);
+		}
+
+		if ((_.isUndefined(data.storage) || data.storage.length === 0) && this.storage) {
+			data.storage = [];
+			data.storage.push({
+				id: this.storage.id,
+				orders: []
+			}
+			);
+		}
+
+		if (_.isUndefined(data.container)) {
+			data.container = [];
+		}
+
+		if (_.isUndefined(data.lab)) {
+			data.lab = [];
+		}
+
+		if (_.isUndefined(data.reactions)) {
+			data.reactions = {};
+		}
 
 		// go through reallacation orders and reset completed orders
 		for (let structureType in data) {

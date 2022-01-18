@@ -45,7 +45,12 @@ action.step = function(creep){
             })) {
             creep.say(String.fromCodePoint(0x1f44b) + String.fromCodePoint(0x1f3fe) + String.fromCodePoint(0x1F6AA) + String.fromCodePoint(0x1f510), true);
         }
-        creep.travelTo(target, {range:targetRange, ignoreCreeps:creep.data.ignoreCreeps || true});
+        if(creep.data.creepType !== 'sourceKiller'){
+            creep.travelTo(target, {range:targetRange, ignoreCreeps:creep.data.ignoreCreeps || true, avoidSKCreeps:false});
+        }
+        else{
+            creep.travelTo(target, {range:targetRange, ignoreCreeps:creep.data.ignoreCreeps || true, avoidSKCreeps:true});
+        }
     } else {
         action.unregister(creep);
     }

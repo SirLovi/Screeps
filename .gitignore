@@ -1,5 +1,6 @@
 ### Project specific
 screeps.json
+package-lock.json
 dist/
 pack/
 pub/

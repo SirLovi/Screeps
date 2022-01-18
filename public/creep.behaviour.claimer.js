@@ -25,3 +25,7 @@ mod.actions = (creep) => {
         Creep.action.bulldozing,
     ];
 };
+mod.strategies.defaultStrategy.moveOptions = function(options) {
+    options.avoidSKCreeps = true;
+    return options;
+};

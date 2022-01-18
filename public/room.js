@@ -2427,6 +2427,8 @@ mod.getCachedStructureMatrix = function (roomName) {
 		const mem = Room.pathfinderCache[roomName];
 		const ttl = Game.time - mem.updated;
 		if (mem.version === Room.COSTMATRIX_CACHE_VERSION && (mem.serializedMatrix || mem.costMatrix) && !mem.stale && ttl < COST_MATRIX_VALIDITY) {
+			if (Room.isSKRoom(roomName) && ttl >= SKROOM_COST_MATRIX_VALIDITY)
+				return false;
 			if (global.DEBUG && global.TRACE)
 				global.trace('PathFinder', {roomName: roomName, ttl, PathFinder: 'CostMatrix'}, 'cached costmatrix');
 			return true;

@@ -36,3 +36,7 @@ mod.gotoTargetRoom = function(creep) {
     const targetFlag = creep.data.destiny ? Game.flags[creep.data.destiny.targetName] : null;
     if (targetFlag) return Creep.action.travelling.assignRoom(creep, targetFlag.pos.roomName);
 };
+mod.strategies.defaultStrategy.moveOptions = function(options) {
+    options.avoidSKCreeps = true;
+    return options;
+};

@@ -90,6 +90,7 @@ module.exports = function(globalOpts = {}){
         findTravelPath(origin, destination, options = {}) {
             _.defaults(options, {
                 ignoreCreeps: true,
+                avoidSKCreeps: true,
                 range: 1,
                 maxOps: gOpts.maxOps,
                 obstacles: [],
