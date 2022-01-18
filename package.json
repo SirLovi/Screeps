@@ -1,5 +1,5 @@
 {
-  "name": "screeps.ai",
+  "name": "ccc.internal.package",
   "main": "main.js",
   "private": true,
   "devDependencies": {
@@ -15,10 +15,10 @@
     "grunt-eslint": "^24.0.0",
     "grunt-git": "^1.0.3",
     "grunt-screeps": "^1.2.1",
-    "grunt-webpack": "^5.0.0",
+    "grunt-webpack": "^1.0.18",
     "load-grunt-tasks": "^3.5.2",
     "require-optional": "^0.4.0",
-    "webpack": "^5.66.0",
-    "webpack-dev-server": "^4.7.3"
+    "webpack": "^1.15.0",
+    "webpack-dev-server": "^1.16.5"
   }
 }

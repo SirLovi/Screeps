@@ -18,6 +18,18 @@ viralUtil.deleteRoads = function (flush = false) {
 
 };
 
+viralUtil.deleteAllRoads = function () {
+	for (const room in Memory.rooms) {
+		let structures = Game.rooms[room].find(FIND_STRUCTURES),
+			roads = _.filter(structures, function (structure) {
+				return structure.structureType === STRUCTURE_ROAD;
+			});
+		roads.forEach(road => {
+			road.destroy();
+		});
+	}
+};
+
 viralUtil.deleteStructures = function (roomName, type) {
 
 	if (roomName === undefined) {
@@ -81,10 +93,6 @@ viralUtil.resetBoostProduction = function (roomName) {
 	for (let room of myRooms) {
 
 		if ((roomName === undefined || room.name === roomName)) {
-		    
-		    if (_.isUndefined(room.memory.resources)) {
-		        room.memory.resources = {};
-		    }
 
 			data = room.memory.resources;
 
@@ -94,41 +102,11 @@ viralUtil.resetBoostProduction = function (roomName) {
 
 				data.offers = [];
 				data.orders = [];
-				
-				if ((_.isUndefined(room.memory.resources.terminal) || room.memory.resources.terminal.length === 0) && room.terminal) {
-				    room.memory.resources.terminal = [];
-				    room.memory.resources.terminal.push({
-						id: room.terminal.id,
-						orders: []
-				    }
-				    );
-                }
 
-                if ((_.isUndefined(room.memory.resources.storage) || room.memory.resources.storage.length === 0) && room.storage) {
-				    room.memory.resources.storage = [];
-				    room.memory.resources.storage.push({
-						id: room.storage.id,
-						orders: []
-				    }
-				    );
-                }
-
-                if (_.isUndefined(room.memory.resources.container)) {
-				    room.memory.resources.container = [];
-                }
-
-                if (_.isUndefined(room.memory.resources.lab)) {
-				    room.memory.resources.lab = [];
-                }
-
-                if (_.isUndefined(room.memory.resources.reactions)) {
-				    room.memory.resources.reactions = {};
-                }
-
-				if (data.terminal)
+				if (data.terminal[0])
 					data.terminal[0].orders = [];
 
-				if (data.storage)
+				if (data.storage[0])
 					data.storage[0].orders = [];
 
 				if (data.reactions)

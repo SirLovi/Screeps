@@ -155,10 +155,6 @@ mod.FLAG_COLOR = {
 		color: COLOR_BROWN,
 		secondaryColor: COLOR_BROWN,
 	},
-	rampart: {
-        color: COLOR_BROWN,
-        secondaryColor: COLOR_BROWN
-    },
 	// COLOR_GREY
 	// COLOR_WHITE
 	command: { // command api
@@ -191,14 +187,6 @@ mod.FLAG_COLOR = {
 			color: COLOR_WHITE,
 			secondaryColor: COLOR_BLUE,
 		},
-		road: {
-            color: COLOR_WHITE,
-            secondaryColor: COLOR_WHITE
-        },
-        wall: {
-            color: COLOR_WHITE,
-            secondaryColor: COLOR_GREY
-        },
 	},
 };
 mod.DECAY_AMOUNT = {
@@ -236,7 +224,7 @@ for (let a in REACTIONS) {
 mod.MEM_SEGMENTS = {
 	COSTMATRIX_CACHE: {
 		start: 98,
-		end: 89,
+		end: 90,
 	},
 };
 // mod.ENERGY_VALUE_CREDITS = global.energyPrice;
@@ -311,56 +299,6 @@ mod.removeConstructionFlags = function () {
 		flag.remove();
 	}
 	return `Removed ${removeFlags.length} construction flags.`;
-};
-mod.runAutobahn = function(roomName, roomsParsed) {
-        
-	const autobahn = Autobahn;
-	
-	// Use a flag as the start point
-	let start = Game.flags['START'];
-
-	// Create an array of energy sources to use as the destinations
-	let destinations = Game.rooms[roomName].find(FIND_SOURCES);
-	
-	// Allow autobahn to path in these three rooms
-	//let options = {roomFilter: (roomName) => roomName.startsWith('W34')};
-	let options = {roomFilter: roomsParsed};
-
-	// Run autobahn
-	let network = autobahn(start, destinations, options);
-
-	// Build the road network
-	for (let i = 0; i < network.length; i++) {
-		let pos = network[i];
-		//Game.rooms[pos.roomName].createConstructionSite(pos, STRUCTURE_ROAD);
-		if((pos.lookFor(LOOK_FLAGS).length == 0) && (pos.lookFor(LOOK_CONSTRUCTION_SITES).length == 0)){
-			pos.newFlag(FLAG_COLOR.command.road);
-		}
-	}
-};
-mod.removeRoomRoadFlags = function (roomName) {
-let room = Game.rooms[roomName];
-let removeFlags = _.filter(room.find(FIND_FLAGS), flag => flag.color == COLOR_WHITE || flag.secondaryColor == COLOR_WHITE);
-for (let flag of removeFlags) {
-	flag.remove();
-}
-return `Removed ${removeFlags.length} road flags.`;
-};
-mod.removeRoomConstructionFlags = function (roomName) {
-let room = Game.rooms[roomName];
-let removeFlags = _.filter(room.find(FIND_FLAGS), flag => flag.color == COLOR_CYAN || flag.color == COLOR_WHITE);
-for (let flag of removeFlags) {
-	flag.remove();
-}
-return `Removed ${removeFlags.length} construction flags.`;
-};
-mod.removeConstructionSites = function (roomName) {
-let room = Game.rooms[roomName];
-let removeSites = room.find(FIND_CONSTRUCTION_SITES);
-for (let site of removeSites) {
-	site.remove();
-}
-return `Removed ${removeSites.length} construction sites.`;
 };
 mod.listConstructionSites = function (filter) {
 	let msg = `${_.keys(Game.constructionSites).length} construction sites currently present: `;

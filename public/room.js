@@ -802,14 +802,19 @@ mod.extend = function () {
 		if (creep.data.creepType === 'remoteHauler'
 			&& creep.sum / creep.carryCapacity < global.REMOTE_HAULER.MIN_LOAD
 			&& creep.data.roomName !== creep.data.homeRoom)
-
 			return;
 
 		// remoteMiner can not make a footPrint, when he`s not at home (if he has been attacked, he will go far away)
 		// TODO they go too far when attacked by invaders or sourceKeeper (where are they going? Flag?)
 		if (creep.data.creepType === 'remoteMiner'
 			&& creep.data.roomName !== creep.data.homeRoom)
+			return;
 
+		if (creep.data.creepType === 'upgrader' || creep.data.creepType === 'miner')
+			return;
+
+		if ((creep.data.creepType === 'hauler' || creep.data.creepType === 'worker' || creep.data.creepType === 'labTech')
+			&& creep.sum === 0)
 			return;
 
 		let x = creep.pos.x;

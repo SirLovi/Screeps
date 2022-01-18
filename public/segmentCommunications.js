@@ -3,7 +3,8 @@
 const TRADING = 'basicTrading';
 
 let mod = {
-	analyze() {
+	run() {
+
 		if (Game.shard.name !== 'shard1')
 			return;
 
@@ -17,9 +18,11 @@ let mod = {
 		if (Game.time % global.SEGMENT_COMMS.sendAndRequestTiming === 0) {
 			console.log(`SEGMENT COMMUNICATIONS STARTING`);
 			this.analyzeOtherPlayerSegment();
-			this.setMyPublicSegment();
-		} else if (Game.time % global.SEGMENT_COMMS.trackTiming === 0)
+			this.writeMyRequest();
+		} else if (Game.time % global.SEGMENT_COMMS.trackTiming === 0) {
+			console.log(`SEGMENT COMMUNICATIONS TRACKING`);
 			this.trackSegmentSharing();
+		}
 	},
 	minEnergy() {
 		return global.acceptedRooms.length * (global.MAX_STORAGE_ENERGY[8] + global.TERMINAL_ENERGY + global.ENERGY_BALANCE_TRANSFER_AMOUNT);
@@ -64,37 +67,17 @@ let mod = {
 		if (!_.isUndefined(offerRoom)) {
 
 			global.logSystem(offerRoom.name, `has ${offerRoom.terminal.store[resource]} ${resource} in the terminal`);
-			// console.log(`enough: ${offerRoom.terminal.store[resource] && offerRoom.terminal.store[resource] >= amount}`);
-			// console.log(`terminal ready to send: ${offerRoom.terminal.cooldown <= 0} cooldown: ${offerRoom.terminal.cooldown}`);
 
 			if (offerRoom.terminal.store[resource] && offerRoom.terminal.store[resource] >= amount && offerRoom.terminal.cooldown <= 0) {
 
 				let ret = offerRoom.terminal.send(resource, amount, targetRoom, message);
 				if (ret === OK)
-					global.logSystem(offerRoom.name, `FULFILLING TERMINAL REQUEST TO: ${resource} ${offerRoom.name} ${targetRoom} ${amount}`);
+					global.logSystem(offerRoom.name, `'SEND WAS SUCCESS: ${amount} ${resource} from: ${offerRoom.name} to: ${targetRoom} `);
 				else
 					console.log('SEND WAS NOT SUCCESS:', resource, '@', offerRoom.name, targetRoom, '#:', amount, 'ERR', global.translateErrorCode(ret));
 
-				// console.log(`request mineral send: ${translateErrorCode(ret)}`);
-
-
-			} else if (offerRoom.terminal.cooldown > 0) {
-
-				// let containerData = offerRoom.memory.resources.terminal[0];
-				// let existingOrder = containerData.orders.find((r) => r.type === resource && r.storeAmount === amount);
-				//
-				// console.log(`terminalId: ${containerData.id}, existingOrder:`);
-				// if (existingOrder)
-				// 	global.BB(existingOrder);
-				//
-				// if (_.isUndefined(existingOrder) && !(offerRoom.terminal.store[resource] && offerRoom.terminal.store[resource] >= amount)) {
-				// 	let ret = offerRoom.setStore(containerData.id, resource, amount);
-				// 	global.logSystem(offerRoom.name, `terminal order placed ${resource} ${amount} ERR: ${global.translateErrorCode(ret)}`);
-				// }
-
+			} else if (offerRoom.terminal.cooldown > 0)
 				global.logSystem(offerRoom.name, `terminal is busy, cooldown: ${offerRoom.terminal.cooldown}`);
-
-			}
 		} else {
 			console.log(`There is no offerRoom for ${resource}`);
 		}
@@ -104,8 +87,7 @@ let mod = {
 		console.log(`analyzeOtherPlayerSegment`);
 		// Reason this is an array instead of object, is that it's easy to use the keys in an array across multiple ticks.
 		let alliedList = global.SEGMENT_COMMS.alliedList;
-
-		let notSeen = 0;
+		// let notSeen = 0;
 		// Acceptable array is the resources you are willing to trade out.
 		let acceptable = global.SEGMENT_COMMS.acceptableMinerals;
 		// The minimum you have of the above mineral before you trade.
@@ -161,7 +143,7 @@ let mod = {
 	makeRequestString() {
 		console.log(`makeRequest`);
 		let ret = {
-			basicTrading: { // currently used by all and basic empire balancing.
+			basicTrading: { // currently, used by all and basic empire balancing.
 				room: '',
 				energy: false,
 				H: false,
@@ -210,30 +192,46 @@ let mod = {
 		// 	Memory.stats.playerTrade = {};
 		// }
 
-		if (Memory.segmentTransactions.lastIncomingTs === undefined)
-			Memory.segmentTransactions.lastIncomingTs = 0;
-		if (Memory.segmentTransactions.lastOutgoingTs === undefined)
-			Memory.segmentTransactions.lastOutgoingTs = 0;
+		if (Memory.segmentTransactions.lastIncoming === undefined) {
+			Memory.segmentTransactions.lastIncoming = {};
+			Memory.segmentTransactions.lastIncoming.time = 0;
+		}
+		if (Memory.segmentTransactions.lastOutgoing === undefined) {
+			Memory.segmentTransactions.lastOutgoing = {};
+			Memory.segmentTransactions.lastOutgoing.time = 0;
+		}
+
+		let lastIncoming = Memory.segmentTransactions.lastIncoming,
+			lastOutgoing = Memory.segmentTransactions.lastOutgoing;
+
 
 		let incomingTrans = Game.market.incomingTransactions;
-		let latestTransaction;
+		let latestTransactionTime;
 		let transaction;
+
+		lastIncoming.resources = {}
+
 		for (let id in incomingTrans) {
+
 			transaction = incomingTrans[id];
-			if (transaction.time > Memory.segmentTransactions.lastIncomingTs) {
-				if (!latestTransaction) {
-					latestTransaction = transaction.time;
+
+			if (transaction.time > lastIncoming.time) {
+				if (!latestTransactionTime) {
+					latestTransactionTime = transaction.time;
 				}
 				if (!transaction.sender || transaction.order) {
 					continue;
 				}
-				//            if (transaction.description !== 'segmentTransactions') {continue; }
+
 				let username = transaction.sender.username;
-				// if (username || Memory.stats.playerTrade[username] === undefined) {
-				// 	Memory.stats.playerTrade[username] = 0;
-				// }
-				// let tradeScore = Memory.stats.playerTrade[username];
+
 				if (username !== playerName && transaction.order === undefined) {
+
+					if (_.isUndefined(lastIncoming.resources[transaction.sender.username]))
+						lastIncoming.resources[transaction.sender.username] = {};
+
+					lastIncoming.resources[transaction.sender.username][transaction.resourceType] = transaction.amount;
+
 					if (Memory.segmentTransactions[username] === undefined) {
 						Memory.segmentTransactions[username] = {};
 					}
@@ -241,29 +239,40 @@ let mod = {
 						Memory.segmentTransactions[username][transaction.resourceType] = 0;
 					}
 					Memory.segmentTransactions[username][transaction.resourceType] += transaction.amount;
-					// Memory.stats.playerTrade[username] += transaction.amount;
-					// console.log("Segment sharing from " + username + " : " + transaction.amount + " " + transaction.resourceType + " at tick " + transaction.time);
 				}
 			} else {
 				break;
 			}
 		}
-		if (latestTransaction) {
-			Memory.segmentTransactions.lastIncomingTs = latestTransaction;
-		}
+
+		if (latestTransactionTime)
+			lastIncoming.time = latestTransactionTime;
 
 		let outgoingTrans = Game.market.outgoingTransactions;
+
+		lastOutgoing.resources = {}
+
 		for (let id in outgoingTrans) {
+
 			transaction = outgoingTrans[id];
-			if (transaction.time > Memory.segmentTransactions.lastOutgoingTs) {
-				if (!latestTransaction) {
-					latestTransaction = transaction.time;
-				}
-				if (!transaction.recipient || transaction.order) {
+
+			if (transaction.time > lastOutgoing.time) {
+
+				if (!latestTransactionTime)
+					latestTransactionTime = transaction.time;
+
+				if (!transaction.recipient || transaction.order)
 					continue;
-				}
+
 				let username = transaction.recipient.username;
+
 				if (username && username !== playerName) {
+
+					if (_.isUndefined(lastOutgoing.resources[transaction.recipient.username]))
+						lastOutgoing.resources[transaction.recipient.username] = {};
+
+					lastOutgoing.resources[transaction.recipient.username][transaction.resourceType] = transaction.amount;
+
 					if (Memory.segmentTransactions[username] === undefined) {
 						Memory.segmentTransactions[username] = {};
 					}
@@ -271,18 +280,17 @@ let mod = {
 						Memory.segmentTransactions[username][transaction.resourceType] = 0;
 					}
 					Memory.segmentTransactions[username][transaction.resourceType] -= transaction.amount;
-					// console.log("Segment sharing to " + username + " : " + transaction.amount + " " + transaction.resourceType + " at tick " + transaction.time);
 				}
 			} else {
 				break;
 			}
 		}
-		if (latestTransaction) {
-			Memory.segmentTransactions.lastOutgoingTs = latestTransaction;
+		if (latestTransactionTime) {
+			lastOutgoing.time = latestTransactionTime;
 		}
 	},
-	setMyPublicSegment() {
-		RawMemory.setPublicSegments([99]);
+	writeMyRequest() {
+		console.log(`setMyPublicSegment is running`);
 		RawMemory.segments[99] = this.makeRequestString();
 	},
 };

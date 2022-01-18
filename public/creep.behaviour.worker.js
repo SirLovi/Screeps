@@ -8,8 +8,7 @@ mod.inflowActions = function (creep) {
         Creep.action.withdrawing,
         Creep.action.uncharging,
         Creep.action.harvesting,
-        Creep.action.reallocating,
-        Creep.action.pickingTombstones
+        Creep.action.reallocating
     ];
     if (creep.sum > creep.carry.energy) {
         priority.unshift(Creep.action.storing);
@@ -43,17 +42,6 @@ mod.outflowActions = function (creep) {
                 Creep.action.repairing,
                 Creep.action.storing,
                 Creep.action.upgrading
-            ];
-        else if (creep.room.controller && creep.room.controller.level === 1)
-            priority = [
-                Creep.action.upgrading,
-                Creep.action.building,
-                Creep.action.fortifying,
-                Creep.action.feeding,
-                Creep.action.fueling,
-                Creep.action.repairing,
-                Creep.action.charging,
-                Creep.action.storing
             ];
         else
             priority = [

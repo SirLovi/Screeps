@@ -1,11 +1,11 @@
 let action = new Creep.Action('building');
 module.exports = action;
-action.maxPerTarget = 8;
+action.maxPerTarget = 3;
 action.targetRange = 3;
 action.reachedRange = function(creep) {
     return creep.getStrategyHandler([action.name], 'reachedRange', creep);
 };
-action.maxPerAction = 5;
+action.maxPerAction = 3;
 action.isValidAction = function(creep){
     return ( creep.carry.energy > 0 );
 };

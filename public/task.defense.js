@@ -104,7 +104,7 @@ mod.creep = {
         fixedBody: [RANGED_ATTACK, MOVE],
         multiBody: {
             [HEAL]: 1,
-            [MOVE]: 4,
+            [MOVE]: 2,
             [RANGED_ATTACK]: 2,
             [TOUGH]: 1,
         },
@@ -189,7 +189,7 @@ mod.orderDefenses = function (invaderCreep, GUID) {
                 //defender.multiBody = [ATTACK, ATTACK, ATTACK, MOVE];
 
                 defender.fixedBody = [ATTACK, MOVE];
-                defender.multiBody = [ATTACK, MOVE];
+                defender.multiBody = [ATTACK, ATTACK, ATTACK, MOVE];
 
                 //global.logSystem(invadersRoom, `WORK -- BOOST materials: `);
 
@@ -202,8 +202,8 @@ mod.orderDefenses = function (invaderCreep, GUID) {
                 //defender.fixedBody = [];
                 //defender.multiBody = [TOUGH, RANGED_ATTACK, HEAL, MOVE];
 
-                defender.fixedBody = [HEAL, MOVE];
-                defender.multiBody = [TOUGH, RANGED_ATTACK, HEAL, MOVE, MOVE, MOVE];
+                defender.fixedBody = [HEAL, HEAL];
+                defender.multiBody = [TOUGH, RANGED_ATTACK, HEAL, MOVE];
 
                 //global.logSystem(invadersRoom, `(ATTACK || RANGED_ATTACK) && HEAL -- BOOST materials: `);
 
@@ -217,8 +217,8 @@ mod.orderDefenses = function (invaderCreep, GUID) {
                 //defender.fixedBody = [RANGED_ATTACK, MOVE];
                 //defender.multiBody = [RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, MOVE];
 
-                defender.fixedBody = [HEAL, MOVE];
-                defender.multiBody = [TOUGH, RANGED_ATTACK, HEAL, MOVE, MOVE, MOVE];
+                defender.fixedBody = [HEAL, HEAL, HEAL, HEAL, HEAL];
+                defender.multiBody = [TOUGH, RANGED_ATTACK, HEAL, MOVE];
 
                 //global.logSystem(invadersRoom, `!(ATTACK || RANGED_ATTACK) && HEAL BOOST materials: `);
 

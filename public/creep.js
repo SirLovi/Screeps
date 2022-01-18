@@ -274,10 +274,10 @@ mod.extend = function () {
 		if (this.fatigue > 0)
 			return;
 
-		if (this.data.creepType === 'remoteHauler') {
-			// global.logSystem(this.room.name, `remoteHauler IDLE ${this.name}`);
-			return;
-		}
+		// if (this.data.creepType === 'remoteHauler') {
+		// 	// global.logSystem(this.room.name, `remoteHauler IDLE ${this.name}`);
+		// 	return;
+		// }
 
 		// check if on road/structure
 		const needToMove = _(this.room.structures.piles).filter('pos', this.pos)
@@ -286,7 +286,7 @@ mod.extend = function () {
 		.size();
 		if (needToMove) {
 			if (!this.data.idle || !this.data.idle.path || !this.data.idle.path.length || this.pos.isEqualTo(this.data.idle.lastPos)) {
-				const idleFlag = FlagDir.find(FLAG_COLOR.command.idle, this.pos, true, (r, flagEntry) => {
+				const idleFlag = global.FlagDir.find(global.FLAG_COLOR.command.idle, this.pos, true, (r, flagEntry) => {
 					const flag = Game.flags[flagEntry.name];
 					const occupied = flag.pos.lookFor(LOOK_CREEPS);
 					if (occupied && occupied.length) {
