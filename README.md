@@ -1,4 +1,4 @@
-# Screeps AI based on old CCC code  
+# [Screeps](https://screeps.com) AI based on old CCC code  
 
 ### Getting started with the repository  
 
@@ -78,5 +78,9 @@ Please note, that it is required to call `getPath('<originalModuleNameWithoutExt
 
 ## Links
 
-[Wiki](https://gitlab.com/ScreepsCCC/public/wikis)  
-[Screeps Discord channel](https://discord.gg/screeps)  
+[Repository Wiki](https://gitlab.com/ScreepsCCC/public/wikis)   
+[Screeps Forum](https://screeps.com/forum/)   
+[Screeps Discord](https://discord.gg/screeps)   
+[Screeps GitHub](https://github.com/screeps/screeps)   
+[Screeps Twitter](https://twitter.com/ScreepsGame)   
+[Screeps Facebook](https://facebook.com/ScreepsGame)   
