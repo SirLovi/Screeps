@@ -15,11 +15,15 @@ action.isValidTarget = function(target){
     //return target.store || target.energy || target.mineralAmount;
 };
 action.newTarget = function(creep) {
-    //let target = creep.room.find(FIND_TOMBSTONES);
     if(!creep.room.storage){
         return creep.pos.findClosestByPath(FIND_TOMBSTONES, {filter: (o) => this.isValidTarget(o, creep) && (o.store[RESOURCE_ENERGY] > 0)});
     }
-    return creep.pos.findClosestByPath(FIND_TOMBSTONES, {filter: (o) => this.isValidTarget(o, creep)});
+    if(!creep.room.storage){
+        return creep.pos.findClosestByPath(FIND_RUINS, {filter: (o) => this.isValidTarget(o, creep) && (o.store[RESOURCE_ENERGY] > 0)});
+    }
+    target = creep.pos.findClosestByPath(FIND_RUINS, {filter: (o) => this.isValidTarget(o, creep)});
+    target = creep.pos.findClosestByPath(FIND_TOMBSTONES, {filter: (o) => this.isValidTarget(o, creep)});
+    return target;
 };
 action.work = function(creep){
     let resourceType = _.last(_.sortBy(_.keys(creep.target.store), resourceType => (creep.target.store[resourceType] || 0)));
