@@ -240,7 +240,7 @@ for (let a in REACTIONS) {
 mod.MEM_SEGMENTS = {
 	COSTMATRIX_CACHE: {
 		start: 98,
-		end: 89,
+		end: 90,
 	},
 };
 // mod.ENERGY_VALUE_CREDITS = global.energyPrice;
