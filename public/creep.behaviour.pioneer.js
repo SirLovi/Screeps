@@ -72,3 +72,7 @@ mod.nextAction = function(creep) {
     }    
     return this.nextEnergyAction(creep);
 };
+mod.strategies.defaultStrategy.moveOptions = function(options) {
+    options.avoidSKCreeps = true;
+    return options;
+};

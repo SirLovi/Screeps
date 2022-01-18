@@ -23,3 +23,7 @@ mod.getEnergy = function(creep) {
 mod.maintain = function(creep) {
     return Creep.behaviour.miner.maintain.call(this, creep);
 };
+mod.strategies.defaultStrategy.moveOptions = function(options) {
+    options.avoidSKCreeps = true;
+    return options;
+};
