@@ -263,17 +263,17 @@ mod.extend = function () {
 		}
 
 		// Roads
-        FlagDir.filter(FLAG_COLOR.command.road, ...ARGS).forEach(flag => {
+        FlagDir.filter(global.FLAG_COLOR.command.road, ...ARGS).forEach(flag => {
             CONSTRUCT(flag, STRUCTURE_ROAD);
         });
         
         // Walls
-        FlagDir.filter(FLAG_COLOR.command.wall, ...ARGS).forEach(flag => {
+        FlagDir.filter(global.FLAG_COLOR.command.wall, ...ARGS).forEach(flag => {
             CONSTRUCT(flag, STRUCTURE_WALL);
         });
         
         // Ramparts
-        FlagDir.filter(FLAG_COLOR.rampart, ...ARGS).forEach(flag => {
+        FlagDir.filter(global.FLAG_COLOR.rampart, ...ARGS).forEach(flag => {
             CONSTRUCT(flag, STRUCTURE_RAMPART);
         });
 
@@ -337,9 +337,9 @@ mod.extend = function () {
 			[STRUCTURE_TOWER]: global.FLAG_COLOR.construct.tower,
 			[STRUCTURE_EXTENSION]: global.FLAG_COLOR.construct,
 			[STRUCTURE_LINK]: global.FLAG_COLOR.construct.link,
-			[STRUCTURE_ROAD]: FLAG_COLOR.command.road,
-            [STRUCTURE_WALL]: FLAG_COLOR.command.wall,
-            [STRUCTURE_RAMPART]: FLAG_COLOR.rampart,
+			[STRUCTURE_ROAD]: global.FLAG_COLOR.command.road,
+            [STRUCTURE_WALL]: global.FLAG_COLOR.command.wall,
+            [STRUCTURE_RAMPART]: global.FLAG_COLOR.rampart,
 			[STRUCTURE_STORAGE]: global.FLAG_COLOR.construct.storage,
 			[STRUCTURE_TERMINAL]: global.FLAG_COLOR.construct.terminal,
 			[STRUCTURE_NUKER]: global.FLAG_COLOR.construct.nuker,
@@ -367,11 +367,11 @@ mod.extend = function () {
 					return failed();
 				const pos = room.getPositionAt(xPos, yPos);
 				const structureType = layout[x] && layout[x][y];
+				let roomTerrain = Game.rooms[room.name].terrain.get(xPos, yPos);
 
-				if (structureType && (pos.lookFor(LOOK_FLAGS).length === 0) && !(Game.map.getTerrainAt(pos) === 'wall')) {
-					let roomTerrain = Game.rooms[Room.name].terrain.get(xPos, yPos)
+				if (structureType && (pos.lookFor(LOOK_FLAGS).length === 0) && !(roomTerrain === TERRAIN_MASK_WALL)) {
 
-					global.logSystem(Room.name, `TEST Room.terrain: ${roomTerrain}`);
+					//global.logSystem(Room.name, `TEST Room.terrain: ${roomTerrain}`);
 
 					//if (roomTerrain === TERRAIN_MASK_WALL)
 					//	return failed();
@@ -396,6 +396,7 @@ mod.extend = function () {
 		});
 		*/
 
+		flag.pos.newFlag(global.FLAG_COLOR.construct.storage);
 		flag.remove();
 	};
 };
