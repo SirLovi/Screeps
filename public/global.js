@@ -340,7 +340,7 @@ mod.runAutobahn = function(roomName, roomsParsed) {
 };
 mod.removeRoomRoadFlags = function (roomName) {
 let room = Game.rooms[roomName];
-let removeFlags = _.filter(room.find(FIND_FLAGS), flag => flag.color == COLOR_WHITE || flag.secondaryColor == COLOR_WHITE);
+let removeFlags = _.filter(room.find(FIND_FLAGS), flag => flag.color == COLOR_WHITE && flag.secondaryColor == COLOR_WHITE);
 for (let flag of removeFlags) {
 	flag.remove();
 }
