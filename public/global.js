@@ -110,6 +110,18 @@ mod.FLAG_COLOR = {
 			color: COLOR_CYAN,
 			secondaryColor: COLOR_WHITE,
 		},
+		road: {
+			color: COLOR_WHITE,
+			secondaryColor: COLOR_WHITE,
+		},
+		wall: {
+			color: COLOR_WHITE,
+			secondaryColor: COLOR_GREY,
+		},
+		rampart: {
+			color: COLOR_BROWN,
+			secondaryColor: COLOR_BROWN,
+		},
 	},
 	//COLOR_GREEN
 	claim: { // claim this room, then build spawn at flag
@@ -190,15 +202,7 @@ mod.FLAG_COLOR = {
 		safeGen: {
 			color: COLOR_WHITE,
 			secondaryColor: COLOR_BLUE,
-		},
-		road: {
-			color: COLOR_WHITE,
-			secondaryColor: COLOR_WHITE,
-		},
-		wall: {
-			color: COLOR_WHITE,
-			secondaryColor: COLOR_GREY,
-		},
+		}
 	},
 };
 mod.DECAY_AMOUNT = {

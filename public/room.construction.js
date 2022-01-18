@@ -343,9 +343,9 @@ mod.extend = function () {
 			[STRUCTURE_TOWER]: global.FLAG_COLOR.construct.tower,
 			[STRUCTURE_EXTENSION]: global.FLAG_COLOR.construct,
 			[STRUCTURE_LINK]: global.FLAG_COLOR.construct.link,
-			[STRUCTURE_ROAD]: global.FLAG_COLOR.command.road,
-            [STRUCTURE_WALL]: global.FLAG_COLOR.command.wall,
-            [STRUCTURE_RAMPART]: global.FLAG_COLOR.rampart,
+			[STRUCTURE_ROAD]: global.FLAG_COLOR.construct.road,
+            [STRUCTURE_WALL]: global.FLAG_COLOR.construct.wall,
+            [STRUCTURE_RAMPART]: global.FLAG_COLOR.construct.rampart,
 			[STRUCTURE_STORAGE]: global.FLAG_COLOR.construct.storage,
 			[STRUCTURE_TERMINAL]: global.FLAG_COLOR.construct.terminal,
 			[STRUCTURE_NUKER]: global.FLAG_COLOR.construct.nuker,
@@ -382,7 +382,7 @@ mod.extend = function () {
 					//if (roomTerrain === TERRAIN_MASK_WALL)
 					//	return failed();
 					if (structureType === STRUCTURE_ROAD) {
-						pos.newFlag(FLAG_COLOR.command.road);
+						pos.newFlag(global.FLAG_COLOR.command.road);
 					} else {
 						const flagColour = constructionFlags[structureType];
 						pos.newFlag(flagColour);
