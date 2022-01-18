@@ -333,14 +333,14 @@ mod.runAutobahn = function(roomName, roomsParsed) {
 	for (let i = 0; i < network.length; i++) {
 		let pos = network[i];
 		//Game.rooms[pos.roomName].createConstructionSite(pos, STRUCTURE_ROAD);
-		if((pos.lookFor(LOOK_FLAGS).length == 0) && (pos.lookFor(LOOK_CONSTRUCTION_SITES).length == 0)){
-			pos.newFlag(FLAG_COLOR.command.road);
+		if((pos.lookFor(LOOK_FLAGS).length === 0) && (pos.lookFor(LOOK_CONSTRUCTION_SITES).length === 0)){
+			pos.newFlag(global.FLAG_COLOR.command.road);
 		}
 	}
 };
 mod.removeRoomRoadFlags = function (roomName) {
 let room = Game.rooms[roomName];
-let removeFlags = _.filter(room.find(FIND_FLAGS), flag => flag.color == COLOR_WHITE && flag.secondaryColor == COLOR_WHITE);
+let removeFlags = _.filter(room.find(FIND_FLAGS), flag => flag.color === COLOR_WHITE && flag.secondaryColor === COLOR_WHITE);
 for (let flag of removeFlags) {
 	flag.remove();
 }
@@ -348,7 +348,7 @@ return `Removed ${removeFlags.length} road flags.`;
 };
 mod.removeRoomConstructionFlags = function (roomName) {
 let room = Game.rooms[roomName];
-let removeFlags = _.filter(room.find(FIND_FLAGS), flag => flag.color == COLOR_CYAN || flag.color == COLOR_WHITE);
+let removeFlags = _.filter(room.find(FIND_FLAGS), flag => flag.color === COLOR_CYAN || flag.color === COLOR_WHITE);
 for (let flag of removeFlags) {
 	flag.remove();
 }

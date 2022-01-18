@@ -151,7 +151,7 @@ mod.extend = function () {
 			});
 
 
-			global.BB(data);
+			// global.BB(data);
 
 			// build roads on all most frequent used fields
 			let setSite = pos => {
@@ -269,17 +269,17 @@ mod.extend = function () {
 		}
 
 		// Roads
-        FlagDir.filter(global.FLAG_COLOR.command.road, ...ARGS).forEach(flag => {
+        global.FlagDir.filter(global.FLAG_COLOR.command.road, ...ARGS).forEach(flag => {
             CONSTRUCT(flag, STRUCTURE_ROAD);
         });
 
         // Walls
-        FlagDir.filter(global.FLAG_COLOR.command.wall, ...ARGS).forEach(flag => {
+        global.FlagDir.filter(global.FLAG_COLOR.command.wall, ...ARGS).forEach(flag => {
             CONSTRUCT(flag, STRUCTURE_WALL);
         });
 
         // Ramparts
-        FlagDir.filter(global.FLAG_COLOR.rampart, ...ARGS).forEach(flag => {
+        global.FlagDir.filter(global.FLAG_COLOR.rampart, ...ARGS).forEach(flag => {
             CONSTRUCT(flag, STRUCTURE_RAMPART);
         });
 
