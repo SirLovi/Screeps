@@ -209,6 +209,7 @@ let mod = {
 		INVADING: String.fromCodePoint(0x1F52B), // 🔫
 		MINING: String.fromCodePoint(0x26CF), // ⛏
 		PICKING: String.fromCodePoint(0x23EC), // ⏬
+		PICKINGTOMBSTONES: String.fromCodePoint(0x1F480), // 💀
 		REALLOCATING: String.fromCodePoint(0x2194), // ↔
 		RECYCLING: String.fromCodePoint(0x267B), // ♻
 		REPAIRING: String.fromCodePoint(0x1F528), // 🔨

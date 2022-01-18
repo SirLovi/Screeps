@@ -208,6 +208,7 @@ let mod = {
         HEALING: String.fromCodePoint(0x26E8), // ⛨
         IDLE: String.fromCodePoint(0x1F3B5), // 🎵
         INVADING: String.fromCodePoint(0x1F52B), // 🔫
+        PICKINGTOMBSTONES: String.fromCodePoint(0x1F480), // 💀
         MINING: String.fromCodePoint(0x26CF), // ⛏
         PICKING: String.fromCodePoint(0x23EC), // ⏬
         REALLOCATING: String.fromCodePoint(0x2194), // ↔
