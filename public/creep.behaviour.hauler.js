@@ -6,7 +6,6 @@ mod.inflowActions = (creep) => {
         Creep.action.picking,
         Creep.action.withdrawing,
         Creep.action.reallocating,
-        Creep.action.reallocating,
         Creep.action.pickingTombstones
     ];
 };
