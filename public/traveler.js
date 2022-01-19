@@ -220,10 +220,10 @@ module.exports = function(globalOpts = {}){
             // handle case where there is a stronghold in the room
             // TODO make it FALSE if they are the squad who want them destroy
 
-            if (creep.room.strongHold) {
-                global.logSystem(creep.room.name, `${creep.name} is in a STRONGHOLD room`);
-                delete travelData.path;
-            }
+            // if (creep.room.strongHold) {
+            //     global.logSystem(creep.room.name, `${creep.name} is in a STRONGHOLD room`);
+            //     delete travelData.path;
+            // }
 
             // TODO Do an actual calculation to see if we have moved, this is unnecessary and expensive when the creep hasn't moved for
             // a few ticks and the path gets rebuilt.

@@ -139,7 +139,7 @@ let mod = {
     ROAD_CONSTRUCTION_FORCED_ROOMS: {'shard1': []}, //Add room names to force automatic road construction regardless of ROAD_CONSTRUCTION_ENABLE e.g. {'shard0':['W0N0','W1N0'],'shard1':['W0N0', 'W1N0']}.
     ROAD_CONSTRUCTION_INTERVAL: 2000,
     ROAD_CONSTRUCTION_MIN_DEVIATION: 1.2,
-    ROAD_CONSTRUCTION_ABS_MIN: 3,
+    ROAD_CONSTRUCTION_ABS_MIN: 10,
     TIME_ZONE: 2, // zone offset in hours (-12 through +12) from UTC
     USE_SUMMERTIME: true, // Please define isSummerTime in global.js to suit to your local summertime rules
     SPAWN_DEFENSE_ON_ATTACK: true, // This will attempt to store enough to have a defense and spawn troops when invaded.
@@ -176,7 +176,7 @@ let mod = {
     REMOTE_RESERVE_HAUL_CAPACITY: 0.1, // Percent of allocated haul capacity before sending reservers.
     PIONEER_UNOWNED: false, // True: pioneers may attempt to work in unowned rooms.
     PRIVATEERS_BUILD: true, // True: robbers may attempt to build
-    DRIVE_BY_REPAIR_RANGE: 1, // range that creeps should search when trying to repair and move
+    DRIVE_BY_REPAIR_RANGE: 3, // range that creeps should search when trying to repair and move
     DRIVE_BY_REPAIR_RANGE_ROAD: 0,
     REMOTE_WORKER_MULTIPLIER: 0, // Number of workers spawned per remote mining room.
     PLAYER_WHITELIST: [],
@@ -226,13 +226,10 @@ let mod = {
     COOLDOWN: {
         TOWER_URGENT_REPAIR: 10,
         TOWER_REPAIR: 50,
-        CREEP_IDLE: 3,
+        CREEP_IDLE: 5,
     },
     TOWER_REPAIR: false,
     TOWER_URGENT_REPAIR: true,
-
-
-    // automatedBoostProduction is under rewrite
 
     // automatedBoostProduction
     // rooms with storage, terminal and flower registered labs loaded with energy are needed for the process
@@ -250,81 +247,8 @@ let mod = {
     MAKE_REACTIONS_WITH_3LABS: false,
     CHECK_ORDERS_INTERVAL: 25,
     PURCHASE_MINERALS: true,
-    STORE_CHARGE_PURCHASE: 0.4, // TODO is it necessary?
-    // COMPOUNDS_TO_MAKE: {    // which compound to make
-    // 	G: {                // for nukes
-    // 		make: true,    // make it or not
-    // 		roomThreshold: 5000, // start producing when room.resourcesAll[compound] <= roomThreshold
-    // 		amount: 5000,   // amount to make when room.resourcesAll <= roomThreshold (keep producing, while room.resourcesAll[compound] < amount + roomThreshold)
-    // 		rooms: [],       // rooms involved, leave it empty for all rooms
-    // 	},
-    // 	GH2O: {        // +80% upgradeController effectiveness without increasing the energy cost
-    // 		make: true,
-    // 		roomThreshold: 10000,
-    // 		amount: 5000,
-    // 		rooms: [],
-    // 	},
-    // 	XGH2O: {        // +100% upgradeController effectiveness without increasing the energy cost
-    // 		make: true,
-    // 		roomThreshold: 15000,
-    // 		amount: 3000,
-    // 		rooms: [],
-    // 	},
-    // 	XUH2O: {        // +300% attack effectiveness
-    // 		make: false,
-    // 		roomThreshold: 15000,
-    // 		amount: 3000,
-    // 		rooms: [],
-    // 	},
-    // 	XKHO2: {        // +300% rangedAttack and rangedMassAttack effectiveness
-    // 		make: false,
-    // 		roomThreshold: 15000,
-    // 		amount: 3000,
-    // 		rooms: [],
-    // 	},
-    // 	XLHO2: {        // +300% heal and rangedHeal effectiveness
-    // 		make: false,
-    // 		roomThreshold: 15000,
-    // 		amount: 3000,
-    // 		rooms: [],
-    // 	},
-    // 	XGHO2: {        // -70% damage taken
-    // 		make: false,
-    // 		roomThreshold: 15000,
-    // 		amount: 3000,
-    // 		rooms: [],
-    // 	},
-    // 	XZH2O: {        // +300% dismantle effectiveness
-    // 		make: false,
-    // 		roomThreshold: 15000,
-    // 		amount: 3000,
-    // 		rooms: [],
-    // 	},
-    // 	XKH2O: {        // +150 capacity
-    // 		make: false,
-    // 		roomThreshold: 15000,
-    // 		amount: 3000,
-    // 		rooms: [],
-    // 	},
-    // 	XZHO2: {        // +300% fatigue decrease speed
-    // 		make: false,
-    // 		roomThreshold: 15000,
-    // 		amount: 3000,
-    // 		rooms: [],
-    // 	},
-    // 	XUHO2: {        // +600% harvest effectiveness
-    // 		make: false,
-    // 		roomThreshold: 9000,
-    // 		amount: 3000,
-    // 		rooms: [],
-    // 	},
-    // 	XLH2O: {        // +100% repair and build effectiveness without increasing the energy cost
-    // 		make: false,
-    // 		roomThreshold: 9000,
-    // 		amount: 3000,
-    // 		rooms: [],
-    // 	},
-    // },
+    STORE_CHARGE_PURCHASE: 0.4,
+
     TRADE_THRESHOLD: 1000,
     MIN_OFFER_AMOUNT: 100,
     MIN_COMPOUND_AMOUNT_TO_MAKE: 3000,
@@ -333,114 +257,6 @@ let mod = {
     ALLOCATE_COMPOUNDS: false,
     ALLOCATE_COMPOUNDS_INTERVAL: 25,
     UNREGISTER_BOOSTLAB_AT: 450,
-    // COMPOUNDS_TO_ALLOCATE: { // if modified -> delete Memory.compoundsToAllocate
-    // 	G: {       // for Nukes
-    // 		allocate: true,
-    // 		allocateRooms: [],
-    // 		roomThreshold: 5000,
-    // 		amount: 5000,
-    // 		storeTo: 'storage',
-    // 		labRefilledAt: 1500,
-    // 	},
-    // 	GH2O: {       // +80% upgradeController effectiveness without increasing the energy cost
-    // 		allocate: true,
-    // 		superior: 'XGH2O', // do not allocate when superior allocated or making with 10 labs
-    // 		allocateRooms: [],
-    // 		roomThreshold: 5000,
-    // 		amount: 5000,
-    // 		storeTo: 'storage',
-    // 		labRefilledAt: 1500,
-    // 	},
-    // 	XGH2O: {       // +100% upgradeController effectiveness without increasing the energy cost
-    // 		allocate: true, // allocate this compound
-    // 		allocateRooms: [], // rooms to allocate, leave it empty for all rooms
-    // 		roomThreshold: 5000, // room allocating will start when compound is below roomThreshold
-    // 		amount: 3000,  // amount to allocate
-    // 		storeTo: 'storage', // 'storage' or 'lab'
-    // 		labRefilledAt: 1500, // lab refilled below this amount, it is meaningless if storeTo = 'storage'
-    // 	},
-    //
-    // 	XUH2O: {       // +300% attack effectiveness
-    // 		allocate: true,
-    // 		allocateRooms: [],
-    // 		roomThreshold: 5000,
-    // 		amount: 3000,
-    // 		storeTo: 'storage',
-    // 		labRefilledAt: 1500,
-    // 	},
-    // 	XKHO2: {       // +300% rangedAttack and rangedMassAttack effectiveness
-    // 		allocate: true,
-    // 		allocateRooms: [],
-    // 		roomThreshold: 5000,
-    // 		amount: 3000,
-    // 		storeTo: 'storage',
-    // 		labRefilledAt: 1500,
-    // 	},
-    // 	XLHO2: {       // +300% heal and rangedHeal effectiveness
-    // 		allocate: true,
-    // 		allocateRooms: [],
-    // 		roomThreshold: 5000,
-    // 		amount: 3000,
-    // 		storeTo: 'storage',
-    // 		labRefilledAt: 1500,
-    // 	},
-    // 	XGHO2: {       //-70% damage taken
-    // 		allocate: true,
-    // 		allocateRooms: [],
-    // 		roomThreshold: 5000,
-    // 		amount: 3000,
-    // 		storeTo: 'storage',
-    // 		labRefilledAt: 1500,
-    // 	},
-    // 	XZH2O: {       // +300% dismantle effectiveness
-    // 		allocate: true,
-    // 		allocateRooms: [],
-    // 		roomThreshold: 5000,
-    // 		amount: 3000,
-    // 		storeTo: 'storage',
-    // 		labRefilledAt: 1500,
-    // 	},
-    // 	XKH2O: {       // +150 capacity
-    // 		allocate: true,
-    // 		allocateRooms: [],
-    // 		roomThreshold: 5000,
-    // 		amount: 3000,
-    // 		storeTo: 'storage',
-    // 		labRefilledAt: 1500,
-    // 	},
-    // 	XZHO2: {       // +300% fatigue decrease speed
-    // 		allocate: true,
-    // 		allocateRooms: [],
-    // 		roomThreshold: 5000,
-    // 		amount: 3000,
-    // 		storeTo: 'storage',
-    // 		labRefilledAt: 1500,
-    // 	},
-    // 	XUHO2: {       // +600% harvest effectiveness
-    // 		allocate: true,
-    // 		allocateRooms: [],
-    // 		roomThreshold: 5000,
-    // 		amount: 3000,
-    // 		storeTo: 'storage',
-    // 		labRefilledAt: 1500,
-    // 	},
-    // 	XLH2O: {       // +100% repair and build effectiveness without increasing the energy cost
-    // 		allocate: true,
-    // 		allocateRooms: [],
-    // 		roomThreshold: 5000,
-    // 		amount: 3000,
-    // 		storeTo: 'storage',
-    // 		labRefilledAt: 1500,
-    // 	},
-    // 	power: {
-    // 		allocate: true,
-    // 		allocateRooms: [], // powers allocated between rooms with PowerSpawn only
-    // 		roomThreshold: 100,
-    // 		amount: 1000,
-    // 		storeTo: 'storage',
-    // 		labRefilledAt: 500,
-    // 	},
-    // },
 
 
     COMPOUNDS_MANAGE_ENABLED: false,
@@ -455,7 +271,7 @@ let mod = {
     TERMINAL_ENERGY: 100000,
     ENERGY_BALANCE_TRANSFER_AMOUNT: 50000,      // amount to transfer when balancing empire energy
     TARGET_STORAGE_SUM_RATIO: 0.9,
-    PROCESS_ORDERS_INTERVAL: 299, // interval to process room orders and run terminalBroker
+    PROCESS_ORDERS_INTERVAL: 247, // interval to process room orders and run terminalBroker
     // RESET_ACCEPTED_ROOMS: 50,
     COMPOUNDS_MANAGE_TIMING: 5,
     COMPOUNDS_MANAGE: { // if modified -> DELETE Memory.compoundsManage!!!!
