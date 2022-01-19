@@ -71,9 +71,11 @@ mod.FLAG_COLOR = {
 	},
 	//COLOR_BLUE - Reserved (internal use)
 	//COLOR_CYAN - Reserved (build related)
-	construct: { // construct an extension at flag when available
-		color: COLOR_CYAN,
-		secondaryColor: COLOR_CYAN,
+	construct: {
+		extension: {
+			color: COLOR_CYAN,
+			secondaryColor: COLOR_CYAN,
+		},
 		spawn: { // construct a spawn at flag when available
 			color: COLOR_CYAN,
 			secondaryColor: COLOR_RED,
@@ -1068,6 +1070,66 @@ mod.percentIncrease = function (a, b, precision = 0) {
 	}
 	return global.round(percent, precision);
 };
+
+mod.getInvadersCoreRooms = function () {
+	// console.log(`InvadersCore CHECK`);
+
+	let strongholds = [],
+		invadersCores = [],
+		core;
+
+	for (const [roomName, room] of Object.entries(Game.rooms)) {
+
+		let invaderStructure = room.find(FIND_HOSTILE_STRUCTURES, {
+			filter: {structureType: STRUCTURE_INVADER_CORE},
+		});
+
+
+		let invadersCoreExist = invaderStructure.length > 0;
+
+		if (invadersCoreExist) {
+			core = invaderStructure[0];
+		}
+
+		let enemyTowersExist = room.find(FIND_HOSTILE_STRUCTURES, {
+			filter: {structureType: STRUCTURE_TOWER},
+		}).length > 0;
+
+		let enemyRampartsExist = room.find(FIND_HOSTILE_STRUCTURES, {
+			filter: {structureType: STRUCTURE_RAMPART},
+		}).length > 0;
+
+		// global.logSystem(roomName, `InvadersCore: ${invadersCoreExist} STRONGHOLD: ${invadersCoreExist && (enemyTowersExist || enemyRampartsExist)} `);
+
+		if (invadersCoreExist && (enemyTowersExist || enemyRampartsExist)) {
+			strongholds.push(core);
+		} else if (invadersCoreExist) {
+			// global.logSystem(roomName, `INVADERSORE FOUND`);
+			invadersCores.push(core);
+		}
+	}
+
+	// // place skipRoom flag
+	// for (const stronghold of strongholds) {
+	// 	mod.placeStrongholdRoomFlag(stronghold.room)
+	// }
+
+	return {
+		stronghold: strongholds,
+		invadersCore: invadersCores,
+	};
+}
+
+// mod.flagFoundSkipRoom = (flag) => {
+// 	return flag.compareTo(global.FLAG_COLOR.command.skipRoom)
+// }
+//
+// mod.placeStrongholdRoomFlag = (room) => {
+// 	if (!Flag.found.on(flag => mod.flagFoundSkipRoom(flag))) {
+// 		global.logSystem(room.name, `SKIP_ROOM Flag placed`);
+// 		room.newFlag(global.FLAG_COLOR.command.skipRoom);
+// 	}
+// };
 
 
 //////////////

@@ -29,8 +29,8 @@ module.exports = function(globalOpts = {}){
     });
     class Traveler {
         constructor() {
-            this.getHostileRoom = (roomName) => _.get(Memory, ['rooms', roomName, 'hostile']);
             this.registerHostileRoom = (room) => room.registerIsHostile();
+            this.getHostileRoom = (roomName) => _.get(Memory, ['rooms', roomName, 'hostile']);
         }
         findAllowedRooms(origin, destination, options = {}) {
             _.defaults(options, { restrictDistance: 16 });
@@ -91,6 +91,7 @@ module.exports = function(globalOpts = {}){
             _.defaults(options, {
                 ignoreCreeps: true,
                 avoidSKCreeps: true,
+                allowHostile: false,
                 range: 1,
                 maxOps: gOpts.maxOps,
                 obstacles: [],
@@ -215,7 +216,16 @@ module.exports = function(globalOpts = {}){
                 options.ignoreCreeps = false;
                 delete travelData.path;
             }
-            // FIXME: Do an actual calculation to see if we have moved, this is unneccesary and expensive when the creep hasn't moved for
+
+            // handle case where there is a stronghold in the room
+            // TODO make it FALSE if they are the squad who want them destroy
+
+            if (creep.room.strongHold) {
+                global.logSystem(creep.room.name, `${creep.name} is in a STRONGHOLD room`);
+                delete travelData.path;
+            }
+
+            // TODO Do an actual calculation to see if we have moved, this is unnecessary and expensive when the creep hasn't moved for
             // a few ticks and the path gets rebuilt.
             // // handle case where creep wasn't traveling last tick and may have moved, but destination is still the same
             // if (Game.time - travelData.tick > Memory.skippedTicks + 2 && hasMoved) {
@@ -264,14 +274,14 @@ module.exports = function(globalOpts = {}){
                                 useFindRoute: false,
                             }));
                         if (options.debug) {
-                            console.log(`attempting path through next room using known route was ${ret.incomplete ? "not" : ""} successful`);
+                            console.log(`attempting path through next room using known route was ${ret.incomplete ? "not" : ""}successful`);
                         }
                     }
                     if (ret.incomplete && ret.ops < 2000 && travelData.stuck < gOpts.defaultStuckValue) {
                         options.useFindRoute = false;
                         ret = this.findTravelPath(creep, destPos, options);
                         if (options.debug) {
-                            console.log(`attempting path without findRoute was ${ret.incomplete ? "not " : ""}successful`);
+                            console.log(`attempting path without findRoute was ${ret.incomplete ? "not" : ""}successful`);
                         }
                     }
                 }
@@ -390,6 +400,7 @@ module.exports = function(globalOpts = {}){
             _.defaults(options, {
                 allowSK: true,
                 avoidSKCreeps: true,
+                allowHostile: false,
                 debug: global.DEBUG,
                 reportThreshold: global.TRAVELER_THRESHOLD,
                 useFindRoute: _.get(global, 'ROUTE_PRECALCULATION', true),

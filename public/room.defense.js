@@ -175,14 +175,18 @@ mod.extend = function() {
 
     Room.prototype.registerIsHostile = function() {
         if (this.controller) {
-            if (_.isUndefined(this.hostile) || typeof this.hostile === 'number') { // not overridden by user
-                if (this.controller.owner && !this.controller.my && !this.ally) {
+            if (_.isUndefined(this.memory.hostile) || typeof this.memory.hostile === 'number') { // not overridden by user
+                if ((this.controller.owner && !this.controller.my && !this.ally)) {
                     this.memory.hostile = this.controller.level;
                 } else {
                     delete this.memory.hostile;
                 }
             }
-        }
+        } else if (this.strongHold
+            && (_.isUndefined(this.memory.hostile) || typeof this.memory.hostile === 'number' || this.memory.hostile !== this.strongHold)) {
+            this.memory.hostile = this.strongHold;
+        } else
+            delete this.memory.hostile;
     };
 };
 mod.flushRoom = function(room) {

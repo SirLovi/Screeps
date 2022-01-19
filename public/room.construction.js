@@ -9,6 +9,10 @@ mod.analyzeRoom = function (room, needMemoryResync) {
 	}
 	room.roadConstruction();
 };
+
+
+
+
 mod.extend = function () {
 
 	// Construction related Room variables go here
@@ -341,7 +345,7 @@ mod.extend = function () {
 		const constructionFlags = {
 			[STRUCTURE_SPAWN]: global.FLAG_COLOR.construct.spawn,
 			[STRUCTURE_TOWER]: global.FLAG_COLOR.construct.tower,
-			[STRUCTURE_EXTENSION]: global.FLAG_COLOR.construct,
+			[STRUCTURE_EXTENSION]: global.FLAG_COLOR.construct.extension,
 			[STRUCTURE_LINK]: global.FLAG_COLOR.construct.link,
 			[STRUCTURE_ROAD]: global.FLAG_COLOR.construct.road,
             [STRUCTURE_WALL]: global.FLAG_COLOR.construct.wall,

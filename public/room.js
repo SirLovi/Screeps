@@ -677,13 +677,13 @@ mod.extend = function () {
 		'skip': {
 			configurable: true,
 			get() {
-				return Util.get(this, '_skip', !!FlagDir.find(FLAG_COLOR.command.skipRoom, this));
+				return global.Util.get(this, '_skip', !!global.FlagDir.find(global.FLAG_COLOR.command.skipRoom, this));
 			},
 		},
 		'nuked': {
 			configurable: true,
 			get: function () {
-				if (!this._nuked)
+				if (_.isUndefined(this._nuked))
 					this._nuked = this.find(FIND_NUKES);
 				if (this._nuked.length > 0)
 					return this._nuked;
@@ -694,27 +694,44 @@ mod.extend = function () {
 		'nukedByMe': {
 			configurable: true,
 			get: function () {
-				if (!this._nukedByMe) {
+				if (_.isUndefined(this._nukedByMe)) {
 					let nukeSites = this.find(FIND_NUKES);
 					this._nukedByMe = _.filter(nukeSites, nukeSite => {
 						return _.some(myRooms, room => {
 							return room.name === nukeSite.pos.roomName;
 						});
 					});
-					return this._nukedByMe.length > 0;
 				}
+				return this._nukedByMe.length > 0;
 			},
 		},
 		'nukedEnds': {
 			configurable: true,
 			get: function () {
-				if (!this._nukedEnds) {
+				if (_.isUndefined(this._nukedEnds)) {
 					let nukeSites = this.find(FIND_NUKES);
 					this._nukedEnds = _.filter(nukeSites, nukeSite => {
 						return nukeSite.timeToLand > 0;
 					});
-					return this._nukedEnds.length === 0;
+
 				}
+				return this._nukedEnds.length === 0;
+			},
+		},
+		'strongHold': {
+			configurable: true,
+			get: function () {
+				if (_.isUndefined(this._strongHold)) {
+					this._strongHold = false;
+					let strongHolds = global.getInvadersCoreRooms().stronghold;
+					for (const strongHold of strongHolds) {
+						if (strongHold.room.name === this.name) {
+							this._strongHold = strongHold.level;
+							break;
+						}
+					}
+				}
+				return this._strongHold;
 			},
 		},
 
@@ -784,7 +801,8 @@ mod.extend = function () {
 	};
 
 	Room.prototype.findRoute = function (destination, checkOwner = true, preferHighway = true, allowSK = true) {
-		if (this.name == destination) return [];
+		if (this.name === destination)
+			return [];
 		const options = {checkOwner, preferHighway, allowSK};
 		return Game.map.findRoute(this, destination, {
 			routeCallback: Room.routeCallback(this.name, destination, options),

@@ -12,50 +12,7 @@ let mod = {
 
 		},
 		collectRooms() {
-
-
-			console.log(`InvadersCore CHECK`);
-
-			let stronghold = [],
-				invadersCore = [],
-				core;
-
-			for (const [roomName, room] of Object.entries(Game.rooms)) {
-
-				let invaderStructure = room.find(FIND_HOSTILE_STRUCTURES, {
-					filter: {structureType: STRUCTURE_INVADER_CORE},
-				});
-
-
-				let invadersCoreExist = invaderStructure.length > 0;
-
-				if (invadersCoreExist) {
-					core = invaderStructure[0];
-				}
-
-				let enemyTowersExist = room.find(FIND_HOSTILE_STRUCTURES, {
-					filter: {structureType: STRUCTURE_TOWER},
-				}).length > 0;
-
-				let enemyRampartsExist = room.find(FIND_HOSTILE_STRUCTURES, {
-					filter: {structureType: STRUCTURE_RAMPART},
-				}).length > 0;
-
-				// global.logSystem(roomName, `InvadersCore: ${invadersCoreExist} STRONGHOLD: ${invadersCoreExist && (enemyTowersExist || enemyRampartsExist)} `);
-
-				if (invadersCoreExist && (enemyTowersExist || enemyRampartsExist)) {
-					stronghold.push(core);
-				} else if (invadersCoreExist) {
-					// global.logSystem(roomName, `INVADERSORE FOUND`);
-					invadersCore.push(core);
-				}
-			}
-
-			return {
-				stronghold: stronghold,
-				invadersCore: invadersCore,
-			};
-
+			return global.getInvadersCoreRooms();
 		},
 
 		handleStrongholdFlags(room, ticksRemaining, timeToLand) {
