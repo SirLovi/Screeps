@@ -421,9 +421,8 @@ let mod = {
     SEGMENT_COMMS: {
         enabled: false,
         alliedList: [
-            ['playerName1', 99],
-            ['playerName2', 99],
-            ['playerName3', 99],
+            ['<playerName1>', 99],
+            ['<playerName2>', 99],
         ],
         sendAndRequestTiming: 298,
         trackTiming: 299,
