@@ -32,13 +32,13 @@ mod.heal = function(roomName, partChange) {
 mod.strategies = {
     miner: {
         setup: function (roomName) {
-            return global.Task.mining.setupCreep(roomName, Room.isCenterNineRoom(roomName) ? global.Task.mining.creep.SKMiner : global.Task.mining.creep.miner);
+            return global.Task.mining.setupCreep(roomName, Game.rooms[roomName].isCenterNineRoom ? global.Task.mining.creep.SKMiner : global.Task.mining.creep.miner);
         }
     },
     hauler: {
         ept: function(roomName) {
             const room = Game.rooms[roomName];
-            if (Room.isCenterNineRoom(roomName)) {
+            if (room.isCenterNineRoom) {
                 return room ? 14 * room.sources.length : 42;
             } else {
                 //FIXME: I would like to be able to call the base class of Task.mining here

@@ -64,6 +64,8 @@ const Behaviour = function(name) {
             if (!actionChecked[action.name]) {
                 actionChecked[action.name] = true;
                 if (this.assignAction(creep, action)) {
+                    // if (creep.data.creepType === 'remoteHauler')
+                    //     console.log(`REMOTE_HAULER ACTION: ${creep.action}`);
                     p.checkCPU('assigned' + action.name, 1.5);
                     return;
                 }
@@ -75,7 +77,12 @@ const Behaviour = function(name) {
     this.nextAction = function(creep) {
         return this.selectAction(creep, this.actions(creep));
     };
-    this.needEnergy = creep => creep.sum < creep.carryCapacity / 2;
+    this.needEnergy = function(creep) {
+        // if (creep.data.creepType === 'remoteHauler')
+        //     return creep.sum / creep.carryCapacity > global.REMOTE_HAULER.MIN_LOAD;
+
+        return creep.sum < creep.carryCapacity / 2;
+    }
     this.nextEnergyAction = function(creep) {
         if (this.needEnergy(creep)) {
             return this.selectInflowAction(creep);
@@ -89,6 +96,9 @@ const Behaviour = function(name) {
                     return true;
                 }
             }
+            // if (creep.data.creepType === 'remoteHauler')
+            //     global.logSystem(creep.name, `OUTFLOW ACTIONS LENGTH: ${this.outflowActions(creep).length} TYPE: ${typeof this.outflowActions(creep)} BEHAVIOUR: ${this.name}`);
+
             return this.selectAction(creep, this.outflowActions(creep));
         }
     };

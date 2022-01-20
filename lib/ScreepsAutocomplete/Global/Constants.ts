@@ -409,6 +409,12 @@ const FIND_TOMBSTONES = 118;
  * @constant
  * @type {number}
  */
+const FIND_RUINS = 123;
+
+/**
+ * @constant
+ * @type {number}
+ */
 const FIND_POWER_CREEPS = 119;
 
 /**
