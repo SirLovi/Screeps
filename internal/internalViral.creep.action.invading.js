@@ -44,7 +44,7 @@ mod.run = {
             return;
         }
         if(targets.length > 0){
-            creep.attackingRanged = creep.rangedAttack(targets[0]) == OK;
+            creep.attackingRanged = creep.rangedAttack(targets[0]) === OK;
         }
     },
     warrior: function(creep){
@@ -81,7 +81,7 @@ mod.run = {
         // attack
         if( hasAttack ){
             let attacking = creep.attack(creep.target);
-            if( attacking == ERR_NOT_IN_RANGE ) {
+            if( attacking === ERR_NOT_IN_RANGE ) {
                 let targets = creep.pos.findInRange(creep.room.hostiles, 1);
                 if( targets.length > 0)
                     creep.attacking = creep.attack(targets[0]) == OK;

@@ -20,5 +20,6 @@
     "require-optional": "^0.4.0",
     "webpack": "^1.15.0",
     "webpack-dev-server": "^1.16.5"
-  }
+  },
+  "dependencies": {}
 }

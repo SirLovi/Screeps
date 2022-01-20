@@ -14,7 +14,6 @@ let mod = {
 		collectRooms() {
 			return global.getInvadersCoreRooms();
 		},
-
 		handleStrongholdFlags(room, ticksRemaining, timeToLand) {
 			// find and remove flags
 			let flags = room.find(FIND_FLAGS);
@@ -36,7 +35,6 @@ let mod = {
 				}
 			}
 		},
-
 		handleCores(ret) {
 
 			let invadersCore = ret.invadersCore,
