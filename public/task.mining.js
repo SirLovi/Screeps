@@ -174,12 +174,12 @@ mod.checkForRequiredCreeps = (flag) => {
 			}
 
 			// spawning a new hauler
-			const creepDefinition = _.create(global.Task.mining.creep.hauler);
-			creepDefinition.maxWeight = maxWeight;
+			let hauler = mod.strategies.hauler.setup(roomName);
+			hauler.maxWeight = maxWeight;
 			if (minWeight)
-				creepDefinition.minWeight = minWeight;
+				hauler.minWeight = minWeight;
 			global.Task.spawn(
-				creepDefinition,
+				hauler,
 				{ // destiny
 					task: mod.name, // taskName
 					targetName: flag.name, // targetName
@@ -321,12 +321,21 @@ mod.setupCreep = function (roomName, definition) {
 
 	const memory = this.memory(roomName);
 
-	const healParts = memory.healSize || 0;
+	memory.healSize = memory.healSize || 0 < 0 ? 0 : memory.healSize;
+
+	const healParts = memory.healSize;
+
 
 	if (definition.behaviour === 'remoteMiner') {
 
-		const workParts = memory.harvestSize || 0;
-		const extraMoveParts = Math.ceil((healParts + workParts) * 0.5 + definition.moveBalance || 0);
+		const workParts = memory.harvestSize;
+
+		if (workParts === 0)
+			return definition;
+
+		let extraMoveParts = Math.ceil((healParts + workParts) * 0.5 + definition.moveBalance || 0);
+
+		extraMoveParts = extraMoveParts <= 0 ? 0 : extraMoveParts;
 
 		return _.create(definition, {
 			fixedBody: definition.fixedBody
@@ -338,8 +347,14 @@ mod.setupCreep = function (roomName, definition) {
 
 	} else if (definition.behaviour === 'remoteHauler') {
 
-		const carryParts = memory.carryParts || 0;
-		const extraMoveParts = Math.ceil((healParts + carryParts) * 0.5 + definition.moveBalance || 0);
+		const carryParts = memory.carryParts;
+
+		if (carryParts === 0)
+			return definition;
+
+		let extraMoveParts = Math.ceil((healParts + carryParts) * 0.5 + definition.moveBalance || 0);
+
+		extraMoveParts = extraMoveParts < 0 ? 0 : extraMoveParts;
 
 		return _.create(definition, {
 			fixedBody: definition.fixedBody
@@ -361,12 +376,15 @@ mod.carry = function (roomName, partChange, population) {
 		global.Task.forceCreepCheck(global.Task.mining.getFlag(roomName), mod.name);
 		delete memory.capacityLastChecked;
 	}
-	return `Task.${mod.name}: hauler carry capacity for ${roomName} ${partChange >= 0 ? 'increased' : 'decreased'} by ${Math.abs(memory.carryParts)}. Currently at ${population}% of desired population. CarryParts: ${memory.carryParts}`;
+	memory.carryParts = (memory.carryParts || 0) <= 0 ? 0 : memory.carryParts;
+	return `Task.${mod.name}: hauler carry capacity for ${roomName} ${partChange >= 0 ? 'increased' : 'decreased'} by ${partChange}. Currently at ${population}% of desired population. CarryParts: ${memory.carryParts}`;
 };
 mod.harvest = function (roomName, partChange) {
 	const memory = global.Task.mining.memory(roomName);
 	memory.harvestSize = (memory.harvestSize || 0) + (partChange || 0);
-	return `Task.${mod.name}: harvesting work capacity for ${roomName} ${memory.harvestSize >= 0 ? 'increased' : 'decreased'} by ${Math.abs(memory.harvestSize)} per miner.`;
+	memory.harvestSize = (memory.harvestSize || 0) < 0 ? 0 : memory.harvestSize;
+
+	return `Task.${mod.name}: harvesting work capacity for ${roomName} ${partChange >= 0 ? 'increased' : 'decreased'} by ${partChange} per miner.`;
 };
 mod.checkCapacity = function (roomName) {
 	const checkRoomCapacity = function (roomName, minPopulationPercent, maxDropped) {
@@ -390,13 +408,15 @@ mod.checkCapacity = function (roomName) {
 			message = 'with ' + totalDropped + ' dropped energy.';
 		}
 
-		global.logSystem(roomName, `INCREASE PARTS: ${populationPercent <= minPopulationPercent} || ${totalDropped >= maxDropped}`);
-
 		if (populationPercent >= minPopulationPercent && totalDropped >= maxDropped) {
 			console.log(mod.carry(roomName, 1, populationPercent), message, global.Util.stack());
 			return true;
-		} else
+
+		} else if (populationPercent >= minPopulationPercent && totalDropped <= maxDropped) {
 			console.log(mod.carry(roomName, -1, populationPercent), message, global.Util.stack());
+			return true;
+		}
+
 
 		// console.log(mod.harvest(roomName));
 		// console.log(mod.heal(roomName));
@@ -410,7 +430,7 @@ mod.checkCapacity = function (roomName) {
 		let total = 0;
 		for (const roomName in Memory.tasks.mining) {
 			total++;
-			if (checkRoomCapacity(roomName, 90, 1000))
+			if (checkRoomCapacity(roomName, 100, 500))
 				count++;
 		}
 		return `Task.${mod.name} ${count} rooms under-capacity out of ${total}.`;
