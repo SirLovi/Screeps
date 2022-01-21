@@ -58,7 +58,7 @@ mod.findName = function (flagColor, pos, local = true, mod, modArgs) {
 	if (pos && pos.roomName) {
 		let range = flag => {
 			let r = 0;
-			let roomDist = routeRange(pos.roomName, flag.roomName);
+			let roomDist = global.Util.routeRange(pos.roomName, flag.roomName);
 			if (roomDist === 0) {
 				r = _.max([Math.abs(flag.x - pos.x), Math.abs(flag.y - pos.y)]);
 			} else {

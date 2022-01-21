@@ -341,7 +341,8 @@ mod.validateAll = function (memory, flag, task, options = {}) {
 	mod.validateRunning(memory, flag, task, options);
 };
 mod.forceCreepCheck = function (flag, task) {
-	_.set(flag.memory, ['nextCheck', task], Game.time);
+	if (flag && task)
+		_.set(flag.memory, ['nextCheck', task], Game.time);
 };
 mod.nextCreepCheck = function (flag, task) {
 	const nextCheck = _.get(flag.memory, ['nextCheck', task]);

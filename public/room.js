@@ -835,6 +835,9 @@ mod.extend = function () {
 			&& creep.sum === 0)
 			return;
 
+		if (creep.data.actionName === 'idle')
+			return;
+
 		let x = creep.pos.x;
 		let y = creep.pos.y;
 
@@ -2338,7 +2341,8 @@ mod.calcCardinalDirection = function (roomName) {
 	return [parsed[1], parsed[2]];
 };
 mod.calcGlobalCoordinates = function (roomName, callBack) {
-	if (!callBack) return null;
+	if (!callBack)
+		return null;
 	const parsed = /^[WE]([0-9]+)[NS]([0-9]+)$/.exec(roomName);
 	const x = +parsed[1];
 	const y = +parsed[2];

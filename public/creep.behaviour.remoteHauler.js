@@ -62,6 +62,8 @@ mod.nextAction = function (creep) {
 			// try spawn & extensions
 			if (this.assignAction(creep, 'feeding'))
 				return;
+			if (this.assignAction(creep, 'healing'))
+				return;
 			if (this.assignAction(creep, 'dropping'))
 				return;
 			else {
@@ -81,7 +83,10 @@ mod.nextAction = function (creep) {
 	// at target room
 	else if (creep.data.destiny.room === creep.pos.roomName) {
 		// TODO: This should perhaps check which distance is greater and make this decision based on that plus its load size
-		if (creep.sum / creep.carryCapacity > global.REMOTE_HAULER.MIN_LOAD) {
+		if (!this.needEnergy(creep)) {
+			if (this.assignAction(creep, 'healing'))
+				return;
+
 			this.goHome(creep);
 			return;
 		}
@@ -109,8 +114,11 @@ mod.nextAction = function (creep) {
 	else {
 		let ret = false;
 		// TODO: This should perhaps check which distance is greater and make this decision based on that plus its load size
-		if (creep.sum / creep.carryCapacity > global.REMOTE_HAULER.MIN_LOAD)
+		if (!this.needEnergy(creep)) {
+			if (this.assignAction(creep, 'healing'))
+				return;
 			ret = this.goHome(creep);
+		}
 		else
 			return this.nextEnergyAction(creep);
 
