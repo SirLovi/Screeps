@@ -4,43 +4,16 @@ let mod = {};
 
 mod.run = function () {
 
-    if (Game.time % global.GRAFANA_INTERVAL === 0) {
-
-        // reset global.rooms properties
-        delete global._acceptedRooms;
-        delete global._myRooms;
-        delete global._myRoomsName;
-
-        Memory.stats = {
-            tick: Game.time,
-            rooms: []
-        };
-
-        let myRooms = _.filter(Game.rooms, {'my': true});
-
-        for (let room of myRooms)
-            Memory.stats.rooms.push(room.name)
-
-    }
+    if (Game.time % global.GRAFANA_INTERVAL === 0)
+        mod.createRoomMemory()
 
     if (!global.GRAFANA || Game.time % global.GRAFANA_INTERVAL !== 0)
         return;
 
-    Object.assign(Memory.stats, {
-        population: Object.keys(Memory.population).length,
-        empireMinerals: {},
-        memory: global.round(RawMemory.get().length / 1024),
-        cpu: Game.cpu,
-        gcl: Game.gcl,
-        market: {
-            credits: Game.market.credits,
-            numOrders: Game.market.orders ? Object.keys(Game.market.orders).length : 0,
-        }
-    });
+    mod.createStatProperties();
 
-    Memory.stats.cpu.used = Game.cpu.getUsed();
 
-    // ROOMS
+    // ROOM STATS DATA
 
     for (let room of global.myRooms) {
         // Memory.stats.rooms[room.name] = {
@@ -54,6 +27,76 @@ mod.run = function () {
         mod.init(room);
     }
 };
+
+mod.createRoomMemory = function () {
+
+    // reset global.rooms properties
+    delete global._acceptedRooms;
+    delete global._myRooms;
+    delete global._myRoomsName;
+
+    if (_.isUndefined(Memory.stats)) {
+        Memory.stats = {
+            tick: Game.time,
+            rooms: []
+        };
+    } else {
+        Memory.stats.tick = Game.time;
+        Memory.stats.rooms = [];
+    }
+
+    let myRooms = _.filter(Game.rooms, {'my': true});
+
+    for (let room of myRooms)
+        Memory.stats.rooms.push(room.name)
+
+};
+
+mod.createStatProperties = function (fromMain = false) {
+
+    if (Object.keys(Memory.stats).length === 2) {
+
+        Object.assign(Memory.stats, {
+            population: Object.keys(Memory.population).length,
+            empireMinerals: {},
+            memory: global.round(RawMemory.get().length / 1024),
+            cpu: {
+                tickLimit: Game.cpu.tickLimit,
+                limit: Game.cpu.limit,
+                bucketData: {
+                    bucket: Game.cpu.bucket,
+                    bucketFillIntervals: [Game.time, Game.time],
+                    bucketFillTime: 0
+                },
+                shardLimits: Game.cpu.shardLimits,
+                unlocked: Game.cpu.unlocked,
+                used: Game.cpu.getUsed(),
+            },
+            gcl: Game.gcl,
+            market: {
+                credits: Game.market.credits,
+                numOrders: Game.market.orders ? Object.keys(Game.market.orders).length : 0,
+            }
+        });
+    } else if (!fromMain) {
+        Memory.stats.population = Object.keys(Memory.population).length;
+        Memory.stats.empireMinerals = {}
+        Memory.stats.memory = global.round(RawMemory.get().length / 1024);
+        Memory.stats.cpu.tickLimit = Game.cpu.tickLimit;
+        Memory.stats.cpu.limit = Game.cpu.limit;
+        Memory.stats.cpu.bucketData.bucket = Game.cpu.bucket;
+        Memory.stats.cpu.shardLimits = Game.cpu.shardLimits;
+        Memory.stats.cpu.unlocked = Game.cpu.unlocked;
+        Memory.stats.cpu.used = Game.cpu.getUsed();
+        Memory.stats.gcl = Game.gcl
+        Memory.stats.market.credits = Game.market.credits;
+        Memory.stats.market.numOrders = Game.market.orders ? Object.keys(Game.market.orders).length : 0;
+
+
+    }
+
+
+}
 
 mod.init = function (room) {
     // mod.controller(room, object);

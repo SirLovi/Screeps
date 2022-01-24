@@ -1,55 +1,59 @@
 let action = new Creep.Action('healing');
 module.exports = action;
 action.targetRange = 3;
-action.isAddableAction = function(){ return true; };
-action.isAddableTarget = function(target, creep) {
-    const filter = creep.getStrategyHandler([action.name], 'targetFilter', creep);
+action.isAddableAction = function (creep) {
+	return _.some(creep.body, bodyParts => {
+		return (bodyParts.type === 'heal');
+	});
+};
+action.isAddableTarget = function (target, creep) {
+	const filter = creep.getStrategyHandler([action.name], 'targetFilter', creep);
 
-    return filter && filter(target);
+	return filter && filter(target);
 };
-action.isValidTarget = function(target, creep){
-    if ( target != null &&
-        target.hits != null &&
-        target.hits < target.hitsMax &&
-        target.pos.roomName === creep.data.healRoom ) {
+action.isValidTarget = function (target, creep) {
+	if (target != null &&
+		target.hits != null &&
+		target.hits < target.hitsMax &&
+		target.pos.roomName === creep.data.healRoom) {
 
-        const filter = creep.getStrategyHandler([action.name], 'targetFilter', creep);
+		const filter = creep.getStrategyHandler([action.name], 'targetFilter', creep);
 
-        return filter && filter(target);
-    }
+		return filter && filter(target);
+	}
 
-    return false;
+	return false;
 };
-action.newTarget = function(creep){
-    if(creep.room.casualties.length > 0){
-        for (const target of creep.room.casualties) {
-            if (target.name !== creep.name) {
-                creep.data.healRoom = target.pos.roomName;
-                return target;
-            }
-        }
-    }
-    delete creep.data.healRoom;
-    return null;
+action.newTarget = function (creep) {
+	if (creep.room.casualties.length > 0) {
+		for (const target of creep.room.casualties) {
+			if (target.name !== creep.name) {
+				creep.data.healRoom = target.pos.roomName;
+				return target;
+			}
+		}
+	}
+	delete creep.data.healRoom;
+	return null;
 };
-action.work = function(creep){
-    if( creep.target.hits < creep.target.hitsMax ){
-        if( creep.pos.isNearTo(creep.target) ){
-            return creep.heal(creep.target);
-        }
-        if(creep.pos.inRangeTo(creep.target, 3)) {
-            return creep.rangedHeal(creep.target);
-        }
-        return OK;
-    }
+action.work = function (creep) {
+	if (creep.target.hits < creep.target.hitsMax) {
+		if (creep.pos.isNearTo(creep.target)) {
+			return creep.heal(creep.target);
+		}
+		if (creep.pos.inRangeTo(creep.target, 3)) {
+			return creep.rangedHeal(creep.target);
+		}
+		return OK;
+	}
 };
-action.defaultStrategy.targetFilter = function(creep) {
-    return function(target) {
-        return target.my;
-    }
+action.defaultStrategy.targetFilter = function (creep) {
+	return function (target) {
+		return target.my;
+	};
 };
-action.defaultStrategy.moveOptions = function(options) {
-    // // allow routing in and through hostile rooms
-    // if (_.isUndefined(options.allowHostile)) options.allowHostile = true;
-    return options;
+action.defaultStrategy.moveOptions = function (options) {
+	// // allow routing in and through hostile rooms
+	// if (_.isUndefined(options.allowHostile)) options.allowHostile = true;
+	return options;
 };

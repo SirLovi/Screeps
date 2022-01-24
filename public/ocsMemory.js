@@ -52,7 +52,7 @@ mod.processSegments = () => {
 	if (_.isUndefined(global.cacheValid)) global.cacheValid = {};
 	if (_.isUndefined(Memory.cacheValid)) Memory.cacheValid = {};
 
-	for (let id = MEM_SEGMENTS.COSTMATRIX_CACHE.start; id >= MEM_SEGMENTS.COSTMATRIX_CACHE.end; id--) {
+	for (let id = global.MEM_SEGMENTS.COSTMATRIX_CACHE.start; id >= global.MEM_SEGMENTS.COSTMATRIX_CACHE.end; id--) {
 		mod.processSegment(id, Room.loadCostMatrixCache);
 	}
 };
@@ -97,7 +97,8 @@ mod.saveSegment = (range, inputData) => {
 				global.Util.logError('RawMemory', 'should not be here.');
 			}
 		} else if (Memory.cacheValid[id]) { // no more data, clear this segment
-			if (global.DEBUG) logSystem('OCSMemory.saveSegment', 'clearing unused segment ' + id);
+			if (global.DEBUG)
+				global.logSystem('OCSMemory.saveSegment', 'clearing unused segment ' + id);
 			RawMemory.segments[id] = '';
 			delete Memory.cacheValid[id];
 		}

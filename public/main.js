@@ -276,7 +276,11 @@ global.install = () => {
 	// custom extend
 	if (global.mainInjection.extend)
 		global.mainInjection.extend();
+
 	global.OCSMemory.activateSegment(global.MEM_SEGMENTS.COSTMATRIX_CACHE, true);
+
+	RawMemory.setPublicSegments([global.MEM_SEGMENTS.PUBLIC_SEGMENT]);
+
 
 	global.modulesValid = Memory.modules.valid;
 	if (global.DEBUG)
@@ -313,7 +317,7 @@ function wrapLoop(fn) {
 
 		RawMemory._parsed = Memory;
 
-		RawMemory.setPublicSegments([99]);
+
 	};
 }
 
@@ -325,8 +329,18 @@ module.exports.loop = wrapLoop(function () {
 	if (Memory.pause)
 		return;
 
+	if (_.isUndefined(Memory.stats))
+		global.Grafana.createRoomMemory();
+
 	if(Game.cpu.bucket === 10000) {
 		//console.log(`GENERATING PIXEL`);
+		if (global.GRAFANA) {
+			global.Grafana.createStatProperties(true);
+			let bucketData = Memory.stats.cpu.bucketData;
+			bucketData.bucketFillIntervals.push(Game.time)
+			bucketData.bucketFillTime = bucketData.bucketFillIntervals[2] - bucketData.bucketFillIntervals[1];
+			bucketData.bucketFillIntervals.shift();
+		}
 		Game.cpu.generatePixel();
 	}
 

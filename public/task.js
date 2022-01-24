@@ -56,11 +56,13 @@ mod.register = function () {
 			Creep.predictedRenewal.on(creep => task.handleCreepDied(creep.name));
 			Creep.died.on(name => task.handleCreepDied(name));
 		}
+		// TODO there is no task.handleCreepError in tasks
 		if (task.handleCreepError)
 			Creep.error.on(errorData => task.handleCreepError(errorData));
 		// Room events
 		if (task.handleNewInvader)
 			Room.newInvader.on(invader => task.handleNewInvader(invader));
+		// TODO there is no task.handleKnownInvader in tasks
 		if (task.handleKnownInvader)
 			Room.knownInvader.on(invaderID => task.handleKnownInvader(invaderID));
 		if (task.handleGoneInvader)
@@ -81,13 +83,13 @@ mod.execute = function () {
 	});
 };
 mod.memory = (task, s) => { // task:  (string) name of the task, s: (string) any selector for that task, could be room name, flag name, enemy name
-	const memory = global.Util.get(Memory, ['tasks', task, s], {});
+	// const memory =
 	// temporary migration, remove if in dev
-	delete memory.queuedValid;
-	delete memory.runningValid;
-	delete memory.spawningValid;
+	// delete memory.queuedValid;
+	// delete memory.runningValid;
+	// delete memory.spawningValid;
 
-	return memory;
+	return global.Util.get(Memory, ['tasks', task, s], {});;
 };
 mod.cleanup = function (subKeys, task, s) {
 	mod.removeQueued(mod.memory(task, s), subKeys);

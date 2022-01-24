@@ -244,6 +244,7 @@ mod.MEM_SEGMENTS = {
 		start: 98,
 		end: 90,
 	},
+	PUBLIC_SEGMENT: 99,
 };
 // mod.ENERGY_VALUE_CREDITS = global.energyPrice;
 // used to log something meaningful instead of numbers

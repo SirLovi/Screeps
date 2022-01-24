@@ -379,15 +379,21 @@ module.exports = {
 	 * @param {string} toRoom - Ending room
 	 * @returns {Number}
 	 */
+
 	routeRange(fromRoom, toRoom) {
 		if (fromRoom === toRoom) return 0;
 
-		return Util.get(Memory, `routeRange.${fromRoom}.${toRoom}`, function () {
+		return global.Util.get(Memory, `routeRange.${fromRoom}.${toRoom}`, function () {
+
 			const room = fromRoom instanceof Room ? fromRoom : Game.rooms[fromRoom];
-			if (!room) return Room.roomDistance(fromRoom, toRoom, false);
+
+			if (!room)
+				return Room.roomDistance(fromRoom, toRoom, false);
 
 			const route = room.findRoute(toRoom, false, false);
-			if (!route) return Room.roomDistance(fromRoom, toRoom, false);
+
+			if (!route)
+				return Room.roomDistance(fromRoom, toRoom, false);
 
 			return route === ERR_NO_PATH ? Infinity : route.length;
 		});
