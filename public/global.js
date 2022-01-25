@@ -121,8 +121,8 @@ mod.FLAG_COLOR = {
 			secondaryColor: COLOR_GREY,
 		},
 		rampart: {
-			color: COLOR_BROWN,
-			secondaryColor: COLOR_BROWN,
+			color: COLOR_BLUE,
+			secondaryColor: COLOR_BLUE,
 		},
 	},
 	//COLOR_GREEN
@@ -166,10 +166,6 @@ mod.FLAG_COLOR = {
 	},
 	//COLOR_BROWN
 	pavementArt: {
-		color: COLOR_BROWN,
-		secondaryColor: COLOR_BROWN,
-	},
-	rampart: {
 		color: COLOR_BROWN,
 		secondaryColor: COLOR_BROWN,
 	},

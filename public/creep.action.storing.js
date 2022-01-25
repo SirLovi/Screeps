@@ -2,7 +2,7 @@ let mod = new Creep.Action('storing');
 module.exports = mod;
 
 mod.isValidAction = function (creep) {
-    return creep.room.storage && creep.room.storage.isActive() && creep.room.terminal && creep.room.terminal.isActive() && creep.sum > 0;
+    return ((creep.room.storage && creep.room.storage.isActive()) || (creep.room.terminal && creep.room.terminal.isActive())) && creep.sum > 0;
 };
 mod.isValidTarget = function (target) {
     return target && target.store && target.active && target.sum < target.store.getCapacity() * global.TARGET_STORAGE_SUM_RATIO;

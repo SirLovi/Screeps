@@ -203,7 +203,7 @@ mod.orderDefenses = function (invaderCreep, GUID) {
                 //defender.multiBody = [TOUGH, RANGED_ATTACK, HEAL, MOVE];
 
                 defender.fixedBody = [HEAL, MOVE];
-                defender.multiBody = [TTOUGH, RANGED_ATTACK, HEAL, MOVE, MOVE, MOVE];
+                defender.multiBody = [TOUGH, RANGED_ATTACK, HEAL, MOVE, MOVE, MOVE];
 
                 //global.logSystem(invadersRoom, `(ATTACK || RANGED_ATTACK) && HEAL -- BOOST materials: `);
 
