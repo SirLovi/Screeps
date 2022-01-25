@@ -10,7 +10,7 @@ mod.flagFilter = function (flagColour) {
 	}
 	return filter;
 };
-mod.findName = function (flagColor, pos, local = true, mod, modArgs) {
+mod.findName = function (flagColor, pos, mod, modArgs, local = true) {
 	let list = this.list;
 
 	// console.log(`flagColor: ${global.json(flagColor)}`);
@@ -80,7 +80,7 @@ mod.findName = function (flagColor, pos, local = true, mod, modArgs) {
 mod.find = function (flagColor, pos, local = true, mod, modArgs) {
 	if (pos instanceof Room)
 		pos = pos.getPositionAt(25, 25);
-	let id = this.findName(flagColor, pos, local, mod, modArgs);
+	let id = this.findName(flagColor, pos, mod, modArgs, local);
 	if (id === null)
 		return null;
 	return Game.flags[id];

@@ -13,8 +13,9 @@ mod.creep = {
         },
         multiBody: [CLAIM, MOVE],
         maxMulti: 7,
-        name: "reserver", 
-        behaviour: "claimer"
+        name: "reserver",
+        behaviour: "claimer",
+        queue: 'High',
     },
 };
 // hook into events
@@ -63,7 +64,7 @@ mod.checkForRequiredCreeps = function(flag) {
     let memory = Task.reserve.memory(flag);
     // clean/validate task memory queued creeps
     Task.validateAll(memory, flag, mod.name, {roomName: flag.pos.roomName, queues: ['Low', 'Medium'], checkValid: true});
-    
+
     // if low & creep in low queue => move to medium queue
     if( spawnParams.queue !== 'Low' && memory.queued.length == 1 ) {
         let spawnRoom = Game.rooms[memory.queued[0].room];
@@ -89,9 +90,9 @@ mod.checkForRequiredCreeps = function(flag) {
             { // destiny
                 task: mod.name, // taskName
                 targetName: flag.name, // targetName
-            }, 
+            },
             { // spawn room selection params
-                targetRoom: flag.pos.roomName, 
+                targetRoom: flag.pos.roomName,
                 minEnergyCapacity: 1300,
                 maxRange: this.spawnRoomMaxRange,
             },
@@ -99,7 +100,7 @@ mod.checkForRequiredCreeps = function(flag) {
                 let memory = Task.reserve.memory(Game.flags[creepSetup.destiny.targetName]);
                 memory.queued.push({
                     room: creepSetup.queueRoom,
-                    name: creepSetup.name, 
+                    name: creepSetup.name,
                     targetName: flag.name
                 });
             }
@@ -108,7 +109,7 @@ mod.checkForRequiredCreeps = function(flag) {
 };
 // when a creep starts spawning
 mod.handleSpawningStarted = params => { // params: {spawn: spawn.name, name: creep.name, destiny: creep.destiny}
-    // ensure it is a creep which has been queued by this task (else return)    
+    // ensure it is a creep which has been queued by this task (else return)
     if ( !params.destiny || !params.destiny.task || params.destiny.task != mod.name )
         return;
     // get flag which caused queueing of that creep
@@ -181,7 +182,7 @@ mod.nextAction = creep => {
 // get task memory
 mod.memory = (flag) => {
     const memory = Util.get(flag.memory, ['tasks', 'reserve'], {
-        queued: [], 
+        queued: [],
         spawning: [],
         running: []
     });
@@ -226,7 +227,7 @@ mod.strategies = {
                 params.queue = 'Medium';
                 if( DEBUG && TRACE ) trace('Task', {lastVisible: flag.memory.lastVisible,
                     tickToEnd: flag.memory.ticksToEnd, checkForRequiredCreeps:'sending urgent reserver, no visibility',
-                    [mod.name]:'checkForRequiredCreeps', Task:mod.name});                
+                    [mod.name]:'checkForRequiredCreeps', Task:mod.name});
             }
             return params;
         },
