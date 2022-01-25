@@ -84,12 +84,12 @@ mod.newTarget = function (creep) {
             creep.room.terminal.sum < creep.room.terminal.store.getCapacity());
 
 
-    let mineralToTerminal = sendMineralToTerminal(creep);
-    let energyToTerminal = sendEnergyToTerminal(creep);
+    //let mineralToTerminal = sendMineralToTerminal(creep);
+    //let energyToTerminal = sendEnergyToTerminal(creep);
 
 
     if (creep.room.terminal && creep.room.terminal.active &&
-        (mineralToTerminal || energyToTerminal)
+        (sendMineralToTerminal(creep) || sendEnergyToTerminal(creep))
         && mod.isAddableTarget(creep.room.terminal, creep)) {
         return creep.room.terminal;
 
