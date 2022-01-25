@@ -396,6 +396,7 @@ mod.carry = function (roomName, partChange, population) {
 		delete memory.capacityLastChecked;
 	}
 	memory.carryParts = (memory.carryParts || 0) <= 0 ? 0 : memory.carryParts;
+	memory.carryParts = (memory.carryParts || 0) >= 6 ? 6 : memory.carryParts;
 	return `Task.${mod.name}: hauler carry capacity for ${roomName} ${partChange >= 0 ? 'increased' : 'decreased'} by ${partChange}. Currently at ${population}% of desired carryPartsPopulation. +CarryParts: ${memory.carryParts}`;
 };
 mod.harvest = function (roomName, partChange) {
@@ -418,6 +419,10 @@ mod.checkHealParts = function (roomName) {
 }
 mod.checkCarryParts = function (roomName) {
 
+	// if (Game.rooms[roomName].hostiles.length > 0 && !Game.rooms[roomName].isCenterNineRoom) {
+	// 	return `Task.${mod.name} in ${roomName} is under attack, check carryCapacity later `;
+	// }
+
 	const checkRoomCapacity = function (roomName, minCarryPartsPercent, maxDropped) {
 		const carryPartsPercent = Math.round(mod.carryPartsPopulation(roomName) * 100);
 
@@ -439,12 +444,12 @@ mod.checkCarryParts = function (roomName) {
 			console.log(`BODY PARTS STARTED for ${roomName}`);
 			console.log(`dropped: ${totalDropped} carryPartsPercent: ${carryPartsPercent}`);
 
-			if (carryPartsPercent <= minCarryPartsPercent && totalDropped >= maxDropped) {
-				console.log(mod.carry(roomName, 1, carryPartsPercent), message);
+			if (carryPartsPercent >= minCarryPartsPercent && totalDropped >= maxDropped) {
+				console.log(mod.carry(roomName, 2, carryPartsPercent), message);
 				return true;
 
-			} else if (carryPartsPercent > 0 && totalDropped === 0) {
-				console.log(mod.carry(roomName, -1, carryPartsPercent), message);
+			} else if (carryPartsPercent === 100 && totalDropped === 0) {
+				console.log(mod.carry(roomName, -2, carryPartsPercent), message);
 				return true;
 			}
 
@@ -489,9 +494,9 @@ mod.storage = function (miningRoom, storageRoom) {
 };
 mod.carryPartsPopulation = function (miningRoomName, homeRoomName) {
 	// how much more do we need to meet our goals
-	const neededWeight = global.Task.mining.strategies.hauler.maxWeight(miningRoomName, homeRoomName, undefined, true, true);
+	const neededWeight = global.Task.mining.strategies.hauler.maxWeight(miningRoomName, homeRoomName, undefined, false, true);
 	// how much do we need for this room in total
-	const totalWeight = global.Task.mining.strategies.hauler.maxWeight(miningRoomName, homeRoomName, undefined, false, true);
+	const totalWeight = global.Task.mining.strategies.hauler.maxWeight(miningRoomName, homeRoomName, undefined, true, true);
 	const ret = 1 - neededWeight / totalWeight
 
 	if (ret !== 0) {
