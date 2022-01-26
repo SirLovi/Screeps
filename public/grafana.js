@@ -4,8 +4,9 @@ let mod = {};
 
 mod.run = function () {
 
-    if (Game.time % global.GRAFANA_INTERVAL === 0)
-        mod.createRoomMemory()
+    if (Game.time % global.GRAFANA_INTERVAL === 0) {
+        mod.createRoomMemory();
+    }
 
     if (!global.GRAFANA || Game.time % global.GRAFANA_INTERVAL !== 0)
         return;

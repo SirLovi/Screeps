@@ -15,7 +15,12 @@ mod.run = function(creep) {
     }
 };
 mod.actions = function(creep) {
-    return Creep.behaviour.miner.actions.call(this, creep);
+    // return Creep.behaviour.miner.actions.call(this, creep);
+    return [
+        Creep.action.mining,
+        Creep.action.healing,
+        Creep.action.recycling,
+    ];
 }
 mod.getEnergy = function(creep) {
     return Creep.behaviour.miner.getEnergy.call(this, creep);
