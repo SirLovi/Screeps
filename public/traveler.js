@@ -226,6 +226,10 @@ module.exports = function(globalOpts = {}){
             // }
 
             // TODO Do an actual calculation to see if we have moved, this is unnecessary and expensive when the creep hasn't moved for
+            if (Room.isSKRoom(creep.room.name) && Game.time % 5) {
+                delete travelData.path;
+            }
+            // FIXME: Do an actual calculation to see if we have moved, this is unneccesary and expensive when the creep hasn't moved for
             // a few ticks and the path gets rebuilt.
             // // handle case where creep wasn't traveling last tick and may have moved, but destination is still the same
             // if (Game.time - travelData.tick > Memory.skippedTicks + 2 && hasMoved) {

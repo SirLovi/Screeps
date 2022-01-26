@@ -1,11 +1,3 @@
-[submodule "internal"]
-	path = internal
-	url = https://gitlab.com/ScreepsCCC/internal.git
-	branch = dev
-[submodule "public"]
-	path = public
-	url = https://gitlab.com/ScreepsCCC/public.git
-	branch = dev
 [submodule "lib/ScreepsAutocomplete"]
 	path = lib/ScreepsAutocomplete
 	url = https://github.com/Garethp/ScreepsAutocomplete.git

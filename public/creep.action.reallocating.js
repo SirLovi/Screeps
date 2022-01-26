@@ -438,7 +438,7 @@ action.newTargetTerminal = function (creep) {
 //                    }
 		}
 		// check orders
-		if (room.memory.resources && room.memory.resources.terminal[0]) {
+		if (room.memory.resources && room.memory.resources.terminal && room.memory.resources.terminal[0]) {
 			let orders = room.memory.resources.terminal[0].orders.slice();
 			orders.push(RESOURCE_ENERGY);
 			let type = null;

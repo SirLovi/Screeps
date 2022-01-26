@@ -135,10 +135,10 @@ mod.resetBoostProduction = function (roomName) {
 				}
 
 
-				if (data.terminal[0])
+				if (data.terminal && data.terminal[0])
 					data.terminal[0].orders = [];
 
-				if (data.storage[0])
+				if (data.storage && data.storage[0])
 					data.storage[0].orders = [];
 
 				if (data.reactions)

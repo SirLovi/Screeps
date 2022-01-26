@@ -127,6 +127,7 @@ let mod = {
         7: 750000,
         8: 300000000,
     },
+    STORAGE_CHARGE_FORTIFYING: 0.05,
     MAX_FORTIFY_CONTAINER: 50000,
     LIMIT_URGENT_REPAIRING: 750, // urgent repair when hits below
     GAP_REPAIR_DECAYABLE: 800, // decayables (e.g. roads) only get repaired when that much hits are missing
@@ -421,8 +422,8 @@ let mod = {
     SEGMENT_COMMS: {
         enabled: false,
         alliedList: [
-            ['<playerName1>', 99],
-            ['<playerName2>', 99],
+            ['playerName1', 99],
+            ['playerName2', 99],
         ],
         sendAndRequestTiming: 298,
         trackTiming: 299,

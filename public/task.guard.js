@@ -2,7 +2,7 @@
 let mod = {};
 module.exports = mod;
 mod.name = 'guard';
-mod.minControllerLevel = 3;
+mod.minControllerLevel = 2;
 // hook into events
 mod.register = () => {};
 // for each flag
@@ -25,6 +25,8 @@ mod.creep = {
             ATTACK,
             RANGED_ATTACK,
             HEAL,
+            MOVE,
+            MOVE,
             MOVE,
             MOVE
         ],
