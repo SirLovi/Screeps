@@ -235,7 +235,7 @@ mod.extend = function () {
 		// Extensions
 		let shortAmount = CONTROLLER_STRUCTURES[STRUCTURE_EXTENSION][LEVEL] - (this.structures.extensions.length + _.filter(this.constructionSites, s => s.structureType === STRUCTURE_EXTENSION).length);
 		if (shortAmount > 0) {
-			global.FlagDir.filter(global.FLAG_COLOR.construct, ...ARGS).splice(0, shortAmount).forEach(flag => {
+			global.FlagDir.filter(global.FLAG_COLOR.construct.extension, ...ARGS).splice(0, shortAmount).forEach(flag => {
 				CONSTRUCT(flag, STRUCTURE_EXTENSION);
 			});
 		}
