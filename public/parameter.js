@@ -141,7 +141,6 @@ let mod = {
     ROAD_CONSTRUCTION_INTERVAL: 2000,
     ROAD_CONSTRUCTION_MIN_DEVIATION: 1.2,
     ROAD_CONSTRUCTION_ABS_MIN: 10,
-    ROAD_DESTROY_HITS: ROAD_HITS - global.GAP_REPAIR_DECAYABLE - 1000,
     TIME_ZONE: 2, // zone offset in hours (-12 through +12) from UTC
     USE_SUMMERTIME: true, // Please define isSummerTime in global.js to suit to your local summertime rules
     SPAWN_DEFENSE_ON_ATTACK: true, // This will attempt to store enough to have a defense and spawn troops when invaded.
@@ -441,4 +440,5 @@ let mod = {
         timing: 100
     },
 };
+mod.ROAD_DESTROY_HITS = ROAD_HITS - mod.GAP_REPAIR_DECAYABLE - 1000;
 module.exports = mod;
