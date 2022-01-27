@@ -331,7 +331,7 @@ mod.extend = function () {
 
 	Room.prototype.destroyUnusedRoads = function () {
 
-		console.log(`destroy hits: ${global.ROAD_DESTROY_HITS}`);
+		// console.log(`destroy hits: ${global.ROAD_DESTROY_HITS}`);
 
 		for (const road of this.roads) {
 			if (road.hits <= global.ROAD_DESTROY_HITS) {
