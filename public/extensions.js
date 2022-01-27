@@ -278,7 +278,7 @@ mod.extend = function(){
     });
     StructureStorage.prototype.getNeeds = function(resourceType) {
         var ret = 0;
-        if (!this.room.storage || !this.room.memory.resources.storage) return 0;
+        if (!this.room.storage || !this.room.memory.resources || !this.room.memory.resources.storage) return 0;
 
         let storageData = this.room.memory.resources.storage[0];
         // look up resource and calculate needs
@@ -317,7 +317,7 @@ mod.extend = function(){
     });
     StructureTerminal.prototype.getNeeds = function(resourceType) {
         var ret = 0;
-        if (!this.room.terminal || !this.room.memory.resources.terminal) return 0;
+        if (!this.room.terminal || !this.room.memory.resources || !this.room.memory.resources.terminal) return 0;
         let terminalData = this.room.memory.resources.terminal[0];
         // look up resource and calculate needs
         let order = null;

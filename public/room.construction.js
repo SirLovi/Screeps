@@ -386,7 +386,7 @@ mod.extend = function () {
 					//if (roomTerrain === TERRAIN_MASK_WALL)
 					//	return failed();
 					if (structureType === STRUCTURE_ROAD) {
-						pos.newFlag(global.FLAG_COLOR.command.road);
+						pos.newFlag(global.FLAG_COLOR.construct.road);
 					} else {
 						const flagColour = constructionFlags[structureType];
 						pos.newFlag(flagColour);

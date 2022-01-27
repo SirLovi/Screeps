@@ -242,15 +242,15 @@ mod.nextAction = function (creep) {
                     return;
                 if (!creep.room.ally && Creep.action.storing.assign(creep))
                     return;
-                Creep.behaviour.worker.nextAction.call(this, creep);
+                //_.some(creep.body, {'type': WORK}) ? Creep.behaviour.worker.nextAction.call(this, creep) : Creep.behaviour.hauler.nextAction.call(this, creep);
                 return;
             }
         }
         // empty
         // travelling
         if (!this.exploitNextRoom(creep))
-            Creep.behaviour.worker.nextAction.call(this, creep);
-
+            //_.some(creep.body, {'type': WORK}) ? Creep.behaviour.worker.nextAction.call(this, creep) : Creep.behaviour.hauler.nextAction.call(this, creep);
+            return;
     }
     // not at home
     else {
@@ -270,7 +270,8 @@ mod.nextAction = function (creep) {
                     // creep.flag.cloaking = _.max([creep.room.ticksToNextRegeneration-20,0]); // approach a bit earlier
                     // travelling
                     if (!this.exploitNextRoom(creep))
-                        Creep.behaviour.worker.nextAction.call(this, creep);
+                        return;
+                        //_.some(creep.body, {'type': WORK}) ? Creep.behaviour.worker.nextAction.call(this, creep) : Creep.behaviour.hauler.nextAction.call(this, creep);
                 }
                 // energy available
                 else {
@@ -293,7 +294,8 @@ mod.nextAction = function (creep) {
                     // no targets in current room
                     // creep.flag.cloaking = 50;
                     if (!this.exploitNextRoom(creep))
-                        Creep.behaviour.worker.nextAction.call(this, creep);
+                        return;
+                        //_.some(creep.body, {'type': WORK}) ? Creep.behaviour.worker.nextAction.call(this, creep) : Creep.behaviour.hauler.nextAction.call(this, creep);
                 }
             }
             // carrier full
@@ -315,7 +317,8 @@ mod.nextAction = function (creep) {
         // not at target room
         else {
             if (!this.exploitNextRoom(creep))
-                Creep.behaviour.worker.nextAction.call(this, creep);
+                return;
+                //_.some(creep.body, {'type': WORK}) ? Creep.behaviour.worker.nextAction.call(this, creep) : Creep.behaviour.hauler.nextAction.call(this, creep);
         }
     }
     // fallback
@@ -328,8 +331,8 @@ mod.exploitNextRoom = function (creep) {
             Flag.compare(flagEntry, global.FLAG_COLOR.invade.exploit) || Flag.compare(flagEntry, global.FLAG_COLOR.invade.robbing)
         );
 
-        // let flag = FlagDir.find(FLAG_COLOR.invade.robbing, new RoomPosition(25, 25, creep.data.homeRoom), false, FlagDir.exploitMod, creep.name);
-        let flag = global.FlagDir.find(validColor, new RoomPosition(25, 25, creep.data.homeRoom), false, global.FlagDir.exploitMod, creep.name);
+        let flag = FlagDir.find(FLAG_COLOR.invade.robbing, new RoomPosition(25, 25, creep.data.homeRoom), false, FlagDir.exploitMod, creep.name);
+        //let flag = global.FlagDir.find(validColor, new RoomPosition(25, 25, creep.data.homeRoom), false, global.FlagDir.exploitMod, creep.name);
 
         // global.logSystem(creep.room.name, `FLAG: ${flag.name}`);
 
