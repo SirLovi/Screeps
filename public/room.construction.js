@@ -8,11 +8,8 @@ mod.analyzeRoom = function (room, needMemoryResync) {
 		room.processConstructionFlags();
 	}
 	room.roadConstruction();
+	room.destroyUnusedRoads();
 };
-
-
-
-
 mod.extend = function () {
 
 	// Construction related Room variables go here
@@ -60,9 +57,9 @@ mod.extend = function () {
 				}
 				return this.memory.roadConstructionTrace;
 			},
-			set : function (value) {
+			set: function (value) {
 
-			}
+			},
 		},
 		'terrain': {
 			configurable: true,
@@ -70,10 +67,10 @@ mod.extend = function () {
 				if (_.isUndefined(this._terrain)) {
 					this._terrain = Game.map.getRoomTerrain(this.name);
 				}
-				return this._terrain
+				return this._terrain;
 			},
 
-		}
+		},
 	});
 
 	Room.prototype.getBestConstructionSiteFor = function (pos, filter = null) {
@@ -273,19 +270,19 @@ mod.extend = function () {
 		}
 
 		// Roads
-        global.FlagDir.filter(global.FLAG_COLOR.construct.road, ...ARGS).forEach(flag => {
-            CONSTRUCT(flag, STRUCTURE_ROAD);
-        });
+		global.FlagDir.filter(global.FLAG_COLOR.construct.road, ...ARGS).forEach(flag => {
+			CONSTRUCT(flag, STRUCTURE_ROAD);
+		});
 
-        // Walls
-        global.FlagDir.filter(global.FLAG_COLOR.construct.wall, ...ARGS).forEach(flag => {
-            CONSTRUCT(flag, STRUCTURE_WALL);
-        });
+		// Walls
+		global.FlagDir.filter(global.FLAG_COLOR.construct.wall, ...ARGS).forEach(flag => {
+			CONSTRUCT(flag, STRUCTURE_WALL);
+		});
 
-        // Ramparts
-        global.FlagDir.filter(global.FLAG_COLOR.construct.rampart, ...ARGS).forEach(flag => {
-            CONSTRUCT(flag, STRUCTURE_RAMPART);
-        });
+		// Ramparts
+		global.FlagDir.filter(global.FLAG_COLOR.construct.rampart, ...ARGS).forEach(flag => {
+			CONSTRUCT(flag, STRUCTURE_RAMPART);
+		});
 
 		// Storage
 		if (!this.storage && CONTROLLER_STRUCTURES[STRUCTURE_STORAGE][LEVEL] > 0) {
@@ -332,6 +329,16 @@ mod.extend = function () {
 		}
 	};
 
+	Room.prototype.destroyUnusedRoads = function () {
+
+		for (const road of this.roads) {
+			if (road.hits <= global.ROAD_DESTROY_HITS) {
+				global.logSystem(road.pos.roomName, `road destroyed at ${road.pos.roomName} ${road.pos.x} ${road.pos.y}`);
+				road.destroy();
+			}
+		}
+	};
+
 	// new Room methods go here
 	Room.roomLayout = function (flag) {
 		if (!Flag.compare(flag, global.FLAG_COLOR.command.roomLayout))
@@ -348,8 +355,8 @@ mod.extend = function () {
 			[STRUCTURE_EXTENSION]: global.FLAG_COLOR.construct.extension,
 			[STRUCTURE_LINK]: global.FLAG_COLOR.construct.link,
 			[STRUCTURE_ROAD]: global.FLAG_COLOR.construct.road,
-            [STRUCTURE_WALL]: global.FLAG_COLOR.construct.wall,
-            [STRUCTURE_RAMPART]: global.FLAG_COLOR.construct.rampart,
+			[STRUCTURE_WALL]: global.FLAG_COLOR.construct.wall,
+			[STRUCTURE_RAMPART]: global.FLAG_COLOR.construct.rampart,
 			[STRUCTURE_STORAGE]: global.FLAG_COLOR.construct.storage,
 			[STRUCTURE_TERMINAL]: global.FLAG_COLOR.construct.terminal,
 			[STRUCTURE_NUKER]: global.FLAG_COLOR.construct.nuker,
@@ -409,4 +416,5 @@ mod.extend = function () {
 		flag.pos.newFlag(global.FLAG_COLOR.construct.storage);
 		flag.remove();
 	};
-};
+}
+

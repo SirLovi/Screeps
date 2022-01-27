@@ -407,15 +407,14 @@ mod.work = function (roomName, partChange) {
 	let memory = global.Task.mining.memory(roomName);
 	memory.harvestSize = (memory.harvestSize || 0) + (partChange || 0);
 	memory.harvestSize = (memory.harvestSize || 0) < 0 ? 0 : memory.harvestSize;
-
-	global.logSystem(roomName, `Task.${mod.name}: harvesting work capacity for ${roomName} ${partChange >= 0 ? 'increased' : 'decreased'} by ${partChange} per miner. Currently added ${memory.harvestSize}`);
+	global.logSystem(roomName, `Task.${mod.name}: harvesting work capacity for ${roomName} ${partChange >= 0 ? 'increased' : 'decreased'} by ${partChange} for remoteMiner. Currently added ${memory.harvestSize}`);
 };
 mod.heal = function (roomName, partChange) {
 	let memory = global.Task.mining.memory(roomName);
 	memory.healSize = (memory.healSize || 0) + (partChange || 0);
 	memory.healSize = (memory.healSize || 0) <= 0 ? 0 : memory.healSize;
 	memory.healSize = (memory.healSize || 0) >= 2 ? 2 : memory.healSize;
-	global.logSystem(roomName, `Task.${this.name}: healing capacity for ${roomName} ${memory.healSize >= 0 ? 'increased' : 'decreased'} to ${memory.healSize} per remoteMiner/remoteHauler. Currently added ${memory.healSize}`);
+	global.logSystem(roomName, `Task.${this.name}: healing capacity for ${roomName} ${memory.healSize >= 0 ? 'increased' : 'decreased'} to ${memory.healSize} for remoteMiner/remoteHauler. Currently added ${memory.healSize}`);
 };
 mod.checkWorkParts = function (roomName) {
 	console.log(`BodyParts count WORK for ${roomName} is started`);

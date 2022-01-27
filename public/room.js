@@ -670,7 +670,8 @@ mod.extend = function () {
 		'RCL': {
 			configurable: true,
 			get() {
-				if (!this.controller) return;
+				if (!this.controller)
+					return;
 				return Util.get(this.memory, 'RCL', this.controller.level);
 			},
 		},
@@ -734,6 +735,19 @@ mod.extend = function () {
 				return this._strongHold;
 			},
 		},
+		'roads': {
+			configurable: true,
+			get: function () {
+				if (_.isUndefined(this._roads)) {
+					let structures = this.find(FIND_STRUCTURES);
+					this._roads = _.filter(structures, function (structure) {
+						return structure.structureType === STRUCTURE_ROAD;
+					});
+				}
+				return this._roads;
+			},
+		},
+
 
 		// 'nextTurn': {
 		// 	configurable: true,
