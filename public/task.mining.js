@@ -437,6 +437,8 @@ mod.checkCarryParts = function (roomName) {
 	// 	return `Task.${mod.name} in ${roomName} is under attack, check carryCapacity later `;
 	// }
 
+	console.log(`BodyParts count CARRY for ${roomName} is started`);
+
 	const checkRoomCapacity = function (roomName, minCarryPartsPercent, maxDropped) {
 		const carryPartsPercent = Math.round(mod.carryPartsPopulation(roomName) * 100);
 
@@ -463,7 +465,7 @@ mod.checkCarryParts = function (roomName) {
 				return true;
 
 			} else if (carryPartsPercent === 100 && totalDropped === 0) {
-				console.log(mod.carry(roomName, -2, carryPartsPercent), message);
+				mod.carry(roomName, -2, carryPartsPercent);
 				return true;
 			}
 
