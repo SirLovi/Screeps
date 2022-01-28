@@ -334,9 +334,20 @@ mod.extend = function () {
 		// console.log(`destroy hits: ${global.ROAD_DESTROY_HITS}`);
 
 		for (const road of this.roads) {
+
 			if (road.hits <= global.ROAD_DESTROY_HITS) {
-				if (road.destroy() === OK)
+
+				let destroy = road.destroy();
+
+				if (destroy === OK)
 					global.logSystem(road.pos.roomName, `road destroyed at ${road.pos.roomName} ${road.pos.x} ${road.pos.y}`);
+
+				// if (destroy === ERR_NOT_OWNER)
+				// 	global.logSystem(road.pos.roomName, `road should be destroyed at ${road.pos.roomName} ${road.pos.x} ${road.pos.y}, but it is not mine room`);
+				//
+				// if (destroy === ERR_BUSY)
+				// 	global.logSystem(road.pos.roomName, `road should be destroyed at ${road.pos.roomName} ${road.pos.x} ${road.pos.y}, but there are enemies at the moment`);
+
 			}
 		}
 	};

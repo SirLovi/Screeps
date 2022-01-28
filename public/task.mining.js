@@ -424,7 +424,7 @@ mod.checkHealParts = function (roomName) {
 
 	console.log(`BodyParts count HEAL for ${roomName} is started`);
 	let room = Game.rooms[roomName];
-	if (room && room.situation.invasion) {
+	if (room && room.hostiles.length >= 2) {
 		mod.heal(roomName, 2);
 	} else if (room) {
 		mod.heal(roomName, -2);
@@ -435,8 +435,6 @@ mod.checkCarryParts = function (roomName) {
 	// if (Game.rooms[roomName].hostiles.length > 0 && !Game.rooms[roomName].isCenterNineRoom) {
 	// 	return `Task.${mod.name} in ${roomName} is under attack, check carryCapacity later `;
 	// }
-
-	console.log(`BodyParts count CARRY for ${roomName} is started`);
 
 	const checkRoomCapacity = function (roomName, minCarryPartsPercent, maxDropped) {
 		const carryPartsPercent = Math.round(mod.carryPartsPopulation(roomName) * 100);
