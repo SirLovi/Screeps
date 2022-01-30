@@ -169,7 +169,7 @@ mod.checkForRequiredCreeps = (flag) => {
 		maxHaulers = memory.running.remoteMiner.length;
 
 
-	console.log(`MAXHAULERS for ${roomName}: ${maxHaulers}`);
+	console.log(`MAX HAULERS for ${roomName}: ${maxHaulers}`);
 
 	if (haulerCount < maxHaulers && (!memory.capacityLastChecked || Game.time - memory.capacityLastChecked > global.TASK_CREEP_CHECK_INTERVAL)) {
 		for (let i = haulerCount; i < maxHaulers; i++) {

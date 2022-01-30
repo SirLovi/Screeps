@@ -9,8 +9,11 @@ mod.priorityLow = [
     Creep.setup.mineralMiner,
     Creep.setup.privateer];
 mod.extend = function () {
-    Spawn.prototype.execute = function () {
-        if (this.spawning) return;
+    StructureSpawn.prototype.execute = function () {
+
+        if (this.spawning)
+            return
+
         let room = this.room;
         // old spawning system
         let that = this;
@@ -18,10 +21,10 @@ mod.extend = function () {
             return setup.isValidSetup(room) && that.createCreepBySetup(setup);
         };
 
-        const spawnDelay = Util.get(this.room.memory, 'spawnDelay', {});
+        const spawnDelay = global.Util.get(this.room.memory, 'spawnDelay', {});
         let busy = this.createCreepByQueue(room.spawnQueueHigh, 'High');
         // don't spawn lower if there is one waiting in the higher queue
-        if (!busy && (room.spawnQueueHigh.length === 0  || room.spawnQueueHigh.length === spawnDelay.High) && Game.time % SPAWN_INTERVAL === 0) {
+        if (!busy && (room.spawnQueueHigh.length === 0  || room.spawnQueueHigh.length === spawnDelay.High) && Game.time % global.SPAWN_INTERVAL === 0) {
             busy = _.some(Spawn.priorityHigh, probe);
             if (!busy) busy = this.createCreepByQueue(room.spawnQueueMedium, 'Medium');
             if (!busy && (room.spawnQueueMedium.length === 0 || room.spawnQueueMedium.length === spawnDelay.Medium)) {
@@ -31,23 +34,24 @@ mod.extend = function () {
         }
         return busy;
     };
-    Spawn.prototype.createCreepBySetup = function (setup) {
+    StructureSpawn.prototype.createCreepBySetup = function (setup) {
         if (global.DEBUG && global.TRACE) trace('Spawn', {setupType: this.type, rcl: this.room.controller.level, energy: this.room.energyAvailable, maxEnergy: this.room.energyCapacityAvailable, Spawn: 'createCreepBySetup'}, 'creating creep');
         let params = setup.buildParams(this);
         if (this.create(params.parts, params.name, params.setup))
             return params;
         return null;
     };
-    Spawn.prototype.createCreepByQueue = function (queue, level) {
+    StructureSpawn.prototype.createCreepByQueue = function (queue, level) {
         const spawnDelay = Util.get(this.room.memory, 'spawnDelay', {});
         if (!queue) return null;
         else if (Memory.CPU_CRITICAL && spawnDelay[level] === queue.length) return null;
         let params;
         for (let index = 0; index < queue.length; index++) {
             const entry = queue[index];
-            if (Memory.CPU_CRITICAL && !CRITICAL_ROLES.includes(entry.behaviour))
+            if (Memory.CPU_CRITICAL && !global.CRITICAL_ROLES.includes(entry.behaviour))
                 continue;
-            else params = queue.splice(index, 1)[0];
+            else
+                params = queue.splice(index, 1)[0];
         }
         if (!params) {
             if (queue.length && global.DEBUG) global.logSystem(this.pos.roomName, 'No non-CRITICAL creeps to spawn, delaying spawn until CPU is not CRITICAL, or new entries are added.');
@@ -61,7 +65,7 @@ mod.extend = function () {
         });
         // no parts
         if (cost === 0) {
-            global.logSystem(this.pos.roomName, dye(CRAYON.error, 'Zero parts body creep queued. Removed.'));
+            global.logSystem(this.pos.roomName, global.dye(global.CRAYON.error, 'Zero parts body creep queued. Removed.'));
             return false;
         }
         // wait with spawning until enough resources are available
@@ -88,7 +92,7 @@ mod.extend = function () {
         }
         return result;
     };
-    Spawn.prototype.create = function (body, name, behaviour, destiny) {
+    StructureSpawn.prototype.create = function (body, name, behaviour, destiny) {
         //console.log('it is viral');
         if (body.length === 0) return false;
         let success = this.spawnCreep(body, name);

@@ -215,7 +215,7 @@ mod.extend = function () {
 
 			roomPos = this.pos.fromDirection(direction);
 
-			if (roomPos.x > 0 && roomPos.y > 0) {
+			if (roomPos.x >= 0 && roomPos.y >= 0) {
 
 				let stuff = roomPos.look();
 

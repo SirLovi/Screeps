@@ -405,7 +405,7 @@ module.exports = {
 	 */
 	pave(roomName) {
 		const flags = _.values(Game.flags).filter(f => f.pos.roomName === roomName && f.compareTo(FLAG_COLOR.pavementArt));
-		const val = Memory.pavementArt[roomName] === undefinede ? '' : Memory.pavementArt[roomName];
+		const val = Memory.pavementArt[roomName] === undefined ? '' : Memory.pavementArt[roomName];
 		const posMap = flag => `x${flag.pos.x}y${flag.pos.y}`;
 		Memory.pavementArt[roomName] = val + flags.map(posMap).join('') + 'x';
 		const setSite = flag => flag.pos.createConstructionSite(STRUCTURE_WALL);
