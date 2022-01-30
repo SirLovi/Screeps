@@ -213,7 +213,7 @@ mod.extend = function () {
 		}
 	};
 
-	Room.prototype.destroyUnusedRoads = function (minDeviation = global.ROAD_CONSTRUCTION_MIN_DEVIATION) {
+	Room.prototype.destroyUnusedRoads = function () {
 
 		if ((!global.ROAD_CONSTRUCTION_ENABLE && !mod.forced) || Game.time % global.ROAD_CONSTRUCTION_INTERVAL !== 0 || !this.my)
 			return;
@@ -236,7 +236,7 @@ mod.extend = function () {
 				if (visited.length === 0) {
 					let ret = road.destroy();
 					if (ret === OK)
-						global.logSystem(this.name, `Destroy road at ${pos.x}'${pos.y} (${pos.n} traces) was successfully done`);
+						global.logSystem(this.name, `Destroy road at ${road.pos.x}'${road.pos.y} was successfully done`);
 				}
 			};
 
