@@ -322,6 +322,7 @@ function wrapLoop(fn) {
 }
 
 let cpuAtFirstLoop;
+
 module.exports.loop = wrapLoop(function () {
 
 	const cpuAtLoop = Game.cpu.getUsed();

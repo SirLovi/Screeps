@@ -830,41 +830,45 @@ mod.extend = function () {
 					global.ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name].indexOf(this.name) === -1)))
 			return;
 
-		// remoteHauler can make footPrint only if he`s going home with full of energy (REMOTE_HAULER.MIN_LOAD)
-		if (creep.data.creepType === 'remoteHauler'
-			&& creep.sum / creep.carryCapacity < global.REMOTE_HAULER.MIN_LOAD
-			&& creep.data.roomName !== creep.data.homeRoom)
-			return;
-
-		// remoteMiner can not make a footPrint, when he`s not at home (if he has been attacked, he will go far away)
-		// TODO they go too far when attacked by invaders or sourceKeeper (where are they going? Flag?)
-		if (creep.data.creepType === 'remoteMiner'
-			&& creep.data.roomName !== creep.data.homeRoom)
-			return;
-
-		if (creep.data.creepType === 'upgrader' || creep.data.creepType === 'miner')
-			return;
-
-		if ((creep.data.creepType === 'hauler' || creep.data.creepType === 'worker' || creep.data.creepType === 'labTech')
-			&& creep.sum === 0)
-			return;
-
-		if (creep.data.actionName === 'idle')
-			return;
-
 		let x = creep.pos.x;
 		let y = creep.pos.y;
 
-		if (x === 0 || y === 0 || x === 49 || y === 49
-			|| creep.carry.energy === 0 || creep.data.actionName === 'building')
-			return;
-
-
 		let footPrintEnabled = () => {
+
+			// remoteHauler can make footPrint only if he`s going home with full of energy (REMOTE_HAULER.MIN_LOAD)
+			if (creep.data.creepType === 'remoteHauler'
+				&& creep.sum / creep.carryCapacity < global.REMOTE_HAULER.MIN_LOAD
+				&& creep.data.roomName !== creep.data.homeRoom)
+				return;
+
+			// remoteMiner can not make a footPrint, when he`s not at home (if he has been attacked, he will go far away)
+			// TODO they go too far when attacked by invaders or sourceKeeper (where are they going? Flag?)
+			if (creep.data.creepType === 'remoteMiner'
+				&& creep.data.roomName !== creep.data.homeRoom)
+				return;
+
+			if (creep.data.creepType === 'upgrader' || creep.data.creepType === 'miner')
+				return;
+
+			if ((creep.data.creepType === 'hauler' || creep.data.creepType === 'worker' || creep.data.creepType === 'labTech')
+				&& creep.sum === 0)
+				return;
+
+			if (creep.data.actionName === 'idle')
+				return;
+
+			if (x === 0 || y === 0 || x === 49 || y === 49 || creep.data.actionName === 'building')
+				return;
+
 			let lookForStructures = creep.room.lookForAt(LOOK_STRUCTURES, x, y);
 			let lookForConstructionSites = creep.room.lookForAt(LOOK_CONSTRUCTION_SITES, x, y);
 			return !_.some(lookForStructures, 'structureType', STRUCTURE_ROAD)
 				&& lookForConstructionSites.length === 0;
+		};
+
+		let onRoad = () => {
+			let lookForStructures = creep.room.lookForAt(LOOK_STRUCTURES, x, y);
+			return _.some(lookForStructures, 'structureType', STRUCTURE_ROAD);
 		};
 
 		if (footPrintEnabled()) {
@@ -875,6 +879,16 @@ mod.extend = function () {
 				this.roadConstructionTrace[key] = 1;
 			else
 				this.roadConstructionTrace[key]++;
+		}
+
+		if (onRoad()) {
+
+			let key = `${String.fromCharCode(32 + x)}${String.fromCharCode(32 + y)}_x${x}-y${y}`;
+
+			if (!this.roadDeconstructionTrace[key])
+				this.roadDeconstructionTrace[key] = 1;
+			else
+				this.roadDeconstructionTrace[key]++;
 		}
 	};
 

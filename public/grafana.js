@@ -31,6 +31,8 @@ mod.run = function () {
 
 mod.createRoomMemory = function () {
 
+    console.log(`Create room memory`);
+
     // reset global.rooms properties
     delete global._acceptedRooms;
     delete global._myRooms;
@@ -55,7 +57,7 @@ mod.createRoomMemory = function () {
 
 mod.createStatProperties = function (fromMain = false) {
 
-    if (Object.keys(Memory.stats).length === 2) {
+    if (fromMain) {
 
         Object.assign(Memory.stats, {
             population: Object.keys(Memory.population).length,
@@ -85,6 +87,7 @@ mod.createStatProperties = function (fromMain = false) {
         Memory.stats.memory = global.round(RawMemory.get().length / 1024);
         Memory.stats.cpu.tickLimit = Game.cpu.tickLimit;
         Memory.stats.cpu.limit = Game.cpu.limit;
+        // Memory.stats.cpu.bucketData.bucketFillIntervals = [];
         Memory.stats.cpu.bucketData.bucket = Game.cpu.bucket;
         Memory.stats.cpu.shardLimits = Game.cpu.shardLimits;
         Memory.stats.cpu.unlocked = Game.cpu.unlocked;

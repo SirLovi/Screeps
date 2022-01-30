@@ -15,9 +15,10 @@ mod.compileBody = function (room, params, sort = true) {
 		attackCount >= rangedCount
 	) {
 		// relocate move parts as armor so that 2:1 move when hits === hullHits
-		const movedMoves = parts.splice(_.findIndex(parts, p => p === MOVE), Math.floor(moveRatio * moveCount));
+		const movedMoves = parts.splice(_.findIndex(parts, p => p === MOVE),
+			Math.floor(moveRatio * moveCount));
 		const insertIndex = Math.max(0,
-			_.findIndex(parts, p => !Population.stats.creep.armorParts[p]),
+			_.findIndex(parts, p => !global.Population.stats.creep.armorParts[p]),
 			_.findIndex(parts, p => p !== TOUGH)); // drainer case
 		parts.splice(insertIndex, 0, ...movedMoves);
 	}
@@ -25,5 +26,10 @@ mod.compileBody = function (room, params, sort = true) {
 		parts.splice(parts.length - 2, 0);
 		parts.push(MOVE);
 	}
+
+	// console.log(`compile behavior ${global.json(parts)}`);
+	if (parts.length >= 50)
+		global.logSystem(room.name, `compile parts ${parts.length}`);
+
 	return parts;
 };

@@ -548,7 +548,8 @@ mod.multi = function (room, params = {}) {
 	const minMulti = params.minMulti || 0;
 	const fixedCosts = Creep.bodyCosts(params.fixedBody);
 	const multiCosts = Creep.bodyCosts(params.multiBody);
-	if (multiCosts === 0) return 0; // prevent divide-by-zero
+	if (multiCosts === 0)
+		return 0; // prevent divide-by-zero
 	let maxThreatMulti = Infinity;
 	if (params.minThreat) {
 		const fixedThreat = Creep.bodyThreat(params.fixedBody);
@@ -605,7 +606,8 @@ mod.formatBody = function (fixedBody, multiBody) {
 mod.compileBody = function (room, params, sort = true) {
 	const {fixedBody, multiBody} = Creep.formatBody(params.fixedBody || [], params.multiBody || []);
 	_.assign(params, {fixedBody, multiBody});
-	if (params.sort !== undefined) sort = params.sort;
+	if (params.sort !== undefined)
+		sort = params.sort;
 	let parts = [];
 	const multi = Creep.multi(room, params);
 	for (let i = 0; i < multi; i++) {
@@ -639,7 +641,8 @@ mod.bodyThreat = function (body) {
 	let evaluatePart = part => {
 		threat += Creep.partThreat[part.type ? part.type : part][part.boost ? 'boosted' : 'common'];
 	};
-	if (body) body.forEach(evaluatePart);
+	if (body)
+		body.forEach(evaluatePart);
 	return threat;
 };
 mod.register = function () {

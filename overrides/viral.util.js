@@ -1031,6 +1031,49 @@ mod.requiresEnergy = (roomName) => {
 		console.log(`NO TRANSFER`);
 };
 
+mod.resetBody = () => {
+	for (const roomName in Memory.tasks.mining) {
+		Memory.tasks.mining[roomName].carrySize = 0
+		Memory.tasks.mining[roomName].harvestSize = 0
+		Memory.tasks.mining[roomName].healSize = 0
+	}
+};
+
+mod.addedParts = () => {
+	console.log(`ADDED PARTS`);
+	// console.log(`MEM: ${global.Task.mining.memory}`);
+
+	for (const room in Memory.tasks.mining) {
+		let memory = global.Task.mining.memory(room);
+		console.log(`room: ${room}`);
+		const carrySize = memory.carrySize;
+		const workSize = memory.harvestSize;
+		const healSize = memory.healSize;
+
+		global.logSystem(room, `Carry: ${carrySize}`);
+		global.logSystem(room, `Work: ${workSize}`);
+		global.logSystem(room, `Heal: ${healSize}`);
+
+	}
+};
+
+mod.deleteBody = () => {
+	for (const room in Memory.tasks.mining) {
+		let memory = global.Task.mining.memory(room);
+		console.log(`room: ${room}`);
+		delete memory.queued;
+
+	}
+};
+
+mod.deleteConstructionTrace = () => {
+	for (const [room, value] of Object.entries(Memory.rooms)) {
+		console.log(`room: ${room}`);
+		delete value.roadConstructionTrace;
+		delete value.roadDeconstructionTrace;
+	}
+};
+
 
 // HERE comes room.memory.resources
 

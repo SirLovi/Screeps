@@ -45,7 +45,8 @@ mod.extend = function () {
         let params;
         for (let index = 0; index < queue.length; index++) {
             const entry = queue[index];
-            if (Memory.CPU_CRITICAL && !CRITICAL_ROLES.includes(entry.behaviour)) continue;
+            if (Memory.CPU_CRITICAL && !CRITICAL_ROLES.includes(entry.behaviour))
+                continue;
             else params = queue.splice(index, 1)[0];
         }
         if (!params) {
@@ -66,7 +67,9 @@ mod.extend = function () {
         // wait with spawning until enough resources are available
         if (cost > this.room.remainingEnergyAvailable) {
             if (cost > this.room.energyCapacityAvailable || (cost > 300 && !this.room.creeps.length)) {
-                global.logSystem(this.pos.roomName, dye(CRAYON.error, 'Queued creep too big for room: ' + JSON.stringify(params)));
+                global.logSystem(this.pos.roomName, global.Util.dye(global.CRAYON.error, 'Queued creep too big for room: ' + JSON.stringify(params)));
+                global.logSystem(this.pos.roomName, global.Util.dye(global.CRAYON.error, 'length ' + params.parts.length));
+
                 return false;
             }
             queue.unshift(params);
@@ -87,9 +90,9 @@ mod.extend = function () {
     };
     Spawn.prototype.create = function (body, name, behaviour, destiny) {
         //console.log('it is viral');
-        if (body.length == 0) return false;
+        if (body.length === 0) return false;
         let success = this.spawnCreep(body, name);
-        if (success == OK) {
+        if (success === OK) {
             let cost = 0;
             body.forEach(function (part) {
                 cost += BODYPART_COST[part];

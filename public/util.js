@@ -662,7 +662,7 @@ module.exports = {
 		return (amount - max) * chargeScale + 1;
 	},
 
-	resetBoostProduction (roomName) {
+	resetBoostProduction(roomName) {
 
 		let data;
 
@@ -737,4 +737,4 @@ module.exports = {
 			Memory.boostTiming = {};
 
 	}
-}
+};

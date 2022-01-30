@@ -3,10 +3,14 @@ module.exports = mod;
 mod.register = function () {
 	Flag.found.on(flag => Room.roomLayout(flag));
 };
+mod.forced = global.ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name] && global.ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name].indexOf(this.name) !== -1;
 mod.analyzeRoom = function (room, needMemoryResync) {
 	if (needMemoryResync) {
 		room.processConstructionFlags();
 	}
+
+
+
 	room.roadConstruction();
 	room.destroyUnusedRoads();
 };
@@ -61,6 +65,18 @@ mod.extend = function () {
 
 			},
 		},
+		'roadDeconstructionTrace': {
+			configurable: true,
+			get: function () {
+				if (_.isUndefined(this.memory.roadDeconstructionTrace)) {
+					this.memory.roadDeconstructionTrace = {};
+				}
+				return this.memory.roadDeconstructionTrace;
+			},
+			set: function (value) {
+
+			},
+		},
 		'terrain': {
 			configurable: true,
 			get: function () {
@@ -91,15 +107,33 @@ mod.extend = function () {
 		return _.min(sites, rangeOrder);
 	};
 
+	Room.prototype.traceMapping = function (construction = true) {
+		if (construction) {
+			return Object.keys(this.roadConstructionTrace).map(k => {
+				return { // convert to [{key,n,x,y}]
+					'n': this.roadConstructionTrace[k], // count of steps on x,y coordinates
+					'x': k.charCodeAt(0) - 32, // extract x from key
+					'y': k.charCodeAt(1) - 32, // extract y from key
+				};
+			});
+		} else {
+			return Object.keys(this.roadDeconstructionTrace).map(k => {
+				return { // convert to [{key,n,x,y}]
+					'n': this.roadDeconstructionTrace[k], // count of steps on x,y coordinates
+					'x': k.charCodeAt(0) - 32, // extract x from key
+					'y': k.charCodeAt(1) - 32, // extract y from key
+				};
+			});
+		}
+	};
+
 	Room.prototype.roadConstruction = function (minDeviation = global.ROAD_CONSTRUCTION_MIN_DEVIATION) {
 
 
-		const forced = global.ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name] && global.ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name].indexOf(this.name) !== -1;
-
-		if ((!global.ROAD_CONSTRUCTION_ENABLE && !forced) || Game.time % global.ROAD_CONSTRUCTION_INTERVAL !== 0 || Memory.rooms.myTotalSites >= MAX_CONSTRUCTION_SITES)
+		if ((!global.ROAD_CONSTRUCTION_ENABLE && !mod.forced) || Game.time % global.ROAD_CONSTRUCTION_INTERVAL !== 0 || Memory.rooms.myTotalSites >= MAX_CONSTRUCTION_SITES)
 			return;
 
-		if (!forced && _.isNumber(global.ROAD_CONSTRUCTION_ENABLE)) {
+		if (!mod.forced && _.isNumber(global.ROAD_CONSTRUCTION_ENABLE)) {
 
 			if (!this.my && !this.myReservation && !this.isCenterNineRoom)
 				return;
@@ -115,15 +149,7 @@ mod.extend = function () {
 			// if (_.isUndefined(Memory.rooms.roomsToCheck))
 			// 	Memory.rooms.roomsToCheck = Object.keys(Memory.rooms).length;
 
-
-			let data = Object.keys(this.roadConstructionTrace).map(k => {
-				return { // convert to [{key,n,x,y}]
-					'n': this.roadConstructionTrace[k], // count of steps on x,y coordinates
-					'x': k.charCodeAt(0) - 32, // extract x from key
-					'y': k.charCodeAt(1) - 32, // extract y from key
-				};
-			});
-
+			let data = this.traceMapping();
 			let min = Math.max(global.ROAD_CONSTRUCTION_ABS_MIN, (data.reduce((_sum, b) => _sum + b.n, 0) / data.length) * minDeviation);
 			let max = _.max(data, 'n').n;
 
@@ -184,6 +210,38 @@ mod.extend = function () {
 			// clear old data
 			// this.roadConstructionTrace = {};
 			delete this.memory.roadConstructionTrace;
+		}
+	};
+
+	Room.prototype.destroyUnusedRoads = function (minDeviation = global.ROAD_CONSTRUCTION_MIN_DEVIATION) {
+
+		if ((!global.ROAD_CONSTRUCTION_ENABLE && !mod.forced) || Game.time % global.ROAD_CONSTRUCTION_INTERVAL !== 0 || !this.my)
+			return;
+
+		// console.log(`destroy hits: ${global.ROAD_DESTROY_HITS}`);
+		if (this.roadDeconstructionTrace && Object.keys(this.roadDeconstructionTrace).length > 0) {
+			// console.log(`road DESTROYING ON: ${this.name}`);
+
+			let data = this.traceMapping(false);
+
+			let roads = this.roads;
+
+			// build roads on all most frequent used fields
+			let deleteRoads = road => {
+
+				let visited = _.filter(data, trace => {
+					return trace.x === road.pos.x && trace.y === road.pos.y;
+				})
+
+				if (visited.length === 0) {
+					let ret = road.destroy();
+					if (ret === OK)
+						global.logSystem(this.name, `Destroy road at ${pos.x}'${pos.y} (${pos.n} traces) was successfully done`);
+				}
+			};
+
+			_.forEach(roads, deleteRoads);
+			delete this.memory.roadDeconstructionTrace;
 		}
 	};
 
@@ -329,28 +387,6 @@ mod.extend = function () {
 		}
 	};
 
-	Room.prototype.destroyUnusedRoads = function () {
-
-		// console.log(`destroy hits: ${global.ROAD_DESTROY_HITS}`);
-
-		for (const road of this.roads) {
-
-			if (road.hits <= global.ROAD_DESTROY_HITS) {
-
-				let destroy = road.destroy();
-
-				if (destroy === OK)
-					global.logSystem(road.pos.roomName, `road destroyed at ${road.pos.roomName} ${road.pos.x} ${road.pos.y}`);
-
-				// if (destroy === ERR_NOT_OWNER)
-				// 	global.logSystem(road.pos.roomName, `road should be destroyed at ${road.pos.roomName} ${road.pos.x} ${road.pos.y}, but it is not mine room`);
-				//
-				// if (destroy === ERR_BUSY)
-				// 	global.logSystem(road.pos.roomName, `road should be destroyed at ${road.pos.roomName} ${road.pos.x} ${road.pos.y}, but there are enemies at the moment`);
-
-			}
-		}
-	};
 
 	// new Room methods go here
 	Room.roomLayout = function (flag) {
@@ -429,5 +465,5 @@ mod.extend = function () {
 		flag.pos.newFlag(global.FLAG_COLOR.construct.storage);
 		flag.remove();
 	};
-}
+};
 
