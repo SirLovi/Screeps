@@ -333,6 +333,9 @@ module.exports.loop = wrapLoop(function () {
 	if (_.isUndefined(Memory.stats))
 		global.Grafana.createRoomMemory();
 
+	if (_.isUndefined(Memory.stats.cpu))
+		global.Grafana.createStatProperties(true);
+
 	if(Game.cpu.bucket === 10000) {
 		//console.log(`GENERATING PIXEL`);
 		if (global.GRAFANA) {

@@ -1,12 +1,7 @@
 const mod = {};
 module.exports = mod;
 
-function haulerCarryToWeight(carry) {
-	if (!carry || carry < 0)
-		return 0;
-	const multiCarry = _.max([0, carry - 5]);
-	return 500 + 150 * _.ceil(multiCarry * 0.5);
-}
+
 
 mod.minControllerLevel = 2;
 mod.name = 'mining';
@@ -223,7 +218,6 @@ mod.checkForRequiredCreeps = (flag) => {
 					memory.queued[creepSetup.behaviour].push({
 						room: creepSetup.queueRoom,
 						name: creepSetup.name,
-						// body: _.countBy(creepSetup.parts),
 						body: _.countBy(creepSetup.parts),
 					});
 				},
@@ -576,6 +570,60 @@ mod.carryPartsPopulation = function (miningRoomName, homeRoomName) {
 	// it is 0, if we need is 0, -ret if we need more
 	return ret;
 };
+mod.countEnergyPrice = function(fixedBody, multiBody) {
+	let fixedCost = 0,
+		multiCost = 0;
+	for (const [part, amount] of Object.entries(fixedBody)) {
+		switch (part) {
+			case CARRY:
+				fixedCost += BODYPART_COST[CARRY] * amount;
+				break;
+			case MOVE:
+				fixedCost += BODYPART_COST[MOVE] * amount;
+				break;
+			case WORK:
+				fixedCost += BODYPART_COST[WORK] * amount;
+				break;
+			case HEAL:
+				fixedCost += BODYPART_COST[HEAL] * amount;
+				break;
+		}
+	}
+	for (const [part, amount] of Object.entries(multiBody)) {
+		switch (part) {
+			case CARRY:
+				multiCost += BODYPART_COST[CARRY] * amount;
+				break;
+			case MOVE:
+				multiCost += BODYPART_COST[MOVE] * amount;
+				break;
+			case WORK:
+				multiCost += BODYPART_COST[WORK] * amount;
+				break;
+			case HEAL:
+				multiCost += BODYPART_COST[HEAL] * amount;
+				break;
+		}
+	}
+
+	return {
+		fixedCost: fixedCost,
+		multiCost: multiCost
+	}
+
+
+}
+function haulerCarryToWeight(carry, setup) {
+	if (!carry || carry < 0)
+		return 0;
+
+	const multiCarry = _.max([0, carry - 5]);
+	const cost = mod.countEnergyPrice(setup.fixedBody, setup.multiBody)
+	const fixedBodyCost = cost.fixedCost;
+	const multiBodyCost = cost.multiCost;
+
+	return fixedBodyCost + multiBodyCost * _.ceil(multiCarry * 0.5);
+}
 mod.strategies = {
 	defaultStrategy: {
 		name: `default-${mod.name}`,
@@ -650,7 +698,7 @@ mod.strategies = {
 			const existingCarry = _.sum(validHaulers, c => (c && c.data && c.data.body) ? c.data.body.carry : 5);
 			const queuedCarry = _.sum(queuedHaulers, c => (c && c.body) ? c.body.carry : 5);
 			const neededCarry = ept * travel * 2 + (memory.carrySize || 0) - existingCarry - queuedCarry;
-			const maxWeight = haulerCarryToWeight(neededCarry);
+			const maxWeight = haulerCarryToWeight(neededCarry, this.setup(flagRoomName));
 			if (global.DEBUG && global.TRACE)
 				global.trace('Task', {
 					Task: mod.name, room: flagRoomName, homeRoom: homeRoomName,
