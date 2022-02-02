@@ -570,8 +570,8 @@ mod.carryPartsPopulation = function (miningRoomName, homeRoomName) {
 	return ret;
 };
 mod.countEnergyPrice = function(fixedBody, multiBody) {
-	console.log(`fixedBody: ${global.json(fixedBody)}`);
-	console.log(`multiBody: ${global.json(multiBody)}`);
+	// console.log(`fixedBody: ${global.json(fixedBody)}`);
+	// console.log(`multiBody: ${global.json(multiBody)}`);
 	let fixedCost = 0,
 		multiCost = 0;
 	for (const [part, amount] of Object.entries(fixedBody)) {
