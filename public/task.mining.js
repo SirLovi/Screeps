@@ -571,6 +571,8 @@ mod.carryPartsPopulation = function (miningRoomName, homeRoomName) {
 	return ret;
 };
 mod.countEnergyPrice = function(fixedBody, multiBody) {
+	console.log(`fixedBody: ${fixedBody}`);
+	console.log(`multiBody: ${multiBody}`);
 	let fixedCost = 0,
 		multiCost = 0;
 	for (const [part, amount] of Object.entries(fixedBody)) {
@@ -610,9 +612,7 @@ mod.countEnergyPrice = function(fixedBody, multiBody) {
 		fixedCost: fixedCost,
 		multiCost: multiCost
 	}
-
-
-}
+};
 function haulerCarryToWeight(carry, setup) {
 	if (!carry || carry < 0)
 		return 0;
@@ -621,8 +621,14 @@ function haulerCarryToWeight(carry, setup) {
 	const cost = mod.countEnergyPrice(setup.fixedBody, setup.multiBody)
 	const fixedBodyCost = cost.fixedCost;
 	const multiBodyCost = cost.multiCost;
+	const ret = fixedBodyCost + multiBodyCost * _.ceil(multiCarry * 0.5);
 
-	return fixedBodyCost + multiBodyCost * _.ceil(multiCarry * 0.5);
+	console.log(`fixedCost: ${fixedBodyCost}`);
+	console.log(`multiCost: ${multiBodyCost}`);
+	console.log(`ret: ${ret}`);
+
+
+	return ret;
 }
 mod.strategies = {
 	defaultStrategy: {
