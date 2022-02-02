@@ -423,7 +423,7 @@ mod.setupCreep = function (roomName, definition) {
 		definition.fixedBody[WORK] += workSize;
 		definition.moveRatio = ((healSize + workSize) % 2) * -0.5 + (definition.moveRatio || 0);
 		definition.fixedBody[MOVE] += Math.ceil((healSize + (memory.harvestSize || 0)) * 0.5 + (definition.moveRatio || 0));
-		definition.fixedBody = mod.bodyToArray(definition.fixedBody);
+
 
 		return definition;
 
@@ -432,7 +432,6 @@ mod.setupCreep = function (roomName, definition) {
 		definition.fixedBody[CARRY] += carrySize;
 		definition.moveRatio = ((healSize + carrySize) % 2) * -0.5 + (definition.moveRatio || 0);
 		definition.fixedBody[MOVE] += Math.ceil((healSize + (memory.carrySize || 0)) * 0.5 + (definition.moveRatio || 0));
-		definition.fixedBody = mod.bodyToArray(definition.fixedBody);
 
 		return definition;
 	}
@@ -571,8 +570,8 @@ mod.carryPartsPopulation = function (miningRoomName, homeRoomName) {
 	return ret;
 };
 mod.countEnergyPrice = function(fixedBody, multiBody) {
-	console.log(`fixedBody: ${fixedBody}`);
-	console.log(`multiBody: ${multiBody}`);
+	console.log(`fixedBody: ${global.json(fixedBody)}`);
+	console.log(`multiBody: ${global.json(multiBody)}`);
 	let fixedCost = 0,
 		multiCost = 0;
 	for (const [part, amount] of Object.entries(fixedBody)) {
@@ -626,7 +625,6 @@ function haulerCarryToWeight(carry, setup) {
 	console.log(`fixedCost: ${fixedBodyCost}`);
 	console.log(`multiCost: ${multiBodyCost}`);
 	console.log(`ret: ${ret}`);
-
 
 	return ret;
 }
@@ -704,6 +702,7 @@ mod.strategies = {
 			const existingCarry = _.sum(validHaulers, c => (c && c.data && c.data.body) ? c.data.body.carry : 5);
 			const queuedCarry = _.sum(queuedHaulers, c => (c && c.body) ? c.body.carry : 5);
 			const neededCarry = ept * travel * 2 + (memory.carrySize || 0) - existingCarry - queuedCarry;
+			// console.log(`this setup: ${global.json(this.setup(flagRoomName))}`);
 			const maxWeight = haulerCarryToWeight(neededCarry, this.setup(flagRoomName));
 			if (global.DEBUG && global.TRACE)
 				global.trace('Task', {
