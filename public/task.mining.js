@@ -624,7 +624,7 @@ function haulerCarryToWeight(carry, setup) {
 
 	console.log(`fixedCost: ${fixedBodyCost}`);
 	console.log(`multiCost: ${multiBodyCost}`);
-	console.log(`ret: ${ret}`);
+	console.log(`haulerCarryToWeight: ${ret}`);
 
 	return ret;
 }
