@@ -1,8 +1,5 @@
 const mod = {};
 module.exports = mod;
-
-
-
 mod.minControllerLevel = 2;
 mod.name = 'mining';
 mod.register = () => {
@@ -159,7 +156,7 @@ mod.checkForRequiredCreeps = (flag) => {
 		droppedEnergy = _.sum(room.droppedResources, 'energy');
 
 	if (droppedEnergy && droppedEnergy > 500)
-		maxHaulers = Math.ceil(memory.running.remoteMiner.length * global.REMOTE_HAULER.MULTIPLIER)
+		maxHaulers = Math.ceil(memory.running.remoteMiner.length * global.REMOTE_HAULER.MULTIPLIER);
 	else
 		maxHaulers = memory.running.remoteMiner.length;
 
@@ -201,6 +198,8 @@ mod.checkForRequiredCreeps = (flag) => {
 				console.log(`hauler maxWeight: ${hauler.maxWeight}`);
 				console.log(`hauler minWeight: ${hauler.minWeight}`);
 			}
+
+			global.logSystem(roomName, `HAULER BORN: ${global.json(hauler)}`);
 			global.Task.spawn(
 				hauler,
 				{ // destiny
@@ -407,7 +406,7 @@ mod.bodyToArray = (definition) => {
 	console.log(`bodyToArray ret: ${fixedBody.length}`);
 	return fixedBody;
 };
-mod.setupCreep = function (roomName, definition) {
+mod.setupCreep = function (roomName, definition, inObject = true) {
 
 	// mod.checkCarryParts(roomName);
 	// mod.checkHealParts(roomName);
@@ -424,8 +423,10 @@ mod.setupCreep = function (roomName, definition) {
 		definition.moveRatio = ((healSize + workSize) % 2) * -0.5 + (definition.moveRatio || 0);
 		definition.fixedBody[MOVE] += Math.ceil((healSize + (memory.harvestSize || 0)) * 0.5 + (definition.moveRatio || 0));
 
-
-		return definition;
+		if (inObject)
+			return definition;
+		else
+			return mod.bodyToArray(definition);
 
 	} else if (definition.behaviour === 'remoteHauler') {
 
@@ -433,7 +434,10 @@ mod.setupCreep = function (roomName, definition) {
 		definition.moveRatio = ((healSize + carrySize) % 2) * -0.5 + (definition.moveRatio || 0);
 		definition.fixedBody[MOVE] += Math.ceil((healSize + (memory.carrySize || 0)) * 0.5 + (definition.moveRatio || 0));
 
-		return definition;
+		if (inObject)
+			return definition;
+		else
+			return mod.bodyToArray(definition);
 	}
 };
 mod.getFlag = function (roomName) {
@@ -569,7 +573,7 @@ mod.carryPartsPopulation = function (miningRoomName, homeRoomName) {
 	// it is 0, if we need is 0, -ret if we need more
 	return ret;
 };
-mod.countEnergyPrice = function(fixedBody, multiBody) {
+mod.countEnergyPrice = function (fixedBody, multiBody) {
 	// console.log(`fixedBody: ${global.json(fixedBody)}`);
 	// console.log(`multiBody: ${global.json(multiBody)}`);
 	let fixedCost = 0,
@@ -609,25 +613,27 @@ mod.countEnergyPrice = function(fixedBody, multiBody) {
 
 	return {
 		fixedCost: fixedCost,
-		multiCost: multiCost
-	}
+		multiCost: multiCost,
+	};
 };
-function haulerCarryToWeight(carry, setup) {
+
+function haulerCarryToWeight(roomName, carry, setup) {
 	if (!carry || carry < 0)
 		return 0;
 
 	const multiCarry = _.max([0, carry - 5]);
-	const cost = mod.countEnergyPrice(setup.fixedBody, setup.multiBody)
+	const cost = mod.countEnergyPrice(setup.fixedBody, setup.multiBody);
 	const fixedBodyCost = cost.fixedCost;
 	const multiBodyCost = cost.multiCost;
 	const ret = fixedBodyCost + multiBodyCost * _.ceil(multiCarry * 0.5);
 
-	console.log(`fixedCost: ${fixedBodyCost}`);
-	console.log(`multiCost: ${multiBodyCost}`);
-	console.log(`haulerCarryToWeight: ${ret}`);
+	global.logSystem(roomName, `fixedCost: ${fixedBodyCost}`);
+	global.logSystem(roomName, `multiCost: ${multiBodyCost}`);
+	global.logSystem(roomName, `return => haulerCarryToWeight: ${ret}`);
 
 	return ret;
 }
+
 mod.strategies = {
 	defaultStrategy: {
 		name: `default-${mod.name}`,
@@ -703,13 +709,14 @@ mod.strategies = {
 			const queuedCarry = _.sum(queuedHaulers, c => (c && c.body) ? c.body.carry : 5);
 			const neededCarry = ept * travel * 2 + (memory.carrySize || 0) - existingCarry - queuedCarry;
 			// console.log(`this setup: ${global.json(this.setup(flagRoomName))}`);
-			const maxWeight = haulerCarryToWeight(neededCarry, this.setup(flagRoomName));
+			const maxWeight = haulerCarryToWeight(flagRoomName, neededCarry, this.setup(flagRoomName));
 			if (global.DEBUG && global.TRACE)
 				global.trace('Task', {
 					Task: mod.name, room: flagRoomName, homeRoom: homeRoomName,
 					haulers: existingHaulers.length + queuedHaulers.length, ept, travel, existingCarry, queuedCarry,
 					neededCarry, maxWeight, [mod.name]: 'maxWeight',
 				});
+			global.logSystem(flagRoomName, `maxWeight: ${maxWeight}`);
 			return maxWeight;
 		},
 	},
