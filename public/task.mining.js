@@ -198,8 +198,6 @@ mod.checkForRequiredCreeps = (flag) => {
 				console.log(`hauler maxWeight: ${hauler.maxWeight}`);
 				console.log(`hauler minWeight: ${hauler.minWeight}`);
 			}
-
-			global.logSystem(roomName, `HAULER BORN: ${global.json(hauler)}`);
 			global.Task.spawn(
 				hauler,
 				{ // destiny
@@ -214,6 +212,7 @@ mod.checkForRequiredCreeps = (flag) => {
 				creepSetup => { // onQueued callback
 					const memory = global.Task.mining.memory(creepSetup.destiny.room);
 					global.logSystem(roomName, `hauler creepSetup ${creepSetup.parts.length}`);
+					global.logSystem(roomName, `HAULER BORN: ${global.json(hauler)}`);
 					memory.queued[creepSetup.behaviour].push({
 						room: creepSetup.queueRoom,
 						name: creepSetup.name,
@@ -394,19 +393,19 @@ mod.creep = {
 		queue: 'Low',
 	},
 };
-mod.bodyToArray = (definition) => {
-
-	let fixedBody = [];
-	console.log(`definition: ${global.json(definition)}`);
-	for (let [bodyPart, count] of Object.entries(definition)) {
-		console.log(`bodyPart: ${bodyPart} count: ${count}`);
-		fixedBody = fixedBody.concat(_.times(count, _.constant(bodyPart)));
-	}
-
-	console.log(`bodyToArray ret: ${fixedBody.length}`);
-	return fixedBody;
-};
-mod.setupCreep = function (roomName, definition, inObject = true) {
+// mod.bodyToArray = (definition) => {
+//
+// 	let fixedBody = [];
+// 	console.log(`definition: ${global.json(definition)}`);
+// 	for (let [bodyPart, count] of Object.entries(definition)) {
+// 		console.log(`bodyPart: ${bodyPart} count: ${count}`);
+// 		fixedBody = fixedBody.concat(_.times(count, _.constant(bodyPart)));
+// 	}
+//
+// 	console.log(`bodyToArray ret: ${fixedBody.length}`);
+// 	return fixedBody;
+// };
+mod.setupCreep = function (roomName, definition) {
 
 	// mod.checkCarryParts(roomName);
 	// mod.checkHealParts(roomName);
@@ -423,10 +422,8 @@ mod.setupCreep = function (roomName, definition, inObject = true) {
 		definition.moveRatio = ((healSize + workSize) % 2) * -0.5 + (definition.moveRatio || 0);
 		definition.fixedBody[MOVE] += Math.ceil((healSize + (memory.harvestSize || 0)) * 0.5 + (definition.moveRatio || 0));
 
-		if (inObject)
-			return definition;
-		else
-			return mod.bodyToArray(definition);
+		return definition;
+
 
 	} else if (definition.behaviour === 'remoteHauler') {
 
@@ -434,10 +431,8 @@ mod.setupCreep = function (roomName, definition, inObject = true) {
 		definition.moveRatio = ((healSize + carrySize) % 2) * -0.5 + (definition.moveRatio || 0);
 		definition.fixedBody[MOVE] += Math.ceil((healSize + (memory.carrySize || 0)) * 0.5 + (definition.moveRatio || 0));
 
-		if (inObject)
-			return definition;
-		else
-			return mod.bodyToArray(definition);
+		return definition;
+
 	}
 };
 mod.getFlag = function (roomName) {
@@ -655,7 +650,7 @@ mod.strategies = {
 	},
 	miner: {
 		name: `miner-${mod.name}`,
-		setup: function (roomName) {
+		setup: function (roomName, retObject = true) {
 			return mod.setupCreep(roomName, Room.isCenterNineRoom(roomName) ? _.cloneDeep(global.Task.mining.creep.SKMiner) : _.cloneDeep(global.Task.mining.creep.miner));
 		},
 		shouldSpawn: function (minerCount, sourceCount) {
@@ -664,7 +659,7 @@ mod.strategies = {
 	},
 	hauler: {
 		name: `hauler-${mod.name}`,
-		setup: function (roomName) {
+		setup: function (roomName, retObject = true) {
 			return mod.setupCreep(roomName, Room.isCenterNineRoom(roomName) ? _.cloneDeep(global.Task.mining.creep.SKHauler) : _.cloneDeep(global.Task.mining.creep.hauler));
 		},
 		ept: function (roomName) {
