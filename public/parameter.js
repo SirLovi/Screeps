@@ -137,6 +137,7 @@ let mod = {
     REPORTS_PER_LOOP: 18,
     SEND_STATISTIC_REPORTS: false, // Set to true to receive room statistics per mail, otherwise set to false.
     ROAD_CONSTRUCTION_ENABLE: 8, // Set to False to disable automatic road construction, or to a number to enable for owned rooms reaching that RC Level. WARNING: HIGH MEMORY USAGE
+    ROAD_CONSTRUCTION_DISABLED_FOR_CLAIMED_ROOMS: true,
     ROAD_CONSTRUCTION_FORCED_ROOMS: {'shard1': []}, //Add room names to force automatic road construction regardless of ROAD_CONSTRUCTION_ENABLE e.g. {'shard0':['W0N0','W1N0'],'shard1':['W0N0', 'W1N0']}.
     ROAD_CONSTRUCTION_INTERVAL: 2000,
     ROAD_CONSTRUCTION_MIN_DEVIATION: 1.2,

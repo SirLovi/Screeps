@@ -1,7 +1,7 @@
 const mod = {};
 module.exports = mod;
 mod.compileBody = function (room, params, sort = true) {
-	const moveRatio = 1 - (_.isNumber(params.moveRatio) ? params.moveRatio : 0.5);
+	const moveRatio = 1 - (_.isNumber(params.moveRatio) && params.moveRatio > 0) ? params.moveRatio : 0.5;
 	const parts = this.baseOf.internalViral.compileBody.apply(this, [room, params, sort]);
 	if (!sort) {
 		return parts;

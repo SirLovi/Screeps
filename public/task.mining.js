@@ -212,7 +212,7 @@ mod.checkForRequiredCreeps = (flag) => {
 				creepSetup => { // onQueued callback
 					const memory = global.Task.mining.memory(creepSetup.destiny.room);
 					global.logSystem(roomName, `hauler creepSetup ${creepSetup.parts.length}`);
-					global.logSystem(roomName, `HAULER BORN: ${global.json(hauler)}`);
+					global.logSystem(storageRoomName, `HAULER BORN: ${global.json(hauler)}`);
 					memory.queued[creepSetup.behaviour].push({
 						room: creepSetup.queueRoom,
 						name: creepSetup.name,
@@ -405,6 +405,17 @@ mod.creep = {
 // 	console.log(`bodyToArray ret: ${fixedBody.length}`);
 // 	return fixedBody;
 // };
+mod.countBody = function (fixedBody) {
+	let count = 0;
+	for (const [fixedBodyPart, amount] of Object.entries(fixedBody)) {
+		if (fixedBodyPart !== MOVE) {
+			count += amount
+		}
+	}
+
+	return count;
+
+}
 mod.setupCreep = function (roomName, definition) {
 
 	// mod.checkCarryParts(roomName);
@@ -419,8 +430,10 @@ mod.setupCreep = function (roomName, definition) {
 	if (definition.behaviour === 'remoteMiner') {
 
 		definition.fixedBody[WORK] += workSize;
-		definition.moveRatio = ((healSize + workSize) % 2) * -0.5 + (definition.moveRatio || 0);
-		definition.fixedBody[MOVE] += Math.ceil((healSize + (memory.harvestSize || 0)) * 0.5 + (definition.moveRatio || 0));
+		definition.fixedBody[HEAL] = healSize;
+		// definition.moveRatio = ((healSize + workSize) % 2) * -0.5 + (definition.moveRatio || 0);
+		definition.moveRatio = (mod.countBody(definition.fixedBody) % 2) * -0.5 + (definition.moveRatio || 0);
+		definition.fixedBody[MOVE] += Math.ceil((healSize + workSize) * 0.5 + (definition.moveRatio || 0));
 
 		return definition;
 
@@ -428,8 +441,10 @@ mod.setupCreep = function (roomName, definition) {
 	} else if (definition.behaviour === 'remoteHauler') {
 
 		definition.fixedBody[CARRY] += carrySize;
-		definition.moveRatio = ((healSize + carrySize) % 2) * -0.5 + (definition.moveRatio || 0);
-		definition.fixedBody[MOVE] += Math.ceil((healSize + (memory.carrySize || 0)) * 0.5 + (definition.moveRatio || 0));
+		definition.fixedBody[HEAL] = healSize;
+		// definition.moveRatio = ((healSize + carrySize) % 2) * -0.5 + (definition.moveRatio || 0);
+		definition.moveRatio = (mod.countBody(definition.fixedBody) % 2) * -0.5 + (definition.moveRatio || 0);
+		definition.fixedBody[MOVE] += Math.ceil((healSize + carrySize) * 0.5 + (definition.moveRatio || 0));
 
 		return definition;
 
@@ -711,7 +726,7 @@ mod.strategies = {
 					haulers: existingHaulers.length + queuedHaulers.length, ept, travel, existingCarry, queuedCarry,
 					neededCarry, maxWeight, [mod.name]: 'maxWeight',
 				});
-			global.logSystem(flagRoomName, `maxWeight: ${maxWeight}`);
+			global.logSystem(flagRoomName, `setup maxWeight: ${maxWeight}`);
 			return maxWeight;
 		},
 	},
