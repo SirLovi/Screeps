@@ -222,6 +222,9 @@ mod.extend = function () {
 		if ((!global.ROAD_CONSTRUCTION_ENABLE && !mod.forced) || Game.time % global.ROAD_CONSTRUCTION_INTERVAL !== 0 || !this.my)
 			return;
 
+		if (!this.my && global.ROAD_CONSTRUCTION_DISABLED_FOR_CLAIMED_ROOMS)
+			return;
+
 		// console.log(`destroy hits: ${global.ROAD_DESTROY_HITS}`);
 		if (this.roadDeconstructionTrace && Object.keys(this.roadDeconstructionTrace).length > 0) {
 			// console.log(`road DESTROYING ON: ${this.name}`);

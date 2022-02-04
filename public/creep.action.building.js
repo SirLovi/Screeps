@@ -5,7 +5,7 @@ action.targetRange = 3;
 action.reachedRange = function(creep) {
     return creep.getStrategyHandler([action.name], 'reachedRange', creep);
 };
-action.maxPerAction = 5;
+action.maxPerAction = 8;
 action.isValidAction = function(creep){
     return ( creep.carry.energy > 0 );
 };
