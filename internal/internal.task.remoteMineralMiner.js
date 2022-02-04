@@ -24,7 +24,7 @@ mod.handleFlagFound = flag => {
 };
 mod.handleFlagRemoved = flagName => {
     const flagMem = Memory.flags[flagName];
-    
+
     if (flagMem && flagMem.task === mod.name && flagMem.roomName) {
         const flags = FlagDir.filter(FLAG_COLOR.claim.mining, new RoomPosition(25, 25, flagMem.roomName), true);
         if (flags && flags.length > 0) {
@@ -41,21 +41,21 @@ mod.checkForRequiredCreeps = flag => {
     const roomName = flag.pos.roomName;
     const flagName = flag.name;
     const room = Game.rooms[roomName];
-    
+
     const type = mod.name;
-    
-    const memory = Task.remoteMineralMiner.memory(roomName);   
+
+    const memory = Task.remoteMineralMiner.memory(roomName);
     // re-validate if too much time has passed in the queue
     Task.validateAll(memory, flag, mod.name, {roomName: flag.pos.roomName, subKey: 'remoteMineralMiner', checkValid: true});
     const mineralMinerCount = memory.queued[type].length + memory.spawning[type].length + memory.running[type].length;
-    
+
     if(DEBUG && TRACE) trace('Task', {Task: mod.name, flagName, mineralMinerCount, [mod.name]: 'Flag.found'}, 'checking flag@', flag.pos);
-    
+
     if (mineralMinerCount < Task.remoteMineralMiner.fieldOrFunction(flag, mod.maxCount)) {
         if (DEBUG && TRACE) trace('Task', {Task: mod.name, room: roomName, mineralMinerCount, mineralMinerTTLs: _.map(_.map(memory.running.remoteMineralMiner, n => Game.creeps[n]), 'ticksToLive'), [mod.name]: 'mineralMinerCount'});
-        
+
         const mineralMiner = mod.setupCreep(roomName, Task.remoteMineralMiner.creep);
-        
+
         for (let i = mineralMinerCount; i < Task.remoteMineralMiner.fieldOrFunction(flag, mod.maxCount); i++) {
             Task.spawn(
                 mineralMiner,
@@ -82,7 +82,7 @@ mod.checkForRequiredCreeps = flag => {
 };
 mod.handleSpawningStarted = params => {
     if (!params.destiny || !params.destiny.task || params.destiny.task !== mod.name) return;
-    const flag = Game.flags[params.destiny.targetName]; 
+    const flag = Game.flags[params.destiny.targetName];
     if (flag) {
         const memory = Task.remoteMineralMiner.memory(params.destiny.room);
         Task.validateQueued(memory, mod.name, {subKey: params.destiny.type});
@@ -101,7 +101,7 @@ mod.handleSpawningCompleted = creep => {
     const flag = Game.flags[creep.data.destiny.targetName];
     if (flag) {
         creep.data.predictedRenewal = creep.data.spawningTime + routeRange(creep.data.homeRoom, creep.data.destiny.room) * 50;
-        
+
         const memory = Task.remoteMineralMiner.memory(creep.data.destiny.room);
         memory.running[creep.data.destiny.type].push(creep.name);
         Task.validateSpawning(memory, flag, mod.name, {roomName: creep.data.destiny.room, subKey: creep.data.destiny.type});
@@ -109,7 +109,7 @@ mod.handleSpawningCompleted = creep => {
 };
 mod.handleCreepDied = name => {
     const mem = Memory.population[name];
-    
+
     if (!mem || !mem.destiny || !mem.destiny.task || mem.destiny.task !== mod.name) return;
     const flag = Game.flags[mem.destiny.targetName];
     if (flag) {
@@ -173,15 +173,15 @@ mod.setupCreep = (roomName, definition) => {
     if (!memory.harvestSize) {
         return definition;
     }
-    
+
     const isWork = b => b === WORK;
     const baseBody = _.reject(definition.fixedBody, isWork);
     const workParts = _.sum(definition.fixedBody, isWork) + memory.harvestSize;
-    
+
     return _.create(definition, {
         fixedBody: _.times(workParts, _.constant(WORK))
             .concat(_.times(Math.ceil(memory.harvestSize * 0.5), _.constant(MOVE)))
             .concat(baseBody),
-        moveBalance: (memory.havestSize % 2) * -0.5,
+        moveRatio: (memory.harvestSize % 2) * -0.5,
     });
 };

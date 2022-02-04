@@ -11,7 +11,10 @@ mod.run = function () {
     if (!global.GRAFANA || Game.time % global.GRAFANA_INTERVAL !== 0)
         return;
 
-    mod.createStatProperties();
+    if (_.isUndefined(Memory.stats.cpu))
+        mod.createStatProperties(false);
+    else
+        mod.createStatProperties();
 
 
     // ROOM STATS DATA
@@ -55,9 +58,9 @@ mod.createRoomMemory = function () {
 
 };
 
-mod.createStatProperties = function (fromMain = false) {
+mod.createStatProperties = function (cpuCreated = true) {
 
-    if (fromMain) {
+    if (!cpuCreated) {
 
         Object.assign(Memory.stats, {
             population: Object.keys(Memory.population).length,
@@ -81,7 +84,7 @@ mod.createStatProperties = function (fromMain = false) {
                 numOrders: Game.market.orders ? Object.keys(Game.market.orders).length : 0,
             }
         });
-    } else if (!fromMain) {
+    } else if (cpuCreated) {
         Memory.stats.population = Object.keys(Memory.population).length;
         Memory.stats.empireMinerals = {}
         Memory.stats.memory = global.round(RawMemory.get().length / 1024);

@@ -883,6 +883,9 @@ mod.extend = function () {
 
 		if (onRoad()) {
 
+			if (!this.my)
+				return;
+
 			let key = `${String.fromCharCode(32 + x)}${String.fromCharCode(32 + y)}_x${x}-y${y}`;
 
 			if (!this.roadDeconstructionTrace[key])

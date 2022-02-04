@@ -43,7 +43,7 @@ mod.handleSpawningStarted = params => {
 	}
 };
 mod.handleSpawningCompleted = creep => {
-	if (!creep.data.destiny || !creep.data.destiny.task || creep.data.destiny.task != mod.name)
+	if (!creep.data.destiny || !creep.data.destiny.task || creep.data.destiny.task !== mod.name)
 		return;
 	if (creep.data.destiny.homeRoom) {
 		creep.data.homeRoom = creep.data.destiny.homeRoom;
@@ -82,11 +82,11 @@ mod.needsReplacement = (creep) => {
 };
 // check if a new creep has to be spawned
 mod.checkForRequiredCreeps = (flag) => {
-	const roomName = flag.pos.roomName;
-	const room = Game.rooms[roomName];
-	// Use the roomName as key in Task.memory?
+	const miningRoomName = flag.pos.roomName;
+	const room = Game.rooms[miningRoomName];
+	// Use the miningRoomName as key in Task.memory?
 	// Prevents accidentally processing same room multiple times if flags > 1
-	const memory = global.Task.mining.memory(roomName);
+	const memory = global.Task.mining.memory(miningRoomName);
 
 	// get number of sources
 	let sourceCount;
@@ -94,16 +94,17 @@ mod.checkForRequiredCreeps = (flag) => {
 	if (room)
 		sourceCount = room.sources.length;
 	// no visibility, but been there before
-	else if (Memory.rooms[roomName] && Memory.rooms[roomName].sources)
-		sourceCount = Memory.rooms[roomName].sources.length;
+	else if (Memory.rooms[miningRoomName] && Memory.rooms[miningRoomName].sources)
+		sourceCount = Memory.rooms[miningRoomName].sources.length;
 	// never been there
 	else
 		sourceCount = 1;
 
 	const countExisting = type => {
+
 		const priority = _.find(global.Task.mining.creep, {behaviour: type}).queue;
 
-		global.Task.validateAll(memory, flag, mod.name, {roomName, subKey: type, queues: [priority], checkValid: true, task: mod.name});
+		global.Task.validateAll(memory, flag, mod.name, {roomName: miningRoomName, subKey: type, queues: [priority], checkValid: true, task: mod.name});
 
 		return memory.queued[type].length + memory.spawning[type].length + memory.running[type].length;
 	};
@@ -119,10 +120,10 @@ mod.checkForRequiredCreeps = (flag) => {
 	if (mod.strategies.miner.shouldSpawn(minerCount, sourceCount)) {
 		if (global.DEBUG && global.TRACE)
 			global.trace('Task', {
-				Task: mod.name, room: roomName, minerCount,
+				Task: mod.name, room: miningRoomName, minerCount,
 				minerTTLs: _.map(_.map(memory.running.remoteMiner, n => Game.creeps[n]), 'ticksToLive'), [mod.name]: 'minerCount',
 			});
-		const miner = mod.strategies.miner.setup(roomName);
+		const miner = mod.strategies.miner.setup(miningRoomName);
 		for (let i = minerCount; i < sourceCount; i++) {
 			global.Task.spawn(
 				miner, // creepDefinition
@@ -132,7 +133,7 @@ mod.checkForRequiredCreeps = (flag) => {
 					type: miner.behaviour, // custom
 				},
 				{ // spawn room selection params
-					targetRoom: roomName,
+					targetRoom: miningRoomName,
 					minEnergyCapacity: miner.minEnergyCapacity, // TODO calculate this
 					rangeRclRatio: 1,
 				},
@@ -156,24 +157,29 @@ mod.checkForRequiredCreeps = (flag) => {
 		droppedEnergy = _.sum(room.droppedResources, 'energy');
 
 	if (droppedEnergy && droppedEnergy > 500)
-		maxHaulers = Math.ceil(memory.running.remoteMiner.length * global.REMOTE_HAULER.MULTIPLIER);
+		maxHaulers = global.round(memory.running.remoteMiner.length * global.REMOTE_HAULER.MULTIPLIER) || 0;
 	else
-		maxHaulers = memory.running.remoteMiner.length;
+		maxHaulers = memory.running.remoteMiner.length || 0;
 
 
-	console.log(`MAX HAULERS for ${roomName}: ${maxHaulers}`);
+	console.log(`MAX HAULERS for ${miningRoomName}: ${maxHaulers} => needMore: ${haulerCount < maxHaulers}, time: ${!memory.capacityLastChecked || Game.time - memory.capacityLastChecked > global.TASK_CREEP_CHECK_INTERVAL}`);
 
 	if (haulerCount < maxHaulers && (!memory.capacityLastChecked || Game.time - memory.capacityLastChecked > global.TASK_CREEP_CHECK_INTERVAL)) {
 		for (let i = haulerCount; i < maxHaulers; i++) {
-			let minWeight = i >= 1 && global.REMOTE_HAULER.MIN_WEIGHT;
-			const spawnRoom = mod.strategies.hauler.spawnRoom(roomName, minWeight);
+			// let minWeight = i >= 1 && global.REMOTE_HAULER.MIN_WEIGHT;
+			let minWeight = global.REMOTE_HAULER.MIN_WEIGHT;
+			let hauler = mod.strategies.hauler.setup(miningRoomName);
+			let spawnRoomName = mod.strategies.hauler.getSpawnRoomName(miningRoomName, minWeight, global.Task.mining.countEnergyPrice(hauler.fixedBody).fixedCost);
+			const spawnRoom = Game.rooms[spawnRoomName];
+
+			console.log(`miningRoom: ${miningRoomName} spawnRoom: ${spawnRoomName}`);
 
 			if (!spawnRoom)
 				break;
 
 			// haulers set homeRoom if closer storage exists
-			const storageRoomName = global.REMOTE_HAULER.REHOME ? mod.strategies.hauler.homeRoomName(roomName) : spawnRoom.name;
-			let maxWeight = mod.strategies.hauler.maxWeight(roomName, storageRoomName, memory); // TODO Task.strategies
+			const storageRoomName = global.REMOTE_HAULER.REHOME ? mod.strategies.hauler.homeRoomName(miningRoomName) : spawnRoomName;
+			let maxWeight = mod.strategies.hauler.maxWeight(miningRoomName, storageRoomName, memory); // TODO Task.strategies
 			if (!maxWeight || (!global.REMOTE_HAULER.ALLOW_OVER_CAPACITY && maxWeight < minWeight)) {
 				memory.capacityLastChecked = Game.time;
 				break;
@@ -188,16 +194,15 @@ mod.checkForRequiredCreeps = (flag) => {
 			}
 
 			// spawning a new hauler
-			let hauler = mod.strategies.hauler.setup(roomName);
+
 			hauler.maxWeight = maxWeight;
 			if (minWeight)
 				hauler.minWeight = minWeight;
 
-			if (hauler.fixedBody.length >= 50) {
-				console.log(`hauler fixedBody: ${hauler.fixedBody.length}`);
-				console.log(`hauler maxWeight: ${hauler.maxWeight}`);
-				console.log(`hauler minWeight: ${hauler.minWeight}`);
-			}
+			console.log(`hauler fixedBody: ${hauler.fixedBody.length}`);
+			console.log(`hauler maxWeight: ${hauler.maxWeight}`);
+			console.log(`hauler minWeight: ${hauler.minWeight}`);
+
 			global.Task.spawn(
 				hauler,
 				{ // destiny
@@ -206,12 +211,12 @@ mod.checkForRequiredCreeps = (flag) => {
 					type: global.Task.mining.creep.hauler.behaviour, // custom
 					homeRoom: storageRoomName,
 				}, {
-					targetRoom: roomName,
+					targetRoom: miningRoomName,
 					explicit: spawnRoom.name,
 				},
 				creepSetup => { // onQueued callback
 					const memory = global.Task.mining.memory(creepSetup.destiny.room);
-					global.logSystem(roomName, `hauler creepSetup ${creepSetup.parts.length}`);
+					global.logSystem(miningRoomName, `hauler creepSetup ${creepSetup.parts.length}`);
 					global.logSystem(storageRoomName, `HAULER BORN: ${global.json(hauler)}`);
 					memory.queued[creepSetup.behaviour].push({
 						room: creepSetup.queueRoom,
@@ -232,7 +237,7 @@ mod.checkForRequiredCreeps = (flag) => {
 					type: global.Task.mining.creep.worker.behaviour, // custom
 				},
 				{ // spawn room selection params
-					targetRoom: roomName,
+					targetRoom: miningRoomName,
 					minEnergyCapacity: 600,
 				},
 				creepSetup => { // onQueued callback
@@ -366,7 +371,7 @@ mod.creep = {
 		fixedBody: {
 			[CARRY]: 0,
 			[MOVE]: 1,
-			[WORK]: 5,
+			[WORK]: 6,
 			[HEAL]: 0,
 		},
 		multiBody: {
@@ -380,7 +385,7 @@ mod.creep = {
 	},
 	SKHauler: {
 		fixedBody: {
-			[CARRY]: 4,
+			[CARRY]: 10,
 			[MOVE]: 5,
 			[WORK]: 1,
 			[HEAL]: 0,
@@ -409,13 +414,13 @@ mod.countBody = function (fixedBody) {
 	let count = 0;
 	for (const [fixedBodyPart, amount] of Object.entries(fixedBody)) {
 		if (fixedBodyPart !== MOVE) {
-			count += amount
+			count += amount;
 		}
 	}
 
 	return count;
 
-}
+};
 mod.setupCreep = function (roomName, definition) {
 
 	// mod.checkCarryParts(roomName);
@@ -427,12 +432,14 @@ mod.setupCreep = function (roomName, definition) {
 	const workSize = memory.harvestSize || 0;
 	const healSize = memory.healSize || 0;
 
+	let fixedLength = mod.countBody(definition.fixedBody) % 2;
 	if (definition.behaviour === 'remoteMiner') {
 
 		definition.fixedBody[WORK] += workSize;
 		definition.fixedBody[HEAL] = healSize;
 		// definition.moveRatio = ((healSize + workSize) % 2) * -0.5 + (definition.moveRatio || 0);
-		definition.moveRatio = (mod.countBody(definition.fixedBody) % 2) * -0.5 + (definition.moveRatio || 0);
+
+		definition.moveRatio = fixedLength * -0.5 + (definition.moveRatio || 0);
 		definition.fixedBody[MOVE] += Math.ceil((healSize + workSize) * 0.5 + (definition.moveRatio || 0));
 
 		return definition;
@@ -443,7 +450,7 @@ mod.setupCreep = function (roomName, definition) {
 		definition.fixedBody[CARRY] += carrySize;
 		definition.fixedBody[HEAL] = healSize;
 		// definition.moveRatio = ((healSize + carrySize) % 2) * -0.5 + (definition.moveRatio || 0);
-		definition.moveRatio = (mod.countBody(definition.fixedBody) % 2) * -0.5 + (definition.moveRatio || 0);
+		definition.moveRatio = fixedLength * -0.5 + (definition.moveRatio || 0);
 		definition.fixedBody[MOVE] += Math.ceil((healSize + carrySize) * 0.5 + (definition.moveRatio || 0));
 
 		return definition;
@@ -453,7 +460,7 @@ mod.setupCreep = function (roomName, definition) {
 mod.getFlag = function (roomName) {
 	return global.FlagDir.find(global.FLAG_COLOR.claim.mining, new RoomPosition(25, 25, roomName));
 };
-mod.carry = function (roomName, partChange, population) {
+mod.carry = function (roomName, partChange, population, message) {
 	let memory = Memory.tasks.mining[roomName];
 	memory.carrySize = (memory.carrySize || 0) + (partChange || 0);
 	// const population = Math.round(mod.carryPartsPopulation(roomName) * 100);
@@ -464,6 +471,7 @@ mod.carry = function (roomName, partChange, population) {
 	// memory.carrySize = (memory.carrySize || 0) <= 0 ? 0 : memory.carrySize;
 	memory.carrySize = (memory.carrySize || 0) >= 6 ? 6 : memory.carrySize;
 	global.logSystem(roomName, `Task.${mod.name}: hauler carry capacity for ${roomName} ${partChange >= 0 ? 'increased' : 'decreased'} by ${partChange}. Currently at ${population}% of desired carryPartsPopulation. Currently added ${memory.carrySize}`);
+	global.logSystem(roomName, `Currently at ${population}% of desired carryPartsPopulation. Currently added ${memory.carrySize} ${message}`);
 };
 mod.work = function (roomName, partChange) {
 	let memory = Memory.tasks.mining[roomName];
@@ -521,7 +529,7 @@ mod.checkCarryParts = function (roomName) {
 			console.log(`dropped: ${totalDropped} carryPartsPercent: ${carryPartsPercent}`);
 
 			if (carryPartsPercent === 100 && totalDropped === 0) {
-				mod.carry(roomName, -2, carryPartsPercent);
+				mod.carry(roomName, -2, carryPartsPercent, message);
 				return true;
 			} else if (carryPartsPercent >= minCarryPartsPercent && totalDropped >= maxDropped) {
 				mod.carry(roomName, 2, carryPartsPercent, message);
@@ -538,7 +546,7 @@ mod.checkCarryParts = function (roomName) {
 		return false;
 	};
 	if (roomName) {
-		return checkRoomCapacity(roomName, 0, 500);
+		checkRoomCapacity(roomName, 0, 500);
 	} else {
 		let count = 0;
 		let total = 0;
@@ -554,17 +562,17 @@ mod.storage = function (miningRoom, storageRoom) {
 	const room = Game.rooms[miningRoom];
 	const memory = global.Task.mining.memory(miningRoom);
 	if (storageRoom) {
-		const was = memory.storageRoom;
-		memory.storageRoom = storageRoom;
+		const was = memory.storageRoomName;
+		memory.storageRoomName = storageRoom;
 		return `Task.${mod.name}: room ${miningRoom}, now sending haulers to ${storageRoom}, (was ${was})`;
-	} else if (!memory.storageRoom) {
+	} else if (!memory.storageRoomName) {
 		return `Task.${mod.name}: room ${miningRoom}, no custom storage destination`;
 	} else if (storageRoom === false) {
-		const was = memory.storageRoom;
-		delete memory.storageRoom;
+		const was = memory.storageRoomName;
+		delete memory.storageRoomName;
 		return `Task.${mod.name}: room ${miningRoom}, cleared custom storage room (was ${was})`;
 	} else {
-		return `Task.${mod.name}: room ${miningRoom}, sending haulers to ${memory.storageRoom}`;
+		return `Task.${mod.name}: room ${miningRoom}, sending haulers to ${memory.storageRoomName}`;
 	}
 };
 mod.carryPartsPopulation = function (miningRoomName, homeRoomName) {
@@ -604,20 +612,22 @@ mod.countEnergyPrice = function (fixedBody, multiBody) {
 				break;
 		}
 	}
-	for (const [part, amount] of Object.entries(multiBody)) {
-		switch (part) {
-			case CARRY:
-				multiCost += BODYPART_COST[CARRY] * amount;
-				break;
-			case MOVE:
-				multiCost += BODYPART_COST[MOVE] * amount;
-				break;
-			case WORK:
-				multiCost += BODYPART_COST[WORK] * amount;
-				break;
-			case HEAL:
-				multiCost += BODYPART_COST[HEAL] * amount;
-				break;
+	if (multiBody) {
+		for (const [part, amount] of Object.entries(multiBody)) {
+			switch (part) {
+				case CARRY:
+					multiCost += BODYPART_COST[CARRY] * amount;
+					break;
+				case MOVE:
+					multiCost += BODYPART_COST[MOVE] * amount;
+					break;
+				case WORK:
+					multiCost += BODYPART_COST[WORK] * amount;
+					break;
+				case HEAL:
+					multiCost += BODYPART_COST[HEAL] * amount;
+					break;
+			}
 		}
 	}
 
@@ -627,7 +637,7 @@ mod.countEnergyPrice = function (fixedBody, multiBody) {
 	};
 };
 
-function haulerCarryToWeight(roomName, carry, setup) {
+mod.creepSize = function (roomName, carry, setup, ignorePopulation) {
 	if (!carry || carry < 0)
 		return 0;
 
@@ -637,12 +647,15 @@ function haulerCarryToWeight(roomName, carry, setup) {
 	const multiBodyCost = cost.multiCost;
 	const ret = fixedBodyCost + multiBodyCost * _.ceil(multiCarry * 0.5);
 
-	global.logSystem(roomName, `fixedCost: ${fixedBodyCost}`);
-	global.logSystem(roomName, `multiCost: ${multiBodyCost}`);
-	global.logSystem(roomName, `return => haulerCarryToWeight: ${ret}`);
+	if (ignorePopulation) {
+		global.logSystem(roomName, `multiCarry: ${multiCarry}`);
+		global.logSystem(roomName, `fixedCost: ${fixedBodyCost}`);
+		global.logSystem(roomName, `multiCost: ${multiBodyCost}`);
+		global.logSystem(roomName, `return => creepSize: ${ret}`);
+	}
 
 	return ret;
-}
+};
 
 mod.strategies = {
 	defaultStrategy: {
@@ -665,8 +678,8 @@ mod.strategies = {
 	},
 	miner: {
 		name: `miner-${mod.name}`,
-		setup: function (roomName, retObject = true) {
-			return mod.setupCreep(roomName, Room.isCenterNineRoom(roomName) ? _.cloneDeep(global.Task.mining.creep.SKMiner) : _.cloneDeep(global.Task.mining.creep.miner));
+		setup: function (roomName) {
+			return mod.setupCreep(roomName, (Room.isCenterNineRoom(roomName) || !Room.my) ? _.cloneDeep(global.Task.mining.creep.SKMiner) : _.cloneDeep(global.Task.mining.creep.miner));
 		},
 		shouldSpawn: function (minerCount, sourceCount) {
 			return minerCount < sourceCount;
@@ -674,8 +687,9 @@ mod.strategies = {
 	},
 	hauler: {
 		name: `hauler-${mod.name}`,
-		setup: function (roomName, retObject = true) {
-			return mod.setupCreep(roomName, Room.isCenterNineRoom(roomName) ? _.cloneDeep(global.Task.mining.creep.SKHauler) : _.cloneDeep(global.Task.mining.creep.hauler));
+		setup: function (roomName) {
+			const room = Game.rooms[roomName];
+			return mod.setupCreep(roomName, (Room.isCenterNineRoom(roomName) || (room && !room.my)) ? _.cloneDeep(global.Task.mining.creep.SKHauler) : _.cloneDeep(global.Task.mining.creep.hauler));
 		},
 		ept: function (roomName) {
 			const room = Game.rooms[roomName];
@@ -685,48 +699,81 @@ mod.strategies = {
 				return room ? 10 * room.sources.length : 20;
 			}
 		},
-		homeRoomName: function (flagRoomName) {
-			// Explicity set by user?
-			const memory = global.Task.mining.memory(flagRoomName);
-			if (memory.storageRoom)
-				return memory.storageRoom;
+		homeRoomName: function (flagRoomName, homeRoom = undefined) {
+
+			if (!_.isUndefined(homeRoom))
+				mod.storage(flagRoomName, homeRoom);
+
+			let memory = global.Task.mining.memory(flagRoomName);
+
+			if (Game.time > memory.capacityLastChecked + global.RESET_STORAGE_SPAWN_ROOMS_INTERVAL)
+				delete memory.storageRoomName;
+
+			if (memory.storageRoomName)
+				return memory.storageRoomName;
 			// Otherwise, score it
-			return Room.bestSpawnRoomFor(flagRoomName).name;
+
+			memory.storageRoomName = Room.bestSpawnRoomFor(flagRoomName).name;
+			return memory.storageRoomName;
 		},
-		spawnRoom: function (flagRoomName, minWeight) {
-			return Room.findSpawnRoom({
-				targetRoom: flagRoomName,
-				minEnergyCapacity: minWeight || 500,
-			});
+		getSpawnRoomName: function (flagRoomName, minWeight, fixedCost) {
+
+			let memory = global.Task.mining.memory(flagRoomName);
+			let spawnRoomName;
+
+			if (Game.time > memory.capacityLastChecked + global.RESET_STORAGE_SPAWN_ROOMS_INTERVAL)
+				delete memory.storageRoomName;
+
+			if (memory.spawnRoomName)
+				return memory.spawnRoomName;
+			else
+				spawnRoomName = Room.findSpawnRoom({
+					targetRoom: flagRoomName,
+					minEnergyCapacity: Math.max(minWeight, fixedCost),
+				}).name;
+			if (_.isUndefined(spawnRoomName))
+				spawnRoomName = Room.findSpawnRoom({
+					targetRoom: flagRoomName,
+					minEnergyCapacity: Math.min(minWeight, fixedCost),
+				}).name;
+			memory.spawnRoomName = spawnRoomName;
+
+			return memory.spawnRoomName;
 		},
 		maxWeight: function (flagRoomName, homeRoomName, memory, ignorePopulation, ignoreQueue) {
 			if (!homeRoomName)
-				homeRoomName = mod.strategies.hauler.homeRoomName(flagRoomName);
+				homeRoomName = mod.strategies.hauler.homeRoomName(flagRoomName, homeRoomName);
 			if (!memory)
 				memory = global.Task.mining.memory(flagRoomName);
 
 			const existingHaulers = ignorePopulation ? [] : _.map(memory.running.remoteHauler, n => Game.creeps[n]);
 			const queuedHaulers = ignoreQueue ? [] : _.union(memory.queued.remoteHauler, memory.spawning.remoteHauler);
-			const room = Game.rooms[flagRoomName];
+			// const room = Game.rooms[flagRoomName];
 
 			// TODO loop per-source, take pinned delivery for route calc
 
-			const travel = global.Util.routeRange(flagRoomName, homeRoomName);
+			const travel = global.Util.routeRange(homeRoomName, flagRoomName);
 			const ept = global.Task.mining.strategies.hauler.ept(flagRoomName);
 			// carry = ept * travel * 2 * 50 / 50
 			const validHaulers = _.filter(existingHaulers, c => !global.Task.mining.needsReplacement(c));
-			const existingCarry = _.sum(validHaulers, c => (c && c.data && c.data.body) ? c.data.body.carry : 5);
-			const queuedCarry = _.sum(queuedHaulers, c => (c && c.body) ? c.body.carry : 5);
-			const neededCarry = ept * travel * 2 + (memory.carrySize || 0) - existingCarry - queuedCarry;
+			const existingCarry = _.sum(validHaulers, c => (c && c.data && c.data.body) ? c.data.body.carry : 4);
+			const queuedCarry = _.sum(queuedHaulers, c => (c && c.body) ? c.body.carry : 4);
+			let neededCarry = ept * travel * 2 + (memory.carrySize || 0) - existingCarry - queuedCarry;
+			// const room = Game.rooms[flagRoomName]
+			// const dropped = room ? room.find(FIND_DROPPED_RESOURCES) : null;
+			// mod.checkCarryParts(flagRoomName, dropped);
+
 			// console.log(`this setup: ${global.json(this.setup(flagRoomName))}`);
-			const maxWeight = haulerCarryToWeight(flagRoomName, neededCarry, this.setup(flagRoomName));
+
+			const maxWeight = mod.creepSize(flagRoomName, neededCarry, this.setup(flagRoomName), ignorePopulation);
 			if (global.DEBUG && global.TRACE)
 				global.trace('Task', {
 					Task: mod.name, room: flagRoomName, homeRoom: homeRoomName,
 					haulers: existingHaulers.length + queuedHaulers.length, ept, travel, existingCarry, queuedCarry,
 					neededCarry, maxWeight, [mod.name]: 'maxWeight',
 				});
-			global.logSystem(flagRoomName, `setup maxWeight: ${maxWeight}`);
+			if (ignorePopulation)
+				global.logSystem(flagRoomName, `setup maxWeight: ${maxWeight}`);
 			return maxWeight;
 		},
 	},

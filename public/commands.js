@@ -62,11 +62,11 @@ global.Task.forceSpawn(Task.guard.creep.guard, {targetRoom: 'W0N0', allowTargetR
 
 // clear spawn queues for a room
 // clear low priority queue
-Memory.rooms['roomName'].spawnQueueLow = [0];
+Memory.rooms['roomName'].spawnQueueLow = [];
 // clear medium priority queue
-Memory.rooms['roomName'].spawnQueueMedium = [0];
+Memory.rooms['roomName'].spawnQueueMedium = [];
 // clear high priority queue
-Memory.rooms['roomName'].spawnQueueHigh = [0];
+Memory.rooms['roomName'].spawnQueueHigh = [];
 
 // check if a specific creep type is in queue
 global.Util.inQueue('defender');

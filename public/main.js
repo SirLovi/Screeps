@@ -333,13 +333,14 @@ module.exports.loop = wrapLoop(function () {
 	if (_.isUndefined(Memory.stats))
 		global.Grafana.createRoomMemory();
 
-	if (_.isUndefined(Memory.stats.cpu))
-		global.Grafana.createStatProperties(true);
+	// if (_.isUndefined(Memory.stats.cpu))
+	// 	global.Grafana.createStatProperties(true);
 
-	if(Game.cpu.bucket === 10000) {
+	if(Game.cpu.bucket === 10000 && global.ENABLE_PIXEL_GENERATION) {
 		//console.log(`GENERATING PIXEL`);
 		if (global.GRAFANA) {
-			global.Grafana.createStatProperties(true);
+			if (_.isUndefined(Memory.stats.cpu))
+				global.Grafana.createStatProperties(false);
 			let bucketData = Memory.stats.cpu.bucketData;
 			bucketData.bucketFillIntervals.push(Game.time)
 			bucketData.bucketFillTime = bucketData.bucketFillIntervals[2] - bucketData.bucketFillIntervals[1];
