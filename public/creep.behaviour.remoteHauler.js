@@ -34,7 +34,7 @@ mod.nextAction = function (creep) {
 
 	if (!flag) {
 		//TODO: in the future look for a nearby room we can support
-		global.logSystem(creep.room.name, `NO FLAG !!!!!!!!!${flag}`);
+		global.logSystem(creep.room.name, `NO FLAG! ${flag}`);
 		return Creep.action.recycling.assign(creep);
 	} else {
 		// at home
@@ -91,38 +91,80 @@ mod.nextAction = function (creep) {
 		}
 		// at target room
 		else {
-			let casualty = creep.room.casualties[0];
+
+			// let creepName = 'remoteHauler-Flag121-2';
+
+			// console.log(`need energy: ${creepName} ${this.needEnergy(Game.creeps[creepName])}`);
+
 			if (creep.data.destiny.room === creep.pos.roomName) {
-				global.logSystem(creep.room.name, `AT TARGET: ${creep.name}`);
+
+				// global.logSystem(creep.room.name, `AT TARGET: ${creep.name}`);
+
 				// TODO: This should perhaps check which distance is greater and make this decision based on that plus its load size
-				let ret;
-				if (!this.needEnergy(creep) && casualty && casualty.name !== creep.name) {
+
+				let ret = false;
+				let casualty = creep.room.casualties[0];
+
+				if (!this.needEnergy(creep) && casualty) {
+
 					ret = this.assignAction(creep, 'healing', casualty);
-				} else if (this.needEnergy(creep)) {
-					ret = this.nextEnergyAction(creep);
-				} else if (!this.needEnergy(creep))
+					// if (creep.name === creepName)
+					// 	console.log(`try to heal: ${creepName} ${ret}`);
+
+				}
+				if (!ret && !this.needEnergy(creep)) {
+
 					ret = this.goHome(creep);
+					// if (creep.name === creepName)
+					// 	console.log(`try to go home: ${creepName} ${ret}`);
+
+				}
+
+				if (this.needEnergy(creep)) {
+
+					ret = this.nextEnergyAction(creep);
+					// if (creep.name === creepName)
+					// 	console.log(`get energy: ${creepName} ${ret}`);
+
+				}
+
 				if (ret)
 					return ret;
 
-				return;
+				// if (creep.name === creepName)
+				// 	console.log(`remote ret: ${creepName} ${ret}`);
+
+				return false;
 
 			}
 			// somewhere
 			else {
 				// TODO: This should perhaps check which distance is greater and make this decision based on that plus its load size
-				let ret;
-				if (!this.needEnergy(creep) && casualty && casualty.name !== creep.name) {
-					ret = this.assignAction(creep, 'healing', casualty);
-				} else if (this.needEnergy(creep)) {
-					ret = this.nextEnergyAction(creep);
-				} else if (this.needEnergy(creep))
-					ret = this.gotoTargetRoom(creep);
+				let ret = false;
+				let currentRoom = Game.rooms[creep.pos.roomName];
+
+				if (!currentRoom.my) {
+					if (!this.needEnergy(creep)) {
+						ret = this.goHome(creep);
+					}
+
+					if (this.needEnergy(creep)) {
+						ret = this.nextEnergyAction(creep);
+					} else if (!ret && this.needEnergy(creep)) {
+						ret = this.gotoTargetRoom(creep);
+					}
+				} else {
+				    if (this.needEnergy(creep)) {
+						ret = this.gotoTargetRoom(creep);
+					} else if (!this.needEnergy(creep)) {
+					    ret = this.goHome(creep);
+				    }
+				}
 
 				if (ret)
 					return ret;
 
-				return;
+				return false;
 			}
 		}
 	}

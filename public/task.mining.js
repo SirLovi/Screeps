@@ -373,7 +373,7 @@ mod.creep = {
 			[CARRY]: 0,
 			[MOVE]: 1,
 			[WORK]: 6,
-			[HEAL]: 0,
+			[HEAL]: 1,
 		},
 		multiBody: {
 			[CARRY]: 1,
@@ -387,9 +387,9 @@ mod.creep = {
 	SKHauler: {
 		fixedBody: {
 			[CARRY]: 14,
-			[MOVE]: 5,
+			[MOVE]: 6,
 			[WORK]: 1,
-			[HEAL]: 0,
+			[HEAL]: 1,
 		},
 		multiBody: {
 			[CARRY]: 1,
