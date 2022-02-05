@@ -83,7 +83,9 @@ mod.nextAction = function (creep) {
 			}
 			// empty
 			// travelling
-			if (this.gotoTargetRoom(creep)) {
+			let gotoTargetRoom = this.gotoTargetRoom(creep);
+			console.log(`GO TO TARGET ROOM: ${gotoTargetRoom}`);
+			if (gotoTargetRoom) {
 				return;
 			}
 		}
@@ -91,16 +93,20 @@ mod.nextAction = function (creep) {
 		else {
 			let casualty = creep.room.casualties[0];
 			if (creep.data.destiny.room === creep.pos.roomName) {
+				global.logSystem(creep.room.name, `AT TARGET: ${creep.name}`);
 				// TODO: This should perhaps check which distance is greater and make this decision based on that plus its load size
 				let ret;
 				if (!this.needEnergy(creep) && casualty && casualty.name !== creep.name) {
 					ret = this.assignAction(creep, 'healing', casualty);
 				} else if (this.needEnergy(creep)) {
 					ret = this.nextEnergyAction(creep);
-				} else
+				} else if (!this.needEnergy(creep))
 					ret = this.goHome(creep);
 				if (ret)
 					return ret;
+
+				return;
+
 			}
 			// somewhere
 			else {
@@ -110,11 +116,13 @@ mod.nextAction = function (creep) {
 					ret = this.assignAction(creep, 'healing', casualty);
 				} else if (this.needEnergy(creep)) {
 					ret = this.nextEnergyAction(creep);
-				} else
+				} else if (this.needEnergy(creep))
 					ret = this.gotoTargetRoom(creep);
 
 				if (ret)
 					return ret;
+
+				return;
 			}
 		}
 	}
@@ -122,6 +130,7 @@ mod.nextAction = function (creep) {
 	// recycle self
 	let mother = Game.spawns[creep.data.motherSpawn];
 	if (mother) {
+		global.logSystem(creep.room.name, `RECYCLING: ${creep.name}`);
 		this.assignAction(creep, Creep.action.recycling, mother);
 	}
 };
