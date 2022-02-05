@@ -2,6 +2,7 @@ const mod = new Creep.Behaviour('remoteMiner');
 module.exports = mod;
 const super_run = mod.run;
 mod.run = function(creep) {
+    let casualties = creep.room.casualties.length > 0;
     if (!Creep.action.avoiding.run(creep)) {
         const flag = creep.data.destiny && Game.flags[creep.data.destiny.targetName];
         if (!flag) {
@@ -10,6 +11,8 @@ mod.run = function(creep) {
             }
         } else if (creep.room.name !== creep.data.destiny.room) {
             Creep.action.travelling.assignRoom(creep, flag.pos.roomName);
+        } else if (casualties) {
+            Creep.behaviour.ranger.heal.call(this, creep);
         }
         super_run.call(this, creep);
     }
@@ -31,4 +34,11 @@ mod.maintain = function(creep) {
 mod.strategies.defaultStrategy.moveOptions = function(options) {
     options.avoidSKCreeps = true;
     return options;
+};
+mod.strategies.healing = {
+    name: `healing-${mod.name}`,
+    moveOptions: function (options) {
+        options.respectRamparts = true;
+        return options;
+    },
 };

@@ -173,6 +173,8 @@ let mod = {
         MIN_WEIGHT: 800, // Small haulers are a CPU drain.
         MULTIPLIER: 4, // Max number of haulers spawned per source in a remote mining room.
         REHOME: true, // May haulers choose closer storage for delivery?
+        RESET_STORAGE_SPAWN_ROOMS_INTERVAL: 100, // looking for the best spawn room
+        RENEW_AT_PERCENT: 80, // renewing remoteHaulers when CREEP_LIFE_TIME percent is below this number. Set it false to disable renewing.
     },
     TASK_CREEP_CHECK_INTERVAL: 250, // Maximum number of ticks before a task checks to see if it needs to spawn new creeps
     REMOTE_RESERVE_HAUL_CAPACITY: 0.1, // Percent of allocated haul capacity before sending reservers.

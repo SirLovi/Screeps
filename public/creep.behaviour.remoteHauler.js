@@ -26,10 +26,20 @@ mod.outflowActions = (creep) => {
 	}
 	return priority;
 };
+mod.renewCreep = function(creep) {
+
+	if (!global.RENEW_AT_PERCENT)
+		return;
+
+	if (creep.data.ttl < CREEP_LIFE_TIME * (global.RENEW_AT_PERCENT / 100)) {
+		this.assignAction(creep, 'renewing')
+	}
+
+};
 mod.nextAction = function (creep) {
 
 	const flag = creep.data.destiny && Game.flags[creep.data.destiny.targetName]
-	global.logSystem(creep.room.name, `ttl: ${creep.data.ttl} predictedRenewal: ${creep.data.predictedRenewal} flag: ${flag}`);
+	// global.logSystem(creep.room.name, `ttl: ${creep.data.ttl} predictedRenewal: ${creep.data.predictedRenewal} flag: ${flag}`);
 
 
 	if (!flag) {
@@ -43,6 +53,7 @@ mod.nextAction = function (creep) {
 		let spawnRoomName = miningRoom ? miningRoom.spawnRoomName : false;
 
 		if (creep.pos.roomName === creep.data.homeRoom || (spawnRoomName ? creep.pos.roomName === spawnRoomName : false)) {
+
 			// carrier filled
 			if (creep.sum > 0) {
 				let deposit = []; // deposit energy in...
@@ -82,9 +93,12 @@ mod.nextAction = function (creep) {
 				}
 			}
 			// empty
+
+			// renew
+			// mod.renewCreep(this, creep)
+
 			// travelling
 			let gotoTargetRoom = this.gotoTargetRoom(creep);
-			// console.log(`GO TO TARGET ROOM: ${gotoTargetRoom}`);
 			if (gotoTargetRoom) {
 				return;
 			}
@@ -92,7 +106,15 @@ mod.nextAction = function (creep) {
 		// at target room
 		else {
 
-			// let creepName = 'remoteHauler-Flag121-2';
+			// let creepName = 'remoteHauler-Flag121-1';
+			let casualties = creep.room.casualties.length > 0;
+
+			// if (casualties.length > 0) {
+			//
+			// 	console.log(`casualty: ${global.json(casualties[0])}`);
+			// }
+			// let casualty = _.min(casualties, 'hits');
+			// global.logSystem(creep.room.name, `casualties: ${casualty}`);
 
 			// console.log(`need energy: ${creepName} ${this.needEnergy(Game.creeps[creepName])}`);
 
@@ -103,16 +125,23 @@ mod.nextAction = function (creep) {
 				// TODO: This should perhaps check which distance is greater and make this decision based on that plus its load size
 
 				let ret = false;
-				let casualty = creep.room.casualties[0];
 
-				if (!this.needEnergy(creep) && casualty) {
 
-					ret = this.assignAction(creep, 'healing', casualty);
+				if (casualties) {
+
+					global.logSystem(creep.room.name, `casualties: ${ creep.room.casualties.length}`);
+
+					// ret = this.assignAction(creep, 'healing', casualty);
+					ret = Creep.behaviour.ranger.heal.call(this, creep);
+
+					if (ret === 0)
+						ret = true;
+
 					// if (creep.name === creepName)
 					// 	console.log(`try to heal: ${creepName} ${ret}`);
 
 				}
-				if (!ret && !this.needEnergy(creep)) {
+				if (!this.needEnergy(creep)) {
 
 					ret = this.goHome(creep);
 					// if (creep.name === creepName)
@@ -120,7 +149,7 @@ mod.nextAction = function (creep) {
 
 				}
 
-				if (this.needEnergy(creep)) {
+				if (!ret && this.needEnergy(creep)) {
 
 					ret = this.nextEnergyAction(creep);
 					// if (creep.name === creepName)
@@ -181,7 +210,7 @@ mod.needEnergy = function (creep) {
 };
 mod.gotoTargetRoom = function (creep) {
 	const targetFlag = creep.data.destiny ? Game.flags[creep.data.destiny.targetName] : null;
-	global.logSystem(creep.room.name, `TARGET FLAG: ${targetFlag}`);
+	// global.logSystem(creep.room.name, `TARGET FLAG: ${targetFlag}`);
 	if (targetFlag)
 		return Creep.action.travelling.assignRoom(creep, targetFlag.pos.roomName);
 };
@@ -195,4 +224,11 @@ mod.strategies.picking = {
 mod.strategies.defaultStrategy.moveOptions = function (options) {
 	options.avoidSKCreeps = true;
 	return options;
+};
+mod.strategies.healing = {
+	name: `healing-${mod.name}`,
+		moveOptions: function (options) {
+		options.respectRamparts = true;
+		return options;
+	},
 };

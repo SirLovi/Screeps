@@ -31,8 +31,10 @@ mod.unregisterCreep = function (creepName) {
 mod.registerAction = function (creep, action, target, entry) {
 	if (global.DEBUG && global.TRACE) trace('Population', {creepName: this.name, registerAction: action.name, target: target.name || target.id, Population: 'registerAction'});
 
-	if (creep === target) throw new Error('attempt to register self target');
-	if (entry === undefined) entry = this.getCreep(creep.name);
+	if (creep === target)
+		throw new Error('attempt to register self target');
+	if (entry === undefined)
+		entry = this.getCreep(creep.name);
 	entry.carryCapacityLeft = creep.carryCapacity - creep.sum;
 	let room = creep.room;
 	if (room.population === undefined) {

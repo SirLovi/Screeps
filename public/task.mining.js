@@ -437,11 +437,11 @@ mod.setupCreep = function (roomName, definition) {
 	if (definition.behaviour === 'remoteMiner') {
 
 		definition.fixedBody[WORK] += workSize;
-		definition.fixedBody[HEAL] = healSize;
+		definition.fixedBody[HEAL] += healSize;
 		// definition.moveRatio = ((healSize + workSize) % 2) * -0.5 + (definition.moveRatio || 0);
 
 		definition.moveRatio = fixedLength * -0.5 + (definition.moveRatio || 0);
-		definition.fixedBody[MOVE] += Math.ceil((healSize + workSize) * 0.5 + (definition.moveRatio || 0));
+		definition.fixedBody[MOVE] += Math.ceil(fixedLength * 0.5 + (definition.moveRatio || 0));
 
 		return definition;
 
@@ -449,10 +449,10 @@ mod.setupCreep = function (roomName, definition) {
 	} else if (definition.behaviour === 'remoteHauler') {
 
 		definition.fixedBody[CARRY] += carrySize;
-		definition.fixedBody[HEAL] = healSize;
+		definition.fixedBody[HEAL] += healSize;
 		// definition.moveRatio = ((healSize + carrySize) % 2) * -0.5 + (definition.moveRatio || 0);
 		definition.moveRatio = fixedLength * -0.5 + (definition.moveRatio || 0);
-		definition.fixedBody[MOVE] += Math.ceil((healSize + carrySize) * 0.5 + (definition.moveRatio || 0));
+		definition.fixedBody[MOVE] += Math.ceil(fixedLength * 0.5 + (definition.moveRatio || 0));
 
 		return definition;
 

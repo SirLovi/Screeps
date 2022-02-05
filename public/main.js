@@ -336,8 +336,7 @@ module.exports.loop = wrapLoop(function () {
 	// if (_.isUndefined(Memory.stats.cpu))
 	// 	global.Grafana.createStatProperties(true);
 
-	if(Game.cpu.bucket === 10000 && global.ENABLE_PIXEL_GENERATION) {
-		//console.log(`GENERATING PIXEL`);
+	if(Game.cpu.bucket === 10000) {
 		if (global.GRAFANA) {
 			if (_.isUndefined(Memory.stats.cpu))
 				global.Grafana.createStatProperties(false);
@@ -346,7 +345,8 @@ module.exports.loop = wrapLoop(function () {
 			bucketData.bucketFillTime = bucketData.bucketFillIntervals[2] - bucketData.bucketFillIntervals[1];
 			bucketData.bucketFillIntervals.shift();
 		}
-		Game.cpu.generatePixel();
+		if (global.ENABLE_PIXEL_GENERATION)
+			Game.cpu.generatePixel();
 	}
 
 	try {
