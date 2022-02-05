@@ -185,6 +185,10 @@ mod.FLAG_COLOR = {
 			color: COLOR_WHITE,
 			secondaryColor: COLOR_CYAN,
 		},
+		fortifyLayout: {
+			color: COLOR_WHITE,
+			secondaryColor: COLOR_ORANGE,
+		},
 		invalidPosition: {
 			color: COLOR_WHITE,
 			secondaryColor: COLOR_RED,

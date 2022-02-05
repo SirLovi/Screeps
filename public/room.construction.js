@@ -2,6 +2,7 @@ const mod = {};
 module.exports = mod;
 mod.register = function () {
 	Flag.found.on(flag => Room.roomLayout(flag));
+	Flag.found.on(flag => Room.fortifyLayout(flag));
 };
 mod.forced = global.ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name] && global.ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name].indexOf(this.name) !== -1;
 mod.analyzeRoom = function (room, needMemoryResync) {
@@ -222,7 +223,7 @@ mod.extend = function () {
 		if ((!global.ROAD_CONSTRUCTION_ENABLE && !mod.forced) || Game.time % global.ROAD_CONSTRUCTION_INTERVAL !== 0 || !this.my)
 			return;
 
-		if (!this.my && global.ROAD_CONSTRUCTION_DISABLED_FOR_CLAIMED_ROOMS)
+		if (this.my && global.ROAD_CONSTRUCTION_DISABLED_FOR_CLAIMED_ROOMS)
 			return;
 
 		// console.log(`destroy hits: ${global.ROAD_DESTROY_HITS}`);
@@ -334,21 +335,6 @@ mod.extend = function () {
 			});
 		}
 
-		// Roads
-		global.FlagDir.filter(global.FLAG_COLOR.construct.road, ...ARGS).forEach(flag => {
-			CONSTRUCT(flag, STRUCTURE_ROAD);
-		});
-
-		// Walls
-		global.FlagDir.filter(global.FLAG_COLOR.construct.wall, ...ARGS).forEach(flag => {
-			CONSTRUCT(flag, STRUCTURE_WALL);
-		});
-
-		// Ramparts
-		global.FlagDir.filter(global.FLAG_COLOR.construct.rampart, ...ARGS).forEach(flag => {
-			CONSTRUCT(flag, STRUCTURE_RAMPART);
-		});
-
 		// Storage
 		if (!this.storage && CONTROLLER_STRUCTURES[STRUCTURE_STORAGE][LEVEL] > 0) {
 			global.FlagDir.filter(global.FLAG_COLOR.construct.storage, ...ARGS).splice(0, 1).forEach(flag => {
@@ -392,6 +378,21 @@ mod.extend = function () {
 				return;
 			CONSTRUCT(mineral.pos, STRUCTURE_EXTRACTOR);
 		}
+
+		// Walls
+		global.FlagDir.filter(global.FLAG_COLOR.construct.wall, ...ARGS).forEach(flag => {
+			CONSTRUCT(flag, STRUCTURE_WALL);
+		});
+
+		// Ramparts
+		global.FlagDir.filter(global.FLAG_COLOR.construct.rampart, ...ARGS).forEach(flag => {
+			CONSTRUCT(flag, STRUCTURE_RAMPART);
+		});
+
+		// Roads
+		global.FlagDir.filter(global.FLAG_COLOR.construct.road, ...ARGS).forEach(flag => {
+			CONSTRUCT(flag, STRUCTURE_ROAD);
+		});
 	};
 
 
@@ -421,9 +422,6 @@ mod.extend = function () {
 		};
 
 		const [centerX, centerY] = [flag.pos.x, flag.pos.y];
-
-		const placed = [];
-		const sites = [];
 
 		const failed = () => {
 			flag.pos.newFlag(global.FLAG_COLOR.command.invalidPosition, 'NO_ROOM');
@@ -470,6 +468,45 @@ mod.extend = function () {
 		*/
 
 		flag.pos.newFlag(global.FLAG_COLOR.construct.storage);
+		flag.remove();
+	};
+
+	Room.fortifyLayout = function (flag) {
+		if (!Flag.compare(flag, global.FLAG_COLOR.command.fortifyLayout))
+			return;
+		flag = Game.flags[flag.name];
+		const room = flag.room;
+		if (!room)
+			return;
+
+		const layout = Room.roomLayoutArray;
+
+		const [centerX, centerY] = [flag.pos.x, flag.pos.y];
+
+		const failed = () => {
+			flag.pos.newFlag(global.FLAG_COLOR.command.invalidPosition, 'NO_ROOM');
+			flag.remove();
+			return false;
+		};
+
+		for (let x = 0; x < layout.length; x++) {
+			for (let y = 0; y < layout[x].length; y++) {
+				const xPos = Math.floor(centerX + (x - layout.length / 2) + 1);
+				const yPos = Math.floor(centerY + (y - layout.length / 2) + 1);
+
+				if (xPos >= 50 || xPos < 0 || yPos >= 50 || yPos < 0)
+					return failed();
+				const pos = room.getPositionAt(xPos, yPos);
+				let roomTerrain = Game.rooms[room.name].terrain.get(xPos, yPos);
+
+				if ((pos.lookFor(LOOK_STRUCTURES).length > 0) &&
+					(pos.lookFor(LOOK_STRUCTURES).filter(f => f.structureType === STRUCTURE_RAMPART).length === 0) &&
+					(pos.lookFor(LOOK_FLAGS).filter(f => f.color === COLOR_BLUE).length === 0) &&
+					!(roomTerrain === TERRAIN_MASK_WALL)) {
+						pos.newFlag(global.FLAG_COLOR.construct.rampart);
+					}
+				}
+			}
 		flag.remove();
 	};
 };
