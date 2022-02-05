@@ -26,19 +26,19 @@ mod.outflowActions = (creep) => {
 	}
 	return priority;
 };
-mod.renewCreep = function(creep) {
+mod.renewCreep = function (creep) {
 
 	if (!global.RENEW_AT_PERCENT)
 		return;
 
 	if (creep.data.ttl < CREEP_LIFE_TIME * (global.RENEW_AT_PERCENT / 100)) {
-		this.assignAction(creep, 'renewing')
+		this.assignAction(creep, 'renewing');
 	}
 
 };
 mod.nextAction = function (creep) {
 
-	const flag = creep.data.destiny && Game.flags[creep.data.destiny.targetName]
+	const flag = creep.data.destiny && Game.flags[creep.data.destiny.targetName];
 	// global.logSystem(creep.room.name, `ttl: ${creep.data.ttl} predictedRenewal: ${creep.data.predictedRenewal} flag: ${flag}`);
 
 
@@ -106,7 +106,7 @@ mod.nextAction = function (creep) {
 		// at target room
 		else {
 
-			// let creepName = 'remoteHauler-Flag121-1';
+			let creepName = 'remoteHauler-Flag112-3';
 			let casualties = creep.room.casualties.length > 0;
 
 			// if (casualties.length > 0) {
@@ -129,19 +129,24 @@ mod.nextAction = function (creep) {
 
 				if (casualties) {
 
-					global.logSystem(creep.room.name, `casualties: ${ creep.room.casualties.length}`);
+					global.logSystem(creep.room.name, `casualties: ${creep.room.casualties.length}`);
 
 					// ret = this.assignAction(creep, 'healing', casualty);
 					creep.action = Creep.action.healing;
-
-
 					ret = Creep.behaviour.ranger.heal.call(this, creep);
 
 					if (ret === 0)
 						ret = true;
 
+					if (creep.name === creepName)
+						console.log(`try to heal: ${creepName} ${ret}`);
+
+				}
+				if (!this.needEnergy(creep)) {
+
+					ret = this.goHome(creep);
 					// if (creep.name === creepName)
-					// 	console.log(`try to heal: ${creepName} ${ret}`);
+					// 	console.log(`try to go home: ${creepName} ${ret}`);
 
 				}
 
@@ -150,13 +155,6 @@ mod.nextAction = function (creep) {
 					ret = this.nextEnergyAction(creep);
 					// if (creep.name === creepName)
 					// 	console.log(`get energy: ${creepName} ${ret}`);
-
-				}
-				if (!this.needEnergy(creep)) {
-
-					ret = this.goHome(creep);
-					// if (creep.name === creepName)
-					// 	console.log(`try to go home: ${creepName} ${ret}`);
 
 				}
 
@@ -188,11 +186,11 @@ mod.nextAction = function (creep) {
 						ret = this.gotoTargetRoom(creep);
 					}
 				} else {
-				    if (this.needEnergy(creep)) {
+					if (this.needEnergy(creep)) {
 						ret = this.gotoTargetRoom(creep);
 					} else if (!this.needEnergy(creep)) {
-					    ret = this.goHome(creep);
-				    }
+						ret = this.goHome(creep);
+					}
 				}
 
 				if (ret)
@@ -232,7 +230,7 @@ mod.strategies.defaultStrategy.moveOptions = function (options) {
 };
 mod.strategies.healing = {
 	name: `healing-${mod.name}`,
-		moveOptions: function (options) {
+	moveOptions: function (options) {
 		options.respectRamparts = true;
 		return options;
 	},

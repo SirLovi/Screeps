@@ -2,14 +2,14 @@ let mod = {};
 module.exports = mod;
 mod.heal = function (creep) {
 	if (creep.data.body.heal !== undefined) {
-
+		// Heal myself
 		const mustHealSelf = creep.hits < creep.data.hullHits;
 		if (mustHealSelf || creep.hits < creep.hitsMax) {
 			// Heal self if not attacking or missing combat parts
 			if (mustHealSelf || !creep.attacking) {
 				creep.target = creep;
 				let ret =  creep.heal(creep);
-				global.logSystem(creep.room.name, `HEALING MYSELF: ${creep.name} ret: ${global.Util.translateErrorCode(ret)}`);
+				// global.logSystem(creep.room.name, `HEALING MYSELF: ${creep.name} ret: ${global.Util.translateErrorCode(ret)}`);
 				return ret;
 			}
 		}
@@ -24,11 +24,11 @@ mod.heal = function (creep) {
 				// Heal other if not attacking or they are badly hurt
 				if (canHeal && (shouldHeal || !creep.attacking)) {
 					let ret = creep.heal(target);
-					global.logSystem(creep.room.name, `HEALING ANOTHER CREEP: ${creep.name} heals ${target.name} ret: ${global.Util.translateErrorCode(ret)}`);
+					// global.logSystem(creep.room.name, `HEALING ANOTHER CREEP: ${creep.name} heals ${target.name} ret: ${global.Util.translateErrorCode(ret)}`);
 					return ret;
 				} else if (shouldHeal && !(creep.attackingRanged || creep.attacking || mustHealSelf)) {
 					let ret = creep.rangedHeal(target);
-					global.logSystem(creep.room.name, `RANGED HEALING ANOTHER CREEP: ${creep.name} heals ${target.name} ret: ${global.Util.translateErrorCode(ret)}`);
+					// global.logSystem(creep.room.name, `RANGED HEALING ANOTHER CREEP: ${creep.name} heals ${target.name} ret: ${global.Util.translateErrorCode(ret)}`);
 					return ret;
 				}
 			}
