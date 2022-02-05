@@ -132,6 +132,9 @@ mod.nextAction = function (creep) {
 					global.logSystem(creep.room.name, `casualties: ${ creep.room.casualties.length}`);
 
 					// ret = this.assignAction(creep, 'healing', casualty);
+					creep.action = Creep.action.healing;
+
+
 					ret = Creep.behaviour.ranger.heal.call(this, creep);
 
 					if (ret === 0)
@@ -139,13 +142,6 @@ mod.nextAction = function (creep) {
 
 					// if (creep.name === creepName)
 					// 	console.log(`try to heal: ${creepName} ${ret}`);
-
-				}
-				if (!this.needEnergy(creep)) {
-
-					ret = this.goHome(creep);
-					// if (creep.name === creepName)
-					// 	console.log(`try to go home: ${creepName} ${ret}`);
 
 				}
 
@@ -156,6 +152,15 @@ mod.nextAction = function (creep) {
 					// 	console.log(`get energy: ${creepName} ${ret}`);
 
 				}
+				if (!this.needEnergy(creep)) {
+
+					ret = this.goHome(creep);
+					// if (creep.name === creepName)
+					// 	console.log(`try to go home: ${creepName} ${ret}`);
+
+				}
+
+
 
 				if (ret)
 					return ret;
