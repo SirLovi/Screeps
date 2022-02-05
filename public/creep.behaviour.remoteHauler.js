@@ -84,7 +84,7 @@ mod.nextAction = function (creep) {
 			// empty
 			// travelling
 			let gotoTargetRoom = this.gotoTargetRoom(creep);
-			console.log(`GO TO TARGET ROOM: ${gotoTargetRoom}`);
+			// console.log(`GO TO TARGET ROOM: ${gotoTargetRoom}`);
 			if (gotoTargetRoom) {
 				return;
 			}
