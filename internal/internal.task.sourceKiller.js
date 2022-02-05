@@ -22,17 +22,17 @@ mod.checkForRequiredCreeps = (flag) => {
     Task.validateAll(memory, flag, mod.name, {roomName: flag.pos.roomName, checkValid: true});
     // count creeps assigned to task
     let count = memory.queued.length + memory.spawning.length + memory.running.length;
-    
-    // if creep count below requirement spawn a new creep creep 
+
+    // if creep count below requirement spawn a new creep creep
     if( count < 1 ) {
         Task.spawn(
             Task.sourceKiller.creep.sourceKiller, // creepDefinition
             { // destiny
                 task: 'sourceKiller', // taskName
                 targetName: flag.name, // targetName
-            }, 
+            },
             { // spawn room selection params
-                targetRoom: flag.pos.roomName, 
+                targetRoom: flag.pos.roomName,
                 minEnergyCapacity: 4100,
                 maxRange: 5,
                 allowTargetRoom: true
@@ -103,11 +103,11 @@ mod.handleCreepDied = name => {
 };
 // get task memory
 mod.memory = (flag) => {
-    if( !flag.memory.tasks ) 
+    if( !flag.memory.tasks )
         flag.memory.tasks = {};
     if( !flag.memory.tasks.sourceKiller ) {
         flag.memory.tasks.sourceKiller = {
-            queued: [], 
+            queued: [],
             spawning: [],
             running: []
         };
@@ -129,8 +129,8 @@ mod.creep = {
             const indexOfB = partsOrder.indexOf(b);
             return indexOfA - indexOfB;
         },
-        name: "sourceKiller", 
-        behaviour: "sourceKiller", 
-        queue: 'Low'
+        name: "sourceKiller",
+        behaviour: "sourceKiller",
+        queue: 'High'
     },
 };

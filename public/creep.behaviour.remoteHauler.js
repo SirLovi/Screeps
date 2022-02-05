@@ -28,9 +28,13 @@ mod.outflowActions = (creep) => {
 };
 mod.nextAction = function (creep) {
 
-	const flag = creep.data.destiny && Game.flags[creep.data.destiny.targetName];
-	if (!flag || creep.data.ttl <= creep.data.predictedRenewal * 1.2) {
+	const flag = creep.data.destiny && Game.flags[creep.data.destiny.targetName]
+	global.logSystem(creep.room.name, `ttl: ${creep.data.ttl} predictedRenewal: ${creep.data.predictedRenewal} flag: ${flag}`);
+
+
+	if (!flag) {
 		//TODO: in the future look for a nearby room we can support
+		global.logSystem(creep.room.name, `NO FLAG !!!!!!!!!${flag}`);
 		return Creep.action.recycling.assign(creep);
 	} else {
 		// at home
@@ -126,6 +130,7 @@ mod.needEnergy = function (creep) {
 };
 mod.gotoTargetRoom = function (creep) {
 	const targetFlag = creep.data.destiny ? Game.flags[creep.data.destiny.targetName] : null;
+	global.logSystem(creep.room.name, `TARGET FLAG: ${targetFlag}`);
 	if (targetFlag)
 		return Creep.action.travelling.assignRoom(creep, targetFlag.pos.roomName);
 };
