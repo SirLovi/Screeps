@@ -94,7 +94,7 @@ let Setup = function(typeName){
         if( this.measureByHome ){
             let home = room.name;
             let count = entry => {
-                if( entry.creepType == this.type && entry.homeRoom == home && Setup.isWorkingAge(entry) ){
+                if( entry.creepType === this.type && entry.homeRoom === home && Setup.isWorkingAge(entry) ){
                     existingCount++;
                     existingWeight += entry.weight;
                 }
@@ -116,13 +116,13 @@ let Setup = function(typeName){
         if( this.measureByHome ){
             let home = room.name;
             let count = entry => {
-                if( entry.creepType == this.type && entry.homeRoom == home ){
+                if( entry.creepType === this.type && entry.homeRoom === home ){
                     existingWeight += entry.weight;
                 }
             };
             _.forEach(Memory.population, count);
         } else {
-            let population = this.globalMeasurement ? Population : room.population;
+            let population = this.globalMeasurement ? global.Population : room.population;
             existingWeight = population ? (population.typeWeight[this.type] || 0) : 0;
         }
         return existingWeight;
@@ -149,7 +149,7 @@ let Setup = function(typeName){
     };
     this.mixParts = function(parts){
         let sum = _.countBy(parts);
-        let nonMove = parts.filter( part => part != MOVE );
+        let nonMove = parts.filter( part => part !== MOVE );
         let mix = [];
         for( let iNonMove = nonMove.length-1; iNonMove >= 0; iNonMove-- ){
             if( sum[MOVE]-- > 0 ){

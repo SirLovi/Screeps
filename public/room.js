@@ -270,7 +270,7 @@ mod.extend = function () {
 			get: function () {
 				if (_.isUndefined(this._casualties)) {
 					let isInjured = creep => creep.hits < creep.hitsMax &&
-						(creep.towers === undefined || creep.towers.length == 0);
+						(creep.towers === undefined || creep.towers.length === 0);
 					this._casualties = _.chain(this.allyCreeps).filter(isInjured).sortBy('hits').value();
 				}
 				return this._casualties;

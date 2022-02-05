@@ -72,10 +72,17 @@ mod.extend = function () {
 		let queueTime = queue => _.sum(queue, c => (c.parts.length * 3));
 		let roomTime = room => ((queueTime(room.spawnQueueLow) * 0.9) + queueTime(room.spawnQueueMedium) + (queueTime(room.spawnQueueHigh) * 1.1)) / room.structures.spawns.length;
 		let evaluation = room => {
-			return global.Util.routeRange(room.name, params.targetRoom) +
-				((8 - room.controller.level) / (params.rangeRclRatio || 3)) +
-				(roomTime(room) / (params.rangeQueueRatio || 51)) -
-				room.energyAvailable;
+			let weight = global.FIND_SPAWN_ROOM_WEIGHT;
+
+			let distance = global.Util.routeRange(room.name, params.targetRoom) * weight.routeRange;
+			let rcl = (8 - room.controller.level) / (params.rangeRclRatio || 3) * weight.rcl;
+			let spawnTime = (roomTime(room)) * weight.roomTime;
+			let energyAvailable = room.energyAvailable * weight.energyAvailable;
+			let ret = distance + rcl + spawnTime - energyAvailable;
+
+			global.logSystem(room.name, `distance: ${distance} rcl: ${rcl} spawnTime: ${spawnTime} energyAvailable: ${energyAvailable} ret: ${ret}`);
+
+			return ret;
 		};
 		return _.min(validRooms, evaluation);
 	};

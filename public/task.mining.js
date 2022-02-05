@@ -169,7 +169,7 @@ mod.checkForRequiredCreeps = (flag) => {
 			// let minWeight = i >= 1 && global.REMOTE_HAULER.MIN_WEIGHT;
 			let minWeight = global.REMOTE_HAULER.MIN_WEIGHT;
 			let hauler = mod.strategies.hauler.setup(miningRoomName);
-			let spawnRoomName = mod.strategies.hauler.getSpawnRoomName(miningRoomName, minWeight, global.Task.mining.countEnergyPrice(hauler.fixedBody).fixedCost);
+			let spawnRoomName = mod.strategies.hauler.getSpawnRoomName(miningRoomName, minWeight, Creep.bodyCosts(hauler.fixedBody));
 			const spawnRoom = Game.rooms[spawnRoomName];
 
 			console.log(`miningRoom: ${miningRoomName} spawnRoom: ${spawnRoomName}`);
@@ -208,16 +208,17 @@ mod.checkForRequiredCreeps = (flag) => {
 				{ // destiny
 					task: mod.name, // taskName
 					targetName: flag.name, // targetName
-					type: global.Task.mining.creep.hauler.behaviour, // custom
+					type: hauler.behaviour, // custom
 					homeRoom: storageRoomName,
-				}, {
+				},
+				{
 					targetRoom: miningRoomName,
 					explicit: spawnRoom.name,
 				},
 				creepSetup => { // onQueued callback
 					const memory = global.Task.mining.memory(creepSetup.destiny.room);
 					global.logSystem(miningRoomName, `hauler creepSetup ${creepSetup.parts.length}`);
-					global.logSystem(storageRoomName, `HAULER BORN: ${global.json(hauler)}`);
+					global.logSystem(storageRoomName, `HAULER QUEUED: ${global.json(hauler)}`);
 					memory.queued[creepSetup.behaviour].push({
 						room: creepSetup.queueRoom,
 						name: creepSetup.name,
@@ -385,7 +386,7 @@ mod.creep = {
 	},
 	SKHauler: {
 		fixedBody: {
-			[CARRY]: 10,
+			[CARRY]: 14,
 			[MOVE]: 5,
 			[WORK]: 1,
 			[HEAL]: 0,
@@ -591,60 +592,13 @@ mod.carryPartsPopulation = function (miningRoomName, homeRoomName) {
 	// it is 0, if we need is 0, -ret if we need more
 	return ret;
 };
-mod.countEnergyPrice = function (fixedBody, multiBody) {
-	// console.log(`fixedBody: ${global.json(fixedBody)}`);
-	// console.log(`multiBody: ${global.json(multiBody)}`);
-	let fixedCost = 0,
-		multiCost = 0;
-	for (const [part, amount] of Object.entries(fixedBody)) {
-		switch (part) {
-			case CARRY:
-				fixedCost += BODYPART_COST[CARRY] * amount;
-				break;
-			case MOVE:
-				fixedCost += BODYPART_COST[MOVE] * amount;
-				break;
-			case WORK:
-				fixedCost += BODYPART_COST[WORK] * amount;
-				break;
-			case HEAL:
-				fixedCost += BODYPART_COST[HEAL] * amount;
-				break;
-		}
-	}
-	if (multiBody) {
-		for (const [part, amount] of Object.entries(multiBody)) {
-			switch (part) {
-				case CARRY:
-					multiCost += BODYPART_COST[CARRY] * amount;
-					break;
-				case MOVE:
-					multiCost += BODYPART_COST[MOVE] * amount;
-					break;
-				case WORK:
-					multiCost += BODYPART_COST[WORK] * amount;
-					break;
-				case HEAL:
-					multiCost += BODYPART_COST[HEAL] * amount;
-					break;
-			}
-		}
-	}
-
-	return {
-		fixedCost: fixedCost,
-		multiCost: multiCost,
-	};
-};
-
 mod.creepSize = function (roomName, carry, setup, ignorePopulation) {
 	if (!carry || carry < 0)
 		return 0;
 
 	const multiCarry = _.max([0, carry - 5]);
-	const cost = mod.countEnergyPrice(setup.fixedBody, setup.multiBody);
-	const fixedBodyCost = cost.fixedCost;
-	const multiBodyCost = cost.multiCost;
+	const fixedBodyCost = Creep.bodyCosts(setup.fixedBody);
+	const multiBodyCost = Creep.bodyCosts(setup.multiBody);
 	const ret = fixedBodyCost + multiBodyCost * _.ceil(multiCarry * 0.5);
 
 	if (ignorePopulation) {
@@ -722,7 +676,7 @@ mod.strategies = {
 			let spawnRoomName;
 
 			if (Game.time > memory.capacityLastChecked + global.RESET_STORAGE_SPAWN_ROOMS_INTERVAL)
-				delete memory.storageRoomName;
+				delete memory.spawnRoomName;
 
 			if (memory.spawnRoomName)
 				return memory.spawnRoomName;

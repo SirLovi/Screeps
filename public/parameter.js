@@ -440,6 +440,11 @@ let mod = {
         display: true,
         timing: 100
     },
+    FIND_SPAWN_ROOM_WEIGHT: {
+        routeRange: 10,
+        rcl: 1,
+        roomTime: 1,
+        energyAvailable: 0.001,
+    },
 };
-mod.ROAD_DESTROY_HITS = ROAD_HITS - mod.GAP_REPAIR_DECAYABLE - 1000;
 module.exports = mod;

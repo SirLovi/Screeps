@@ -535,10 +535,39 @@ mod.execute = function () {
 };
 mod.bodyCosts = function (body) {
 	let costs = 0;
-	if (body) {
+	if (Array.isArray(body)) {
 		body.forEach(function (part) {
 			costs += BODYPART_COST[part];
 		});
+	} else if (typeof body === 'object') {
+		for (const [part, amount] of Object.entries(body)) {
+			switch (part) {
+				case MOVE:
+					costs += BODYPART_COST[MOVE] * amount;
+					break;
+				case WORK:
+					costs += BODYPART_COST[WORK] * amount;
+					break;
+				case ATTACK:
+					costs += BODYPART_COST[ATTACK] * amount;
+					break;
+				case CARRY:
+					costs += BODYPART_COST[CARRY] * amount;
+					break;
+				case HEAL:
+					costs += BODYPART_COST[HEAL] * amount;
+					break;
+				case RANGED_ATTACK:
+					costs += BODYPART_COST[RANGED_ATTACK] * amount;
+					break;
+				case TOUGH:
+					costs += BODYPART_COST[TOUGH] * amount;
+					break;
+				case CLAIM:
+					costs += BODYPART_COST[CLAIM] * amount;
+					break;
+			}
+		}
 	}
 	return costs;
 };
@@ -623,6 +652,9 @@ mod.compileBody = function (room, params, sort = true) {
 		parts.splice(index, 1);
 		parts.push(HEAL);
 	}
+
+	console.log(`compile parts PUBLIC for ${params.name}, length: ${parts.length}`);
+
 	return parts;
 };
 mod.partThreat = {

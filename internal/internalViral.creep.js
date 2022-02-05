@@ -2,7 +2,6 @@ const mod = {};
 module.exports = mod;
 mod.compileBody = function (room, params, spawn = false, sort = true) {
 
-
 	console.log(`compileBody params: ${global.json(params)}`);
 
 	const moveRatio = 1 - (_.isNumber(params.moveRatio) && params.moveRatio > 0) ? params.moveRatio : 0.5;
@@ -30,7 +29,7 @@ mod.compileBody = function (room, params, spawn = false, sort = true) {
 		parts.push(MOVE);
 	}
 
-	console.log(`compile parts for ${params.name}, length: ${parts.length}`);
+	console.log(`compile parts for INTERNAL ${params.name}, length: ${parts.length}`);
 	// if (parts.length >= 50)
 	// 	global.logSystem(room.name, `compile parts ${parts.length}`);
 
