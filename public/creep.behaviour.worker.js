@@ -1,16 +1,28 @@
 const mod = new Creep.Behaviour('worker');
 module.exports = mod;
 mod.inflowActions = function (creep) {
-    let priority = [
-        Creep.action.bulldozing,
-        Creep.action.picking,
-        Creep.action.dismantling,
-        Creep.action.withdrawing,
-        Creep.action.uncharging,
-        Creep.action.harvesting,
-        Creep.action.reallocating,
-        Creep.action.pickingTombstones
-    ];
+    let priority = [];
+    
+    if (creep.room.situation.invasion){
+        priority = [
+            Creep.action.withdrawing,
+            Creep.action.uncharging,
+            Creep.action.harvesting,
+            Creep.action.reallocating
+        ];
+    }
+    else {
+        priority = [
+            Creep.action.bulldozing,
+            Creep.action.picking,
+            Creep.action.dismantling,
+            Creep.action.withdrawing,
+            Creep.action.uncharging,
+            Creep.action.harvesting,
+            Creep.action.reallocating,
+            Creep.action.pickingTombstones
+        ];
+    }
     if (creep.sum > creep.carry.energy) {
         priority.unshift(Creep.action.storing);
     }

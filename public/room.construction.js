@@ -134,7 +134,7 @@ mod.extend = function () {
 		if ((!global.ROAD_CONSTRUCTION_ENABLE && !mod.forced) || Game.time % global.ROAD_CONSTRUCTION_INTERVAL !== 0 || Memory.rooms.myTotalSites >= MAX_CONSTRUCTION_SITES)
 			return;
 
-		if (!this.my && global.ROAD_CONSTRUCTION_DISABLED_FOR_CLAIMED_ROOMS)
+		if (this.my && global.ROAD_CONSTRUCTION_DISABLED_FOR_CLAIMED_ROOMS)
 			return;
 
 		if (!mod.forced && _.isNumber(global.ROAD_CONSTRUCTION_ENABLE)) {

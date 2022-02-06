@@ -239,7 +239,7 @@ mod.checkForRequiredCreeps = (flag) => {
 				},
 				{ // spawn room selection params
 					targetRoom: miningRoomName,
-					minEnergyCapacity: 600,
+					minEnergyCapacity: 650,
 				},
 				creepSetup => { // onQueued callback
 					const memory = global.Task.mining.memory(creepSetup.destiny.room);
@@ -349,6 +349,7 @@ mod.creep = {
 			[CARRY]: 1,
 			[MOVE]: 1,
 		},
+		minEnergyCapacity: 450,
 		behaviour: 'remoteHauler',
 		queue: 'Low',
 	},
@@ -365,6 +366,7 @@ mod.creep = {
 			[WORK]: 2,
 		},
 		maxMulti: 3,
+		minEnergyCapacity: 650,
 		behaviour: 'remoteWorker',
 		queue: 'Low',
 	},
@@ -381,6 +383,7 @@ mod.creep = {
 			[WORK]: 5,
 		},
 		maxMulti: 1,
+		minEnergyCapacity: 900,
 		behaviour: 'remoteMiner',
 		queue: 'Medium', // not much point in hauling or working without a miner, and they're a cheap spawn.
 	},
@@ -395,6 +398,7 @@ mod.creep = {
 			[CARRY]: 1,
 			[MOVE]: 1,
 		},
+		minEnergyCapacity: 1350,
 		behaviour: 'remoteHauler',
 		queue: 'Low',
 	},
