@@ -3,10 +3,10 @@ module.exports = mod;
 mod.inflowActions = (creep) => {
 	if (creep.room.situation.invasion) {
         return [
-		Creep.action.uncharging,
-		Creep.action.withdrawing,
-		Creep.action.reallocating,
-	];
+			Creep.action.uncharging,
+			Creep.action.withdrawing,
+			Creep.action.reallocating,
+		];
     }
 	return [
 		Creep.action.uncharging,
