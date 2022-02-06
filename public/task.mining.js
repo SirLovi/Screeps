@@ -134,7 +134,8 @@ mod.checkForRequiredCreeps = (flag) => {
 				},
 				{ // spawn room selection params
 					targetRoom: miningRoomName,
-					minEnergyCapacity: miner.minEnergyCapacity, // TODO calculate this
+					// minEnergyCapacity: miner.minEnergyCapacity, // TODO calculate this
+					minEnergyCapacity: Creep.bodyCosts(miner.fixedBody),
 					rangeRclRatio: 1,
 				},
 				creepSetup => { // onQueued callback
@@ -229,9 +230,10 @@ mod.checkForRequiredCreeps = (flag) => {
 		}
 	}
 	if (room && room.myConstructionSites.length > 0 && workerCount < global.REMOTE_WORKER_MULTIPLIER) {
+		let worker = global.Task.mining.creep.worker;
 		for (let i = workerCount; i < global.REMOTE_WORKER_MULTIPLIER; i++) {
 			global.Task.spawn(
-				global.Task.mining.creep.worker, // creepDefinition
+				worker, // creepDefinition
 				{ // destiny
 					task: mod.name, // taskName
 					targetName: flag.name, // targetName
@@ -239,7 +241,7 @@ mod.checkForRequiredCreeps = (flag) => {
 				},
 				{ // spawn room selection params
 					targetRoom: miningRoomName,
-					minEnergyCapacity: 650,
+					minEnergyCapacity: Creep.bodyCosts(worker.fixedBody),
 				},
 				creepSetup => { // onQueued callback
 					const memory = global.Task.mining.memory(creepSetup.destiny.room);
@@ -334,7 +336,8 @@ mod.creep = {
 			[WORK]: 5,
 		},
 		maxMulti: 1,
-		minEnergyCapacity: 550,
+		// minEnergyCapacity: Creep.bodyCosts(this.creep.fixedBody),
+		// minEnergyCapacity: 550,
 		behaviour: 'remoteMiner',
 		queue: 'Medium', // not much point in hauling or working without a miner, and they're a cheap spawn.
 	},
@@ -349,7 +352,8 @@ mod.creep = {
 			[CARRY]: 1,
 			[MOVE]: 1,
 		},
-		minEnergyCapacity: 450,
+		// minEnergyCapacity: Creep.bodyCosts(mod.creep.hauler.fixedBody),
+		// minEnergyCapacity: 450,
 		behaviour: 'remoteHauler',
 		queue: 'Low',
 	},
@@ -366,7 +370,8 @@ mod.creep = {
 			[WORK]: 2,
 		},
 		maxMulti: 3,
-		minEnergyCapacity: 650,
+		// minEnergyCapacity: Creep.bodyCosts(mod.creep.worker.fixedBody),
+		// minEnergyCapacity: 650,
 		behaviour: 'remoteWorker',
 		queue: 'Low',
 	},
@@ -383,7 +388,8 @@ mod.creep = {
 			[WORK]: 5,
 		},
 		maxMulti: 1,
-		minEnergyCapacity: 900,
+		// minEnergyCapacity: Creep.bodyCosts(mod.creep.SKMiner.fixedBody),
+		// minEnergyCapacity: 900,
 		behaviour: 'remoteMiner',
 		queue: 'Medium', // not much point in hauling or working without a miner, and they're a cheap spawn.
 	},
@@ -398,7 +404,8 @@ mod.creep = {
 			[CARRY]: 1,
 			[MOVE]: 1,
 		},
-		minEnergyCapacity: 1350,
+		// minEnergyCapacity: Creep.bodyCosts(mod.creep.SKHauler.fixedBody),
+		// minEnergyCapacity: 1350,
 		behaviour: 'remoteHauler',
 		queue: 'Low',
 	},
