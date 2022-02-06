@@ -1074,6 +1074,16 @@ mod.deleteConstructionTrace = () => {
 	}
 };
 
+mod.renewable = () => {
+	for (let spawn in Game.spawns) {
+		spawn = Game.spawns[spawn];
+		if (spawn.renewable) {
+			global.logSystem(spawn.pos.roomName, `renewable length: ${spawn.renewable.length}`);
+		}
+
+	}
+};
+
 
 // HERE comes room.memory.resources
 

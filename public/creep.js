@@ -653,7 +653,7 @@ mod.compileBody = function (room, params, sort = true) {
 		parts.push(HEAL);
 	}
 
-	console.log(`compile parts PUBLIC for ${params.name}, length: ${parts.length}`);
+	console.log(`compile parts PUBLIC for ${params.behavior}, length: ${parts.length}`);
 
 	return parts;
 };

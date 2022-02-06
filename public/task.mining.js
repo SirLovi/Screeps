@@ -633,7 +633,8 @@ mod.strategies = {
 	miner: {
 		name: `miner-${mod.name}`,
 		setup: function (roomName) {
-			return mod.setupCreep(roomName, (Room.isCenterNineRoom(roomName) || !Room.my) ? _.cloneDeep(global.Task.mining.creep.SKMiner) : _.cloneDeep(global.Task.mining.creep.miner));
+			const room = Game.rooms[roomName];
+			return mod.setupCreep(roomName, (Room.isCenterNineRoom(roomName) || (room && !room.my)) ? _.cloneDeep(global.Task.mining.creep.SKMiner) : _.cloneDeep(global.Task.mining.creep.miner));
 		},
 		shouldSpawn: function (minerCount, sourceCount) {
 			return minerCount < sourceCount;
@@ -705,6 +706,7 @@ mod.strategies = {
 			// const room = Game.rooms[flagRoomName];
 
 			// TODO loop per-source, take pinned delivery for route calc
+			// TODO needed carry + dropped / x
 
 			const travel = global.Util.routeRange(homeRoomName, flagRoomName);
 			const ept = global.Task.mining.strategies.hauler.ept(flagRoomName);

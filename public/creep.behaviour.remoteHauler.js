@@ -26,13 +26,14 @@ mod.outflowActions = (creep) => {
 	}
 	return priority;
 };
-mod.renewCreep = function (creep) {
+mod.renewCreep = function (that, creep) {
 
-	if (!global.RENEW_AT_PERCENT)
-		return;
+	// global.logSystem(creep.room.name, `RENEWING ${creep.name} ttl: ${creep.data.ttl}`);
 
-	if (creep.data.ttl < CREEP_LIFE_TIME * (global.RENEW_AT_PERCENT / 100)) {
-		this.assignAction(creep, 'renewing');
+	global.logSystem(creep.room.name, `${creep.name} ttl: ${creep.data.ttl} renewal: ${creep.data.predictedRenewal} needToRenew: ${creep.data.ttl < creep.data.predictedRenewal * 2}`);
+
+	if (creep.data.ttl < creep.data.predictedRenewal * 2) {
+		return !!that.assignAction(creep, 'renewing');
 	}
 
 };
@@ -95,7 +96,9 @@ mod.nextAction = function (creep) {
 			// empty
 
 			// renew
-			// mod.renewCreep(this, creep)
+
+			if (mod.renewCreep(this, creep))
+				return;
 
 			// travelling
 			let gotoTargetRoom = this.gotoTargetRoom(creep);
@@ -129,17 +132,16 @@ mod.nextAction = function (creep) {
 
 				if (casualties) {
 
-					global.logSystem(creep.room.name, `casualties: ${creep.room.casualties.length}`);
+					// global.logSystem(creep.room.name, `casualties: ${creep.room.casualties.length}`);
 
 					// ret = this.assignAction(creep, 'healing', casualty);
 					creep.action = Creep.action.healing;
 					ret = Creep.behaviour.ranger.heal.call(this, creep);
 
-					if (ret === 0)
-						ret = true;
+					ret = ret === 0;
 
-					if (creep.name === creepName)
-						console.log(`try to heal: ${creepName} ${ret}`);
+					// if (creep.name === creepName)
+					global.logSystem(creep.room.name, `try to heal: ${creepName} ${ret}`);
 
 				}
 				if (!this.needEnergy(creep)) {
