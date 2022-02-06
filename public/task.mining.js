@@ -134,7 +134,7 @@ mod.checkForRequiredCreeps = (flag) => {
 				},
 				{ // spawn room selection params
 					targetRoom: miningRoomName,
-					// minEnergyCapacity: miner.minEnergyCapacity, // TODO calculate this
+					// minEnergyCapacity: miner.minEnergyCapacity,
 					minEnergyCapacity: Creep.bodyCosts(miner.fixedBody),
 					rangeRclRatio: 1,
 				},
@@ -218,8 +218,8 @@ mod.checkForRequiredCreeps = (flag) => {
 				},
 				creepSetup => { // onQueued callback
 					const memory = global.Task.mining.memory(creepSetup.destiny.room);
-					global.logSystem(miningRoomName, `hauler creepSetup ${creepSetup.parts.length}`);
-					global.logSystem(storageRoomName, `HAULER QUEUED: ${global.json(hauler)}`);
+					global.logSystem(miningRoomName, `hauler creepSetup size ${creepSetup.parts.length}`);
+					// global.logSystem(storageRoomName, `HAULER QUEUED: ${global.json(hauler)}`);
 					memory.queued[creepSetup.behaviour].push({
 						room: creepSetup.queueRoom,
 						name: creepSetup.name,
@@ -410,18 +410,6 @@ mod.creep = {
 		queue: 'Low',
 	},
 };
-// mod.bodyToArray = (definition) => {
-//
-// 	let fixedBody = [];
-// 	console.log(`definition: ${global.json(definition)}`);
-// 	for (let [bodyPart, count] of Object.entries(definition)) {
-// 		console.log(`bodyPart: ${bodyPart} count: ${count}`);
-// 		fixedBody = fixedBody.concat(_.times(count, _.constant(bodyPart)));
-// 	}
-//
-// 	console.log(`bodyToArray ret: ${fixedBody.length}`);
-// 	return fixedBody;
-// };
 mod.countBody = function (fixedBody) {
 	let count = 0;
 	for (const [fixedBodyPart, amount] of Object.entries(fixedBody)) {

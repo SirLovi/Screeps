@@ -28,9 +28,10 @@ mod.outflowActions = (creep) => {
 };
 mod.renewCreep = function (that, creep) {
 
-	// global.logSystem(creep.room.name, `RENEWING ${creep.name} ttl: ${creep.data.ttl}`);
+	if (!global.REMOTE_HAULER.RENEW)
+		return;
 
-	global.logSystem(creep.room.name, `${creep.name} ttl: ${creep.data.ttl} renewal: ${creep.data.predictedRenewal} needToRenew: ${creep.data.ttl < creep.data.predictedRenewal * 2}`);
+	global.logSystem(creep.room.name, `${creep.name} ttl: ${creep.data.ttl} renewal at: ${creep.data.predictedRenewal * 2} needToRenew: ${creep.data.ttl < creep.data.predictedRenewal * 2}`);
 
 	if (creep.data.ttl < creep.data.predictedRenewal * 2) {
 		return !!that.assignAction(creep, 'renewing');
@@ -96,7 +97,6 @@ mod.nextAction = function (creep) {
 			// empty
 
 			// renew
-
 			if (mod.renewCreep(this, creep))
 				return;
 
@@ -141,7 +141,7 @@ mod.nextAction = function (creep) {
 					ret = ret === 0;
 
 					// if (creep.name === creepName)
-					global.logSystem(creep.room.name, `try to heal: ${creepName} ${ret}`);
+					// global.logSystem(creep.room.name, `try to heal: ${creepName} ${ret}`);
 
 				}
 				if (!this.needEnergy(creep)) {
