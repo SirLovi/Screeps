@@ -11,6 +11,10 @@ mod.inflowActions = function (creep) {
         Creep.action.reallocating,
         Creep.action.pickingTombstones
     ];
+    if (creep.room.situation.invasion) {
+        priority.unshift(Creep.action.pickingTombstones);
+        priority.unshift(Creep.action.picking);
+    }
     if (creep.sum > creep.carry.energy) {
         priority.unshift(Creep.action.storing);
     }
