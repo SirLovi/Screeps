@@ -27,11 +27,11 @@ action.newTarget = function (creep) {
 	let room = Game.rooms[currentRoomName];
 	let roomMemory = Memory.rooms[currentRoomName];
 	let spawnRenewQueueMemory = Memory.tasks.mining[currentRoomName].spawnRenewQueue;
-	let inHomeRoom = (room && room.my)
+	let inHomeRoom = room && room.my && room.name === currentRoomName;
 
 	if (!inHomeRoom) {
 		global.logSystem(currentRoomName, `RENEWING IS SELECT NEW TARGET for ${creep.name} is INVALID (not my room), 'NEW_TARGET')`);
-		global.logSystem(currentRoomName, `RENEWING creep.currentRoom: ${currentRoomName} creep.homeRoom: ${creep.data.homeRoom} !room.my: ${!!room || !room.my}`);
+		// global.logSystem(currentRoomName, `RENEWING creep.currentRoom: ${currentRoomName} creep.homeRoom: ${creep.data.homeRoom} !room.my: ${!!room || !room.my}`);
 
 		return false;
 	}
