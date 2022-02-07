@@ -23,6 +23,25 @@ action.checkMemory = (creep) => {
 };
 action.newTarget = function (creep) {
 
+	let room = Game.rooms[creep.room.name];
+
+	if (creep.room.name !== creep.data.homeRoom || !room || !room.my) {
+		global.logSystem(creep.room.name, `RENEWING IS SELECT NEW TARGET for ${creep.name} is INVALID (not my room), 'NEW_TARGET')`);
+		global.logSystem(creep.room.name, `RENEWING creep.currentRoom: ${creep.room.name} creep.homeRoom: ${creep.data.homeRoom} !room.my: ${!!room || !room.my}`);
+
+		return false;
+	}
+
+	let needToRenew = creep.data.ttl <= creep.data.predictedRenewal * 2;
+	let finishedRenew = creep.data.ttl >= creep.data.predictedRenewal * 3;
+
+	if (!needToRenew || finishedRenew) {
+		global.logSystem(creep.room.name, `RENEWING IS SELECT NEW TARGET for ${creep.name} is INVALID (no need to renew), 'NEW_TARGET'`);
+		return false;
+	}
+
+	global.logSystem(creep.room.name, `RENEWING IS SELECT NEW TARGET for ${creep.name}`);
+
 	action.checkMemory(creep);
 
 	let roomName = creep.room.name;
@@ -70,24 +89,26 @@ action.removeFromQueue = function (renewQueue, creep) {
 };
 action.work = function (creep) {
 
-
 	global.logSystem(creep.room.name, `RENEWING IS RUNNING for ${creep.name}`);
 
 	let roomName = creep.room.name;
+	let room = Game.rooms[roomName];
 	let spawn = creep.target;
 	let flee = false;
 	let needToRenew = creep.data.ttl <= creep.data.predictedRenewal * 2;
 	let finishedRenew = creep.data.ttl >= creep.data.predictedRenewal * 3;
 
-	if (creep.room.name !== creep.data.homeRoom)
-		return false;
-
-	if (!needToRenew) {
-		global.logSystem(creep.pos.roomName, `${creep.name} ttl: ${creep.data.ttl} renewal at: ${creep.data.predictedRenewal * 2} needToRenew: FALSE}`);
+	if (creep.room.name !== creep.data.homeRoom || !room.my) {
+		global.logSystem(creep.room.name, `RENEWING for ${creep.name} is INVALID (not my room), 'WORK'`);
 		return false;
 	}
 
-	global.logSystem(creep.room.name, `RENEWING! ${creep.name} ttl: ${creep.data.ttl} needToRenew: ${needToRenew} time: ${Game.time}`);
+	if (!needToRenew || finishedRenew) {
+		global.logSystem(creep.room.name, `RENEWING for ${creep.name} is INVALID (no need to renew), 'WORK'`);
+		return false;
+	}
+
+	global.logSystem(creep.room.name, `RENEWING STARTED!!! ${creep.name} ttl: ${creep.data.ttl} needToRenew: ${needToRenew} time: ${Game.time}`);
 
 	action.checkMemory(creep);
 

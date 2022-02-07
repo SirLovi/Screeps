@@ -22,6 +22,7 @@ mod.outflowActions = (creep) => {
 		Creep.action.fueling,
 		Creep.action.storing,
 		Creep.action.healing,
+		Creep.action.renewing,
 	];
 	if (creep.sum > creep.carry.energy ||
 		(!creep.room.situation.invasion &&
