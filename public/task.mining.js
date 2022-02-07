@@ -214,6 +214,7 @@ mod.checkForRequiredCreeps = (flag) => {
 				{
 					targetRoom: miningRoomName,
 					explicit: spawnRoom.name,
+					// minEnergyCapacity: Creep.bodyCosts(hauler.fixedBody),
 				},
 				creepSetup => { // onQueued callback
 					const memory = global.Task.mining.memory(creepSetup.destiny.room);
@@ -684,7 +685,7 @@ mod.strategies = {
 					targetRoom: flagRoomName,
 					minEnergyCapacity: Math.max(minWeight, fixedCost),
 				}).name;
-			if (_.isUndefined(spawnRoomName))
+			if (_.isNull(spawnRoomName))
 				spawnRoomName = Room.findSpawnRoom({
 					targetRoom: flagRoomName,
 					minEnergyCapacity: Math.min(minWeight, fixedCost),

@@ -23,11 +23,15 @@ action.checkMemory = (creep) => {
 };
 action.newTarget = function (creep) {
 
-	let room = Game.rooms[creep.room.name];
+	let currentRoomName = creep.room.name;
+	let room = Game.rooms[currentRoomName];
+	let roomMemory = Memory.rooms[currentRoomName];
+	let spawnRenewQueueMemory = Memory.tasks.mining[currentRoomName].spawnRenewQueue;
+	let inHomeRoom = (room && room.my)
 
-	if (creep.room.name !== creep.data.homeRoom || !room || !room.my) {
-		global.logSystem(creep.room.name, `RENEWING IS SELECT NEW TARGET for ${creep.name} is INVALID (not my room), 'NEW_TARGET')`);
-		global.logSystem(creep.room.name, `RENEWING creep.currentRoom: ${creep.room.name} creep.homeRoom: ${creep.data.homeRoom} !room.my: ${!!room || !room.my}`);
+	if (!inHomeRoom) {
+		global.logSystem(currentRoomName, `RENEWING IS SELECT NEW TARGET for ${creep.name} is INVALID (not my room), 'NEW_TARGET')`);
+		global.logSystem(currentRoomName, `RENEWING creep.currentRoom: ${currentRoomName} creep.homeRoom: ${creep.data.homeRoom} !room.my: ${!!room || !room.my}`);
 
 		return false;
 	}
@@ -36,26 +40,26 @@ action.newTarget = function (creep) {
 	let finishedRenew = creep.data.ttl >= creep.data.predictedRenewal * 3;
 
 	if (!needToRenew || finishedRenew) {
-		global.logSystem(creep.room.name, `RENEWING IS SELECT NEW TARGET for ${creep.name} is INVALID (no need to renew), 'NEW_TARGET'`);
+		global.logSystem(currentRoomName, `RENEWING IS SELECT NEW TARGET for ${creep.name} is INVALID (no need to renew), 'NEW_TARGET'`);
 		return false;
 	}
 
-	global.logSystem(creep.room.name, `RENEWING IS SELECT NEW TARGET for ${creep.name}`);
+	global.logSystem(currentRoomName, `RENEWING IS SELECT NEW TARGET for ${creep.name}, 'NEW_TARGET'`);
 
 	action.checkMemory(creep);
 
-	let roomName = creep.room.name;
-	let memory = Memory.rooms[roomName].spawnRenewQueue;
-	let spawns = creep.room.structures.spawns;
+
+	let spawns = room.structures.spawns;
 	let availableSpawns = _.filter(spawns, spawn => {
-		return !'spawning' in spawn;
+		// return !'spawning' in spawn;
+		return !_.isNull('spawning' in spawn);
 	});
 
 	if (!availableSpawns) {
 		console.log(`not available spawns`);
-		if (memory.spawnQueueHigh.length === 0 && memory.spawnQueueMedium.length === 0 && memory.spawnQueueLow.length === 0) {
+		if (roomMemory.spawnQueueHigh.length === 0 && roomMemory.spawnQueueMedium.length === 0 && roomMemory.spawnQueueLow.length === 0) {
 			let firstAvailable = _.min(spawns, 'spawning.needTime');
-			if (!memory[firstAvailable.name] || memory[firstAvailable.name].length === 0) {
+			if (!spawnRenewQueueMemory[firstAvailable.name] || spawnRenewQueueMemory[firstAvailable.name].length === 0) {
 				console.log(`firstAvailable spawn will be ${firstAvailable.name}`);
 				return firstAvailable;
 			}
