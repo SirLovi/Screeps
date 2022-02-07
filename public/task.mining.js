@@ -162,8 +162,7 @@ mod.checkForRequiredCreeps = (flag) => {
 	else
 		maxHaulers = memory.running.remoteMiner.length || 0;
 
-
-	console.log(`MAX HAULERS for ${miningRoomName}: ${maxHaulers} => needMore: ${haulerCount < maxHaulers}, time: ${!memory.capacityLastChecked || Game.time - memory.capacityLastChecked > global.TASK_CREEP_CHECK_INTERVAL}`);
+	// global.logSystem(miningRoomName, `MAX HAULERS for ${miningRoomName}: ${maxHaulers} => needMore: ${haulerCount < maxHaulers}, time: ${!memory.capacityLastChecked || Game.time - memory.capacityLastChecked > global.TASK_CREEP_CHECK_INTERVAL}`);
 
 	if (haulerCount < maxHaulers && (!memory.capacityLastChecked || Game.time - memory.capacityLastChecked > global.TASK_CREEP_CHECK_INTERVAL)) {
 		for (let i = haulerCount; i < maxHaulers; i++) {
@@ -173,7 +172,7 @@ mod.checkForRequiredCreeps = (flag) => {
 			let spawnRoomName = mod.strategies.hauler.getSpawnRoomName(miningRoomName, minWeight, Creep.bodyCosts(hauler.fixedBody));
 			const spawnRoom = Game.rooms[spawnRoomName];
 
-			console.log(`miningRoom: ${miningRoomName} spawnRoom: ${spawnRoomName}`);
+			// console.log(`miningRoom: ${miningRoomName} spawnRoom: ${spawnRoomName}`);
 
 			if (!spawnRoom)
 				break;
@@ -200,7 +199,7 @@ mod.checkForRequiredCreeps = (flag) => {
 			if (minWeight)
 				hauler.minWeight = minWeight;
 
-			console.log(`hauler fixedBody: ${hauler.fixedBody.length}`);
+			console.log(`hauler fixedBody: ${Creep.bodyCosts(hauler.fixedBody)}`);
 			console.log(`hauler maxWeight: ${hauler.maxWeight}`);
 			console.log(`hauler minWeight: ${hauler.minWeight}`);
 

@@ -1,7 +1,5 @@
 let action = new Creep.Action('renewing');
 module.exports = action;
-
-
 action.testCreep = function () {
 	return 'remoteHauler-Flag90-1';
 };
@@ -10,7 +8,22 @@ action.isValidAction = function (creep) {
 };
 action.isAddableAction = () => true;
 action.isAddableTarget = () => true;
+action.checkMemory = (creep) => {
+
+	let roomName = creep.pos.roomName;
+	let spawns = creep.room.structures.spawns;
+
+	if (_.isUndefined(Memory.rooms[roomName].spawnRenewQueue)) {
+		Memory.rooms[roomName].spawnRenewQueue = {};
+		for (const spawn of spawns) {
+			if (_.isUndefined(Memory.rooms[roomName].spawnRenewQueue[spawn.name]))
+				Memory.rooms[roomName].spawnRenewQueue[spawn.name] = [];
+		}
+	}
+};
 action.newTarget = function (creep) {
+
+	action.checkMemory(creep);
 
 	let roomName = creep.room.name;
 	let memory = Memory.rooms[roomName].spawnRenewQueue;
@@ -56,30 +69,37 @@ action.removeFromQueue = function (renewQueue, creep) {
 
 };
 action.work = function (creep) {
-	// const ticks = creep.ticksToLive;
+
+
+	global.logSystem(creep.room.name, `RENEWING IS RUNNING for ${creep.name}`);
+
+	let roomName = creep.room.name;
 	let spawn = creep.target;
 	let flee = false;
-	let needToRenew = creep.data.ttl < creep.data.predictedRenewal * 2;
+	let needToRenew = creep.data.ttl <= creep.data.predictedRenewal * 2;
 	let finishedRenew = creep.data.ttl >= creep.data.predictedRenewal * 3;
 
-	global.logSystem(creep.room.name, `RENEWING ${creep.name} ttl: ${creep.data.ttl} needToRenew: ${needToRenew} time: ${Game.time}`);
+	if (creep.room.name !== creep.data.homeRoom)
+		return false;
 
-
-	let roomName = creep.pos.roomName;
-	if (_.isUndefined(Memory.rooms[roomName].spawnRenewQueue)) {
-		Memory.rooms[roomName].spawnRenewQueue = {};
-		if (_.isUndefined(Memory.rooms[roomName].spawnRenewQueue[spawn.name]))
-			Memory.rooms[roomName].spawnRenewQueue[spawn.name] = [];
+	if (!needToRenew) {
+		global.logSystem(creep.pos.roomName, `${creep.name} ttl: ${creep.data.ttl} renewal at: ${creep.data.predictedRenewal * 2} needToRenew: FALSE}`);
+		return false;
 	}
+
+	global.logSystem(creep.room.name, `RENEWING! ${creep.name} ttl: ${creep.data.ttl} needToRenew: ${needToRenew} time: ${Game.time}`);
+
+	action.checkMemory(creep);
 
 	let renewQueue = Memory.rooms[roomName].spawnRenewQueue[spawn.name];
 
-	if (spawn.pos.y - 1 === creep.pos.y && creep.pos.x === spawn.pos.y && needToRenew) {
-		if (action.testCreep() === creep.name) {
-			console.log(`flee 1`);
-		}
-		flee = true;
-	}
+	// if (spawn.pos.y - 1 === creep.pos.y && creep.pos.x === spawn.pos.y && needToRenew) {
+	// 	if (action.testCreep() === creep.name) {
+	// 		console.log(`flee 1`);
+	// 	}
+	// 	flee = true;
+	// }
+
 	if (needToRenew) {
 		action.addToQueue(renewQueue, creep);
 		// step toward spawn and request renew
@@ -87,14 +107,25 @@ action.work = function (creep) {
 			if (_.first(renewQueue) === creep.name) {
 				let ret = spawn.renewCreep(creep);
 				if (ret === ERR_NOT_ENOUGH_ENERGY || ret === ERR_BUSY) {
-					if (action.testCreep() === creep.name) {
-						console.log(`old target: ${creep.target}`);
+					// if (action.testCreep() === creep.name) {
+					console.log(`old target: ${creep.target}`);
+					// }
+					let retNewTarget = action.newTarget(creep);
+					// if (action.testCreep() === creep.name)
+
+					if (!retNewTarget) {
+						console.log(`no new target for ${creep.name}`);
+						action.removeFromQueue(renewQueue, creep);
+						delete creep.target;
+						delete creep.action;
+						return false;
 					}
-					action.newTarget(creep);
-					if (action.testCreep() === creep.name)
+					else {
+						creep.target = retNewTarget;
 						console.log(`getting new target: ${creep.target}`);
-					action.removeFromQueue(renewQueue, creep);
-				}
+					}
+				} else
+					return global.translateErrorCode(ret) === OK;
 			}
 		} else {
 			creep.move(creep.pos.getDirectionTo(spawn));
@@ -112,7 +143,12 @@ action.work = function (creep) {
 		if (spawn.pos.isNearTo(creep)) {
 			creep.move((creep.pos.getDirectionTo(spawn) + 3 % 8) + 1);
 		}
+		return true;
 	}
+
+	return false;
+
+
 };
 
 action.onAssignment = function (creep, target) {

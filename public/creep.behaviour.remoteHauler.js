@@ -1,10 +1,17 @@
 const mod = new Creep.Behaviour('remoteHauler');
 module.exports = mod;
+// mod.actions = (creep) => {
+// 	if (global.REMOTE_HAULER.RENEW)
+// 		return [Creep.action.renewing];
+// 	else
+// 		return [];
+// };
 mod.inflowActions = (creep) => {
 	return [
 		Creep.action.picking,
 		Creep.action.pickingTombstones,
 		Creep.action.uncharging,
+		Creep.action.renewing,
 	];
 };
 mod.outflowActions = (creep) => {
@@ -26,16 +33,16 @@ mod.outflowActions = (creep) => {
 	}
 	return priority;
 };
-mod.renewCreep = function (that, creep) {
+mod.renewCreep = function (creep) {
 
 	if (!global.REMOTE_HAULER.RENEW)
-		return;
+		return false;
 
-	global.logSystem(creep.room.name, `${creep.name} ttl: ${creep.data.ttl} renewal at: ${creep.data.predictedRenewal * 2} needToRenew: ${creep.data.ttl < creep.data.predictedRenewal * 2}`);
+	global.logSystem(creep.pos.roomName, `${creep.name} ttl: ${creep.data.ttl} renewal at: ${creep.data.predictedRenewal * 2} needToRenew: ${creep.data.ttl < creep.data.predictedRenewal * 2}`);
 
-	if (creep.data.ttl < creep.data.predictedRenewal * 2) {
-		return !!that.assignAction(creep, 'renewing');
-	}
+	let ret = this.assignAction(creep, 'renewing');
+	global.logSystem(creep.room.name, `renewing ret: ${ret}`);
+	return ret;
 
 };
 mod.nextAction = function (creep) {
@@ -97,8 +104,8 @@ mod.nextAction = function (creep) {
 			// empty
 
 			// renew
-			if (mod.renewCreep(this, creep))
-				return;
+			// if (mod.renewCreep(creep))
+			// 	return;
 
 			// travelling
 			let gotoTargetRoom = this.gotoTargetRoom(creep);
@@ -108,8 +115,6 @@ mod.nextAction = function (creep) {
 		}
 		// at target room
 		else {
-
-			let creepName = 'remoteHauler-Flag112-3';
 			let casualties = creep.room.casualties.length > 0;
 
 			// if (casualties.length > 0) {

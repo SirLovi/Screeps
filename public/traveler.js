@@ -256,8 +256,7 @@ module.exports = function(globalOpts = {}){
                 travelData.avg = _.round(travelData.cpu / travelData.count, 2);
                 if (travelData.count > 25 && travelData.avg > options.reportThreshold) {
                     if (options.debug){
-                        console.log(`TRAVELER: heavy cpu use: ${creep.name}, avg: ${travelData.cpu / travelData.count}, total: ${_.round(travelData.cpu, 2)},` +
-                            `origin: ${creep.pos}, dest: ${destPos}`);
+                        global.logSystem(creep.room.name, `TRAVELER: heavy cpu use: ${creep.name}, avg: ${travelData.cpu / travelData.count}, total: ${_.round(travelData.cpu, 2)},` + `origin: ${creep.pos}, dest: ${destPos}`);
                     }
                 }
                 if (ret.incomplete) {
