@@ -673,26 +673,29 @@ mod.strategies = {
 		getSpawnRoomName: function (flagRoomName, minWeight, fixedCost) {
 
 			let memory = global.Task.mining.memory(flagRoomName);
-			let spawnRoomName;
 
 			if (Game.time > memory.capacityLastChecked + global.RESET_STORAGE_SPAWN_ROOMS_INTERVAL)
 				delete memory.spawnRoomName;
 
+			let spawnRoom;
+
 			if (memory.spawnRoomName)
 				return memory.spawnRoomName;
 			else
-				spawnRoomName = Room.findSpawnRoom({
+				spawnRoom = Room.findSpawnRoom({
 					targetRoom: flagRoomName,
 					minEnergyCapacity: Math.max(minWeight, fixedCost),
-				}).name;
-			if (_.isNull(spawnRoomName))
-				spawnRoomName = Room.findSpawnRoom({
+				});
+			if (_.isUndefined(spawnRoom))
+				spawnRoom = Room.findSpawnRoom({
 					targetRoom: flagRoomName,
 					minEnergyCapacity: Math.min(minWeight, fixedCost),
-				}).name;
-			memory.spawnRoomName = spawnRoomName;
+				});
 
-			return memory.spawnRoomName;
+			if (!_.isUndefined(spawnRoom)) {
+				memory.spawnRoomName = spawnRoom.name;
+				return memory.spawnRoomName;
+			}
 		},
 		maxWeight: function (flagRoomName, homeRoomName, memory, ignorePopulation, ignoreQueue) {
 			if (!homeRoomName)
