@@ -1,9 +1,9 @@
-// This task will react on Red/Cyan flags, sending a giant (RCL3 Req) claiming creep to the flags position.
+// This task will react on Red/Cyan flags, sending a giant (RCL4 Req) claiming creep to the flags position.
 // FLAG: red-cyan
 let mod = {};
 module.exports = mod;
 mod.name = 'attackController';
-mod.minControllerLevel = 3;
+mod.minControllerLevel = 4;
 // hook into events
 mod.register = () => {
 };
@@ -36,7 +36,7 @@ mod.checkForRequiredCreeps = (flag) => {
 			},
 			{ // spawn room selection params
 				targetRoom: flag.pos.roomName,
-				minEnergyCapacity: 650,
+				minEnergyCapacity: 1300,
 				maxRange: 5,
 			},
 			creepSetup => { // onQueued callback
@@ -140,7 +140,7 @@ mod.creep = {
 			[CLAIM]: 1,
 			[MOVE]: 1,
 		},
-		minMulti: 1,
+		minMulti: 2,
 		maxMulti: 10,
 		name: 'Atk-Contr',
 		behaviour: 'claimer',

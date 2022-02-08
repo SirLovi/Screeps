@@ -830,6 +830,10 @@ mod.extend = function () {
 					global.ROAD_CONSTRUCTION_FORCED_ROOMS[Game.shard.name].indexOf(this.name) === -1)))
 			return;
 
+		if (global.ROAD_CONSTRUCTION_DISABLED_FOR_CLAIMED_ROOMS && creep.room.my){
+			return;
+		}
+
 		let x = creep.pos.x;
 		let y = creep.pos.y;
 
