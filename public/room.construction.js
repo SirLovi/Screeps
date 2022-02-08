@@ -501,11 +501,11 @@ mod.extend = function () {
 					const pos = room.getPositionAt(xPos, yPos);
 					let roomTerrain = Game.rooms[room.name].terrain.get(xPos, yPos);
 
-					if ((pos.lookFor(LOOK_FLAGS).length === 0) && !(roomTerrain === TERRAIN_MASK_WALL) && ((x+y) % 2 === 0)) {
+					if ((pos.lookFor(LOOK_FLAGS).filter(f => f.color === COLOR_BLUE || (f.color === COLOR_WHITE && f.secondaryColor === COLOR_GREY)).length === 0) && !(roomTerrain === TERRAIN_MASK_WALL) && ((x+y) % 2 === 0)) {
 						pos.newFlag(global.FLAG_COLOR.construct.rampart);
-					} else if ((pos.lookFor(LOOK_FLAGS).length === 0) && !(roomTerrain === TERRAIN_MASK_WALL) && (pos.lookFor(LOOK_STRUCTURES).filter(f => f.structureType === STRUCTURE_ROAD).length > 0)){
+					} else if ((pos.lookFor(LOOK_FLAGS).filter(f => f.color === COLOR_BLUE || (f.color === COLOR_WHITE && f.secondaryColor === COLOR_GREY)).length === 0) && !(roomTerrain === TERRAIN_MASK_WALL) && (pos.lookFor(LOOK_STRUCTURES).filter(f => f.structureType === STRUCTURE_ROAD).length > 0)){
 						pos.newFlag(global.FLAG_COLOR.construct.rampart);
-					} else if ((pos.lookFor(LOOK_FLAGS).length === 0) && !(roomTerrain === TERRAIN_MASK_WALL)){
+					} else if ((pos.lookFor(LOOK_FLAGS).filter(f => f.color === COLOR_BLUE || (f.color === COLOR_WHITE && f.secondaryColor === COLOR_GREY)).length === 0) && !(roomTerrain === TERRAIN_MASK_WALL)){
 						pos.newFlag(global.FLAG_COLOR.construct.wall);
 					}
 				}
