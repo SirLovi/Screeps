@@ -686,13 +686,13 @@ mod.strategies = {
 					targetRoom: flagRoomName,
 					minEnergyCapacity: Math.max(minWeight, fixedCost),
 				});
-			if (_.isUndefined(spawnRoom))
+			if (_.isNull(spawnRoom))
 				spawnRoom = Room.findSpawnRoom({
 					targetRoom: flagRoomName,
 					minEnergyCapacity: Math.min(minWeight, fixedCost),
 				});
 
-			if (!_.isUndefined(spawnRoom)) {
+			if (!_.isNull(spawnRoom)) {
 				memory.spawnRoomName = spawnRoom.name;
 				return memory.spawnRoomName;
 			}

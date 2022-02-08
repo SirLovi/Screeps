@@ -533,14 +533,22 @@ mod.execute = function () {
 	};
 	_.forEach(Game.creeps, run);
 };
-mod.bodyCosts = function (body) {
+mod.bodyCosts = function (body, exist = false) {
 	let costs = 0;
 	if (Array.isArray(body)) {
-		body.forEach(function (part) {
-			costs += BODYPART_COST[part];
-		});
+		if (exist) {
+			body.forEach(function (part) {
+				costs += BODYPART_COST[part.type];
+			});
+		} else {
+			body.forEach(function (part) {
+				costs += BODYPART_COST[part];
+			});
+		}
+
 	} else if (typeof body === 'object') {
 		for (const [part, amount] of Object.entries(body)) {
+
 			switch (part) {
 				case MOVE:
 					costs += BODYPART_COST[MOVE] * amount;
