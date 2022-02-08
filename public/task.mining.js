@@ -642,8 +642,8 @@ mod.strategies = {
 	hauler: {
 		name: `hauler-${mod.name}`,
 		setup: function (roomName) {
-			const room = Game.rooms[roomName];
-			return mod.setupCreep(roomName, (Room.isCenterNineRoom(roomName) || (room && !room.my)) ? _.cloneDeep(global.Task.mining.creep.SKHauler) : _.cloneDeep(global.Task.mining.creep.hauler));
+			// const room = Game.rooms[roomName];
+			return mod.setupCreep(roomName, (Room.isCenterNineRoom(roomName)) ? _.cloneDeep(global.Task.mining.creep.SKHauler) : _.cloneDeep(global.Task.mining.creep.hauler));
 		},
 		ept: function (roomName) {
 			const room = Game.rooms[roomName];

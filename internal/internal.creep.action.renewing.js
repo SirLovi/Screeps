@@ -1,7 +1,7 @@
 let action = new Creep.Action('renewing');
 module.exports = action;
-action.testCreep = function () {
-	return 'remoteHauler-Flag90-1';
+action.testRoom = function () {
+	return 'E16S27';
 };
 action.isValidAction = function (creep) {
 	return !creep.room.situation.invasion;
@@ -30,6 +30,9 @@ action.energyPrice = (creep) => {
 
 };
 action.newTarget = function (creep) {
+
+	if (creep.room.name !== action.testRoom())
+		return false;
 
 	action.checkMemory(creep);
 
@@ -124,6 +127,9 @@ action.removeFromQueue = function (creep) {
 };
 action.work = function (creep) {
 
+	if (creep.room.name !== action.testRoom())
+		return false;
+
 	global.logSystem(creep.room.name, `RENEWING IS RUNNING for ${creep.name}`);
 
 	let roomName = creep.room.name;
@@ -132,7 +138,7 @@ action.work = function (creep) {
 	let finishedRenew = creep.data.ttl >= creep.data.predictedRenewal * 3;
 	let inMyRoom = room && room.my;
 
-	if (inMyRoom) {
+	if (!inMyRoom) {
 		global.logSystem(creep.room.name, `RENEWING for ${creep.name} is INVALID (not my room), 'WORK'`);
 		return false;
 	}
@@ -147,7 +153,7 @@ action.work = function (creep) {
 
 	global.logSystem(creep.room.name, `RENEWING STARTED!!! ${creep.name} time: ${Game.time}`);
 
-	// action.checkMemory(creep);
+	action.checkMemory(creep);
 
 
 	let spawn = creep.target;
@@ -174,8 +180,8 @@ action.work = function (creep) {
 					if (!retNewTarget) {
 						console.log(`no new target for ${creep.name}`);
 						action.removeFromQueue(creep);
-						// delete creep.target;
-						// delete creep.action;
+						delete creep.target;
+						delete creep.action;
 						return false;
 					} else {
 						creep.target = retNewTarget;
@@ -188,9 +194,6 @@ action.work = function (creep) {
 			creep.move(creep.pos.getDirectionTo(spawn));
 		}
 	} else if (finishedRenew) {
-		if (action.testCreep() === creep.name) {
-			console.log(`flee 3`);
-		}
 		action.removeFromQueue(creep);
 		flee = true;
 	}

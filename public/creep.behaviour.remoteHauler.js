@@ -1,12 +1,12 @@
 const mod = new Creep.Behaviour('remoteHauler');
 module.exports = mod;
-mod.actions = (creep) => {
-	// if (global.REMOTE_HAULER.RENEW)
-	// 	return [Creep.action.renewing];
-	// else
-	// 	return [];
-	// return [Creep.action.renewing];
-};
+// mod.actions = (creep) => {
+// 	if (global.REMOTE_HAULER.RENEW)
+// 		return [Creep.action.renewing];
+// 	else
+// 		return [];
+// 	return [Creep.action.renewing];
+// };
 mod.inflowActions = (creep) => {
 	return [
 		// Creep.action.renewing,
@@ -42,7 +42,7 @@ mod.renewCreep = function (creep) {
 
 	// global.logSystem(creep.pos.roomName, `${creep.name} ttl: ${creep.data.ttl} renewal at: ${creep.data.predictedRenewal * 2} needToRenew: ${creep.data.ttl < creep.data.predictedRenewal * 2}`);
 
-	let ret = this.assignAction(creep, 'RENEWING');
+	let ret = this.assignAction(creep, 'renewing');
 	global.logSystem(creep.room.name, `RENEWING ret: ${ret} for ${creep.name}`);
 	return ret;
 
@@ -118,15 +118,6 @@ mod.nextAction = function (creep) {
 		// at target room
 		else {
 			let casualties = creep.room.casualties.length > 0;
-
-			// if (casualties.length > 0) {
-			//
-			// 	console.log(`casualty: ${global.json(casualties[0])}`);
-			// }
-			// let casualty = _.min(casualties, 'hits');
-			// global.logSystem(creep.room.name, `casualties: ${casualty}`);
-
-			// console.log(`need energy: ${creepName} ${this.needEnergy(Game.creeps[creepName])}`);
 
 			if (creep.data.destiny.room === creep.pos.roomName) {
 
