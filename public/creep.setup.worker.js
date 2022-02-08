@@ -12,9 +12,9 @@ setup.maxWorker = room => {
     // if none of them are present spawn a worker first
     if (room.controller.level < 4) {
         if (room.situation.invasion) return 1;
-        let max = room.controller.level === 2 ? 3 * room.sources.length : 2 * room.sources.length;
+        let max = room.controller.level === 2 ? 4 * room.sources.length : 3 * room.sources.length;
         const numPioneers = room.population && room.population.typeCount.pioneer || 0;
-        return max - numPioneers + Math.floor(12 / room.controller.level);
+        return max - numPioneers;
     }
     if (!setup.hasMinerOrHauler(room))
         count = count + 1;

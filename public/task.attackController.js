@@ -1,8 +1,9 @@
-// This task will react on Red/Cyan flags, sending a giant (RCL5 Req) claiming creep to the flags position.
+// This task will react on Red/Cyan flags, sending a giant (RCL3 Req) claiming creep to the flags position.
 // FLAG: red-cyan
 let mod = {};
 module.exports = mod;
 mod.name = 'attackController';
+mod.minControllerLevel = 3;
 // hook into events
 mod.register = () => {
 };
@@ -26,7 +27,7 @@ mod.checkForRequiredCreeps = (flag) => {
 	// count creeps assigned to task
 	let count = memory.queued.length + memory.spawning.length + memory.running.length;
 	// if creep count below requirement spawn a new cree
-	if (count < 1 && room && room.controller.upgradeBlocked < 200) {
+	if (count < 1 && ((room && room.controller.upgradeBlocked < 200) || (room && !room.controller.upgradeBlocked) || (!room))) {
 		global.Task.spawn(
 			global.Task.attackController.creep.attackController, // creepDefinition
 			{ // destiny
@@ -35,7 +36,7 @@ mod.checkForRequiredCreeps = (flag) => {
 			},
 			{ // spawn room selection params
 				targetRoom: flag.pos.roomName,
-				minEnergyCapacity: 1300,
+				minEnergyCapacity: 650,
 				maxRange: 5,
 			},
 			creepSetup => { // onQueued callback
@@ -136,8 +137,8 @@ mod.creep = {
 	attackController: {
 		fixedBody: [],
 		multiBody: {
-			[CLAIM]: 2,
-			[MOVE]: 2,
+			[CLAIM]: 1,
+			[MOVE]: 1,
 		},
 		minMulti: 1,
 		maxMulti: 10,
