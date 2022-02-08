@@ -1,7 +1,8 @@
 let action = new Creep.Action('renewing');
 module.exports = action;
 action.testRoom = function () {
-	return 'E16S27';
+	// return 'E16S27';
+	return '';
 };
 action.isValidAction = function (creep) {
 	return !creep.room.situation.invasion;

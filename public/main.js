@@ -208,7 +208,7 @@ global.install = () => {
 			upgrading: load('creep.action.upgrading'),
 			withdrawing: load('creep.action.withdrawing'),
 			safeGen: load('creep.action.safeGen'),
-			// renewing: load('creep.action.renewing'),
+			renewing: load('creep.action.renewing'),
 
 		},
 		behaviour: {

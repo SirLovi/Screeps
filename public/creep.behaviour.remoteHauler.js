@@ -106,8 +106,8 @@ mod.nextAction = function (creep) {
 			// empty
 
 			// renew
-			// if (mod.renewCreep(creep))
-			// 	return;
+			if (mod.renewCreep(creep))
+				return;
 
 			// travelling
 			let gotoTargetRoom = this.gotoTargetRoom(creep);
