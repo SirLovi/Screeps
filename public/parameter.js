@@ -30,6 +30,7 @@ let mod = {
     TRAVELER_STUCK_TICKS: 2, // Number of ticks not moving to be considered stuck by the Traveler API
     TRAVELER_THRESHOLD: 5, // Average creep CPU usage/tick before warning about pathing cost, starts after 25 ticks
     USE_UNBUILT_ROADS: true, // enabling this will set the pathing cost of road construction sites to that of roads
+    USE_UNBUILT_ROADS_REMOTE_ONLY: false,
     GRAFANA: true, // track for Grafana data
     GRAFANA_INTERVAL: 15, // loops between Grafana tracking - No lower than 3.
     CENSUS_ANNOUNCEMENTS: false, // log birth and death

@@ -486,7 +486,7 @@ mod.extend = function () {
 							// don't walk on allied construction sites.
 							if (site && !structure.my && Task.reputation.allyOwner(structure)) return costMatrix.set(structure.pos.x, structure.pos.y, 0xFF);
 							if (structure.structureType === STRUCTURE_ROAD) {
-								if (!site || USE_UNBUILT_ROADS)
+								if (!site || (USE_UNBUILT_ROADS && !USE_UNBUILT_ROADS_REMOTE_ONLY) || (USE_UNBUILT_ROADS_REMOTE_ONLY && !this.my))
 									return costMatrix.set(structure.pos.x, structure.pos.y, 1);
 							} else if (structure.structureType === STRUCTURE_PORTAL) {
 								return costMatrix.set(structure.pos.x, structure.pos.y, 0xFF); // only take final step onto portals
@@ -2353,8 +2353,8 @@ mod.routeCallback = function (origin, destination, options) {
 			return 1;
 		else if (isHighway)
 			return 3;
-		else if (Game.map.getRoomStatus(roomName) === 'normal') ;
-		return (options.checkOwner || options.preferHighway) ? 11 : 1;
+		else if (Game.map.getRoomStatus(roomName) !== 'closed')
+			return (options.checkOwner || options.preferHighway) ? 11 : 1;
 		return Number.POSITIVE_INFINITY;
 	};
 };

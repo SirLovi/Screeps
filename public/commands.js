@@ -15,24 +15,21 @@ global.listConstructionSites(filter);
 // Removes all flags with primary COLOR_CYAN (construction flags)
 global.removeConstructionFlags();
 
-
 global.removeRoomConstructionFlags('roomName');
-
 
 global.removeRoomRoadFlags('roomName');
 
-
 global.removeConstructionSites('roomName');
 
+for(const roomName in Memory.tasks.mining) {delete Memory.tasks.mining[roomName];}
+
+for(const roomName in Memory.rooms) {delete Memory.rooms[roomName].spawnQueueLow;delete Memory.rooms[roomName].spawnQueueMedium;delete Memory.rooms[roomName].spawnQueueHigh;}
 
 _.forEach((Game.rooms["roomName"].find(FIND_CREEPS)), s => s.suicide());
 
-
 _.forEach((Game.rooms["roomName"].find(FIND_STRUCTURES, {filter: (i) => i.structureType == STRUCTURE_WALL })), s => s.destroy());
 
-
 global.Util.resetBoostProduction();
-
 
 Game.rooms['roomName'].placeRoomOrder('orderId', RESOURCE_ENERGY, 50000);
 

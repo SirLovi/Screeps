@@ -49,11 +49,11 @@ action.step = function(creep){
 };
 action.work = function(creep){
 
-    global.logSystem(creep.room.name, `time to die: ${creep.room.controller.upgradeBlocked} > ${creep.ticksToLive}`);
-
+    //global.logSystem(creep.room.name, `time to die: ${creep.room.controller.upgradeBlocked} > ${creep.ticksToLive}`);
+    /*
     if (creep.room.controller.upgradeBlocked > creep.ticksToLive)
         creep.suicide();
-
+    */
     let workResult;
 
     creep.controllerSign();
@@ -71,4 +71,9 @@ action.work = function(creep){
     global.logSystem(creep.room.name, `workResult: ${workResult}`);
 
     return workResult;
+};
+action.defaultStrategy.moveOptions = function(options) {
+    // allow routing in and through hostile rooms
+    if (_.isUndefined(options.allowHostile)) options.allowHostile = true;
+    return options;
 };
