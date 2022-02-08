@@ -361,6 +361,14 @@ mod.removeRoomConstructionFlags = function (roomName) {
 	}
 	return `Removed ${removeFlags.length} construction flags.`;
 };
+mod.removeRoomWallRampartFlags = function (roomName) {
+	let room = Game.rooms[roomName];
+	let removeFlags = _.filter(room.find(FIND_FLAGS), flag => flag.color === COLOR_BLUE || (flag.color === COLOR_WHITE && flag.secondaryColor === COLOR_GREY));
+	for (let flag of removeFlags) {
+		flag.remove();
+	}
+	return `Removed ${removeFlags.length} construction flags.`;
+};
 mod.removeConstructionSites = function (roomName) {
 	let room = Game.rooms[roomName];
 	let removeSites = room.find(FIND_CONSTRUCTION_SITES);
