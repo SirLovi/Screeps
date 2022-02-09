@@ -214,7 +214,7 @@ mod.checkForRequiredCreeps = (flag) => {
 				{
 					targetRoom: miningRoomName,
 					explicit: spawnRoom.name,
-					minEnergyCapacity: Creep.bodyCosts(hauler.fixedBody),
+					// minEnergyCapacity: Creep.bodyCosts(hauler.fixedBody),
 				},
 				creepSetup => { // onQueued callback
 					const memory = global.Task.mining.memory(creepSetup.destiny.room);

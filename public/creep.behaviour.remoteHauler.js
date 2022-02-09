@@ -35,6 +35,24 @@ mod.outflowActions = (creep) => {
 	}
 	return priority;
 };
+mod.selectInflowAction = function(creep) {
+	const p = Util.startProfiling('selectInflowAction' + creep.name, {enabled: PROFILING.BEHAVIOUR});
+	const actionChecked = {};
+	const outflowActions = this.outflowActions(creep);
+	for (const action of this.inflowActions(creep)) {
+		if (!actionChecked[action.name]) {
+			actionChecked[action.name] = true;
+			if (this.assignAction(creep, action, undefined, outflowActions)) {
+				p.checkCPU('assigned' + action.name, 1.5);
+				return;
+			}
+		}
+	}
+	if (creep.room.name !== creep.data.homeRoom) {
+		p.checkCPU('!assigned', 1.5);
+		return Creep.action.idle.assign(creep);
+	}
+};
 mod.renewCreep = function (creep) {
 
 	if (!global.REMOTE_HAULER.RENEW)
@@ -62,20 +80,21 @@ mod.deposit = (that, creep) => {
 	if (deposit.length > 0) {
 		let target = creep.pos.findClosestByRange(deposit);
 		if (target.structureType === STRUCTURE_STORAGE && that.assignAction(creep, 'storing', target))
-			return;
+			return true;
 		else if (that.assignAction(creep, 'charging', target))
-			return;
+			return true;
 		else if (that.assignAction(creep, 'storing'))
-			return; // prefer storage
+			return true; // prefer storage
+
 	}
 	if (that.assignAction(creep, 'charging'))
-		return;
+		return true;
 	// no deposit :/
 	// try spawn & extensions
 	if (that.assignAction(creep, 'feeding'))
-		return;
+		return true;
 	if (that.assignAction(creep, 'dropping'))
-		return;
+		return true;
 	else {
 		const drop = r => {
 			if (creep.carry[r] > 0) creep.drop(r);
