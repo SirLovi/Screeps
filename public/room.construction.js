@@ -479,8 +479,6 @@ mod.extend = function () {
 		if (!room)
 			return;
 
-		const layout = Room.roomLayoutArray;
-
 		const [centerX, centerY] = [flag.pos.x, flag.pos.y];
 
 		const failed = () => {
@@ -489,24 +487,30 @@ mod.extend = function () {
 			return false;
 		};
 
-		for (let x = 0; x < layout.length; x++) {
-			for (let y = 0; y < layout[x].length; y++) {
-				const xPos = Math.floor(centerX + (x - layout.length / 2) + 1);
-				const yPos = Math.floor(centerY + (y - layout.length / 2) + 1);
+		const bunkerDiameter = 16;
+
+		for (let x = 0; x <= bunkerDiameter; x++) {
+			for (let y = 0; y <= bunkerDiameter; y++) {
+				const xPos = Math.floor(centerX + (x - bunkerDiameter / 2));
+				const yPos = Math.floor(centerY + (y - bunkerDiameter / 2));
 
 				if (xPos >= 50 || xPos < 0 || yPos >= 50 || yPos < 0)
 					return failed();
-				const pos = room.getPositionAt(xPos, yPos);
-				let roomTerrain = Game.rooms[room.name].terrain.get(xPos, yPos);
 
-				if ((pos.lookFor(LOOK_STRUCTURES).length > 0) &&
-					(pos.lookFor(LOOK_STRUCTURES).filter(f => f.structureType === STRUCTURE_RAMPART).length === 0) &&
-					(pos.lookFor(LOOK_FLAGS).filter(f => f.color === COLOR_BLUE).length === 0) &&
-					!(roomTerrain === TERRAIN_MASK_WALL)) {
+				if((x === 0 ) || (y === 0 ) || (x === bunkerDiameter ) || (y === bunkerDiameter )){
+					const pos = room.getPositionAt(xPos, yPos);
+					let roomTerrain = Game.rooms[room.name].terrain.get(xPos, yPos);
+
+					if ((pos.lookFor(LOOK_STRUCTURES).filter(f => f.structureType === STRUCTURE_WALL || f.structureType === STRUCTURE_RAMPART).length === 0) && (pos.lookFor(LOOK_FLAGS).filter(f => f.color === COLOR_BLUE || (f.color === COLOR_WHITE && f.secondaryColor === COLOR_GREY)).length === 0) && !(roomTerrain === TERRAIN_MASK_WALL) && ((x+y) % 2 === 0)) {
 						pos.newFlag(global.FLAG_COLOR.construct.rampart);
+					} else if ((pos.lookFor(LOOK_STRUCTURES).filter(f => f.structureType === STRUCTURE_WALL || f.structureType === STRUCTURE_RAMPART).length === 0) && (pos.lookFor(LOOK_FLAGS).filter(f => f.color === COLOR_BLUE || (f.color === COLOR_WHITE && f.secondaryColor === COLOR_GREY)).length === 0) && !(roomTerrain === TERRAIN_MASK_WALL) && (pos.lookFor(LOOK_STRUCTURES).filter(f => f.structureType === STRUCTURE_ROAD).length > 0)){
+						pos.newFlag(global.FLAG_COLOR.construct.rampart);
+					} else if ((pos.lookFor(LOOK_STRUCTURES).filter(f => f.structureType === STRUCTURE_WALL || f.structureType === STRUCTURE_RAMPART).length === 0) && (pos.lookFor(LOOK_FLAGS).filter(f => f.color === COLOR_BLUE || (f.color === COLOR_WHITE && f.secondaryColor === COLOR_GREY)).length === 0) && !(roomTerrain === TERRAIN_MASK_WALL)){
+						pos.newFlag(global.FLAG_COLOR.construct.wall);
 					}
 				}
 			}
+		}
 		flag.remove();
 	};
 };

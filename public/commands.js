@@ -17,6 +17,8 @@ global.removeConstructionFlags();
 
 global.removeRoomConstructionFlags('roomName');
 
+global.removeRoomWallRampartFlags('roomName');
+
 global.removeRoomRoadFlags('roomName');
 
 global.removeConstructionSites('roomName');
