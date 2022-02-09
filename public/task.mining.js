@@ -632,8 +632,8 @@ mod.strategies = {
 	miner: {
 		name: `miner-${mod.name}`,
 		setup: function (roomName) {
-			const room = Game.rooms[roomName];
-			return mod.setupCreep(roomName, (Room.isCenterNineRoom(roomName) || (room && !room.my)) ? _.cloneDeep(global.Task.mining.creep.SKMiner) : _.cloneDeep(global.Task.mining.creep.miner));
+			// const room = Game.rooms[roomName];
+			return mod.setupCreep(roomName, (Room.isCenterNineRoom(roomName)) ? _.cloneDeep(global.Task.mining.creep.SKMiner) : _.cloneDeep(global.Task.mining.creep.miner));
 		},
 		shouldSpawn: function (minerCount, sourceCount) {
 			return minerCount < sourceCount;
