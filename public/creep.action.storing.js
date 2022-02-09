@@ -105,11 +105,9 @@ mod.work = function (creep) {
 
 
         if (creep.target.structureType === STRUCTURE_TERMINAL) {
-
             amount = Math.min(Math.abs(creep.room.terminal.getNeeds(resourceType)), creep.carry[resourceType]);
         }
         else if (creep.target.structureType === STRUCTURE_STORAGE) {
-
             amount = Math.min(Math.abs(creep.room.storage.getNeeds(resourceType)), creep.carry[resourceType]);
         }
 

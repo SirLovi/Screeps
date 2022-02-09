@@ -199,9 +199,9 @@ mod.checkForRequiredCreeps = (flag) => {
 			if (minWeight)
 				hauler.minWeight = minWeight;
 
-			console.log(`hauler fixedBody: ${Creep.bodyCosts(hauler.fixedBody)}`);
-			console.log(`hauler maxWeight: ${hauler.maxWeight}`);
-			console.log(`hauler minWeight: ${hauler.minWeight}`);
+			// console.log(`hauler fixedBody: ${Creep.bodyCosts(hauler.fixedBody)}`);
+			// console.log(`hauler maxWeight: ${hauler.maxWeight}`);
+			// console.log(`hauler minWeight: ${hauler.minWeight}`);
 
 			global.Task.spawn(
 				hauler,
@@ -600,12 +600,12 @@ mod.creepSize = function (roomName, carry, setup, ignorePopulation) {
 	const multiBodyCost = Creep.bodyCosts(setup.multiBody);
 	const ret = fixedBodyCost + multiBodyCost * _.ceil(multiCarry * 0.5);
 
-	if (ignorePopulation) {
-		global.logSystem(roomName, `multiCarry: ${multiCarry}`);
-		global.logSystem(roomName, `fixedCost: ${fixedBodyCost}`);
-		global.logSystem(roomName, `multiCost: ${multiBodyCost}`);
-		global.logSystem(roomName, `return => creepSize: ${ret}`);
-	}
+	// if (ignorePopulation) {
+	// 	global.logSystem(roomName, `multiCarry: ${multiCarry}`);
+	// 	global.logSystem(roomName, `fixedCost: ${fixedBodyCost}`);
+	// 	global.logSystem(roomName, `multiCost: ${multiBodyCost}`);
+	// 	global.logSystem(roomName, `return => creepSize: ${ret}`);
+	// }
 
 	return ret;
 };
@@ -730,8 +730,8 @@ mod.strategies = {
 					haulers: existingHaulers.length + queuedHaulers.length, ept, travel, existingCarry, queuedCarry,
 					neededCarry, maxWeight, [mod.name]: 'maxWeight',
 				});
-			if (ignorePopulation)
-				global.logSystem(flagRoomName, `setup maxWeight: ${maxWeight}`);
+			// if (ignorePopulation)
+			// 	global.logSystem(flagRoomName, `setup maxWeight: ${maxWeight}`);
 			return maxWeight;
 		},
 	},

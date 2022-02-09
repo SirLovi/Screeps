@@ -45,7 +45,7 @@ mod.creep = {
         },
         name: "guard",
         behaviour: "warrior",
-        queue: 'Low'
+        queue: 'High'
     }
 };
 // check if a new creep has to be spawned

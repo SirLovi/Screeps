@@ -47,6 +47,43 @@ mod.renewCreep = function (creep) {
 	return ret;
 
 };
+mod.deposit = (that, creep) => {
+	let deposit = []; // deposit energy in...
+	// links?
+	if (creep.carry.energy === creep.sum)
+		deposit = creep.room.structures.links.privateers;
+	// storage?
+	if (creep.room.storage)
+		deposit.push(creep.room.storage);
+	// containers?
+	if (creep.room.structures.container)
+		deposit = deposit.concat(creep.room.structures.container.privateers);
+	// Choose the closest
+	if (deposit.length > 0) {
+		let target = creep.pos.findClosestByRange(deposit);
+		if (target.structureType === STRUCTURE_STORAGE && that.assignAction(creep, 'storing', target))
+			return;
+		else if (that.assignAction(creep, 'charging', target))
+			return;
+		else if (that.assignAction(creep, 'storing'))
+			return; // prefer storage
+	}
+	if (that.assignAction(creep, 'charging'))
+		return;
+	// no deposit :/
+	// try spawn & extensions
+	if (that.assignAction(creep, 'feeding'))
+		return;
+	if (that.assignAction(creep, 'dropping'))
+		return;
+	else {
+		const drop = r => {
+			if (creep.carry[r] > 0) creep.drop(r);
+		};
+		_.forEach(Object.keys(creep.carry), drop);
+		return this.assignAction(creep, 'idle');
+	}
+}
 mod.nextAction = function (creep) {
 
 	const flag = creep.data.destiny && Game.flags[creep.data.destiny.targetName];
@@ -62,48 +99,21 @@ mod.nextAction = function (creep) {
 		let creepTargetRoomName = Memory.flags[flag.name].roomName;
 		let miningRoom = global.Task.mining.memory[creepTargetRoomName];
 		let spawnRoomName = miningRoom ? miningRoom.spawnRoomName : false;
+		let ret;
 
 		if (creep.pos.roomName === creep.data.homeRoom || (spawnRoomName ? creep.pos.roomName === spawnRoomName : false)) {
 
 			// carrier filled
-			if (creep.sum > 0) {
-				let deposit = []; // deposit energy in...
-				// links?
-				if (creep.carry.energy === creep.sum)
-					deposit = creep.room.structures.links.privateers;
-				// storage?
-				if (creep.room.storage)
-					deposit.push(creep.room.storage);
-				// containers?
-				if (creep.room.structures.container)
-					deposit = deposit.concat(creep.room.structures.container.privateers);
-				// Choose the closest
-				if (deposit.length > 0) {
-					let target = creep.pos.findClosestByRange(deposit);
-					if (target.structureType === STRUCTURE_STORAGE && this.assignAction(creep, 'storing', target))
-						return;
-					else if (this.assignAction(creep, 'charging', target))
-						return;
-					else if (this.assignAction(creep, 'storing'))
-						return; // prefer storage
-				}
-				if (this.assignAction(creep, 'charging'))
+			if (!this.needEnergy(creep)) {
+				return mod.deposit(this, creep);
+			} else if (creep.sum > 0) {
+				ret = this.nextEnergyAction(creep);
+				global.logSystem(creep.room.name, `creep ${creep.name} wants more: ret ${ret}`);
+				if (ret)
 					return;
-				// no deposit :/
-				// try spawn & extensions
-				if (this.assignAction(creep, 'feeding'))
-					return;
-				if (this.assignAction(creep, 'dropping'))
-					return;
-				else {
-					const drop = r => {
-						if (creep.carry[r] > 0) creep.drop(r);
-					};
-					_.forEach(Object.keys(creep.carry), drop);
-					return this.assignAction(creep, 'idle');
-				}
+				else
+					return mod.deposit(this, creep);
 			}
-			// empty
 
 			// renew
 			if (mod.renewCreep(creep))
@@ -114,6 +124,7 @@ mod.nextAction = function (creep) {
 			if (gotoTargetRoom) {
 				return;
 			}
+
 		}
 		// at target room
 		else {
@@ -127,44 +138,23 @@ mod.nextAction = function (creep) {
 
 				let ret = false;
 
-
 				if (casualties) {
-
-					// global.logSystem(creep.room.name, `casualties: ${creep.room.casualties.length}`);
-
-					// ret = this.assignAction(creep, 'healing', casualty);
 					creep.action = Creep.action.healing;
 					ret = Creep.behaviour.ranger.heal.call(this, creep);
 
 					ret = ret === 0;
 
-					// if (creep.name === creepName)
-					// global.logSystem(creep.room.name, `try to heal: ${creepName} ${ret}`);
-
 				}
 				if (!this.needEnergy(creep)) {
-
 					ret = this.goHome(creep);
-					// if (creep.name === creepName)
-					// 	console.log(`try to go home: ${creepName} ${ret}`);
-
 				}
 
 				if (!ret && this.needEnergy(creep)) {
-
 					ret = this.nextEnergyAction(creep);
-					// if (creep.name === creepName)
-					// 	console.log(`get energy: ${creepName} ${ret}`);
-
 				}
-
-
 
 				if (ret)
 					return ret;
-
-				// if (creep.name === creepName)
-				// 	console.log(`remote ret: ${creepName} ${ret}`);
 
 				return false;
 
