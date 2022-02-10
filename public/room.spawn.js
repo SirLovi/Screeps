@@ -80,7 +80,8 @@ mod.extend = function () {
 			let energyAvailable = room.energyAvailable * weight.energyAvailable;
 			let ret = distance + rcl + spawnTime - energyAvailable;
 
-			// global.logSystem(room.name, `distance: ${distance} rcl: ${rcl} spawnTime: ${spawnTime} energyAvailable: ${energyAvailable} ret: ${ret}`);
+			if (global.DEBUG && global.DEBUGGING.findSpawnRoom)
+				global.logSystem(room.name, `distance: ${distance} rcl: ${rcl} spawnTime: ${spawnTime} energyAvailable: ${energyAvailable} ret: ${ret}`);
 
 			return ret;
 		};

@@ -7,6 +7,10 @@ let mod = {
     SAY_ASSIGNMENT: true, // say a symbol representing the assiged action
     SAY_PUBLIC: true, // creeps talk public
     DEBUG: true, // gimme some more details, use false not undefined to unset
+    DEBUGGING: {
+        OCSMemory: false,
+        findSpawnRoom: true,
+    },
     DEBUG_STACKS: false, // add stack frame to EVERY console.log message (spammy!)
     TRACE: false, // use Memory.debugTrace for low-level information
     PROFILE: false, // enable CPU profiling
