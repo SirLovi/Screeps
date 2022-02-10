@@ -337,14 +337,16 @@ mod.strategies = {
         homeRoom: function(flagRoomName) {
             // Explicity set by user?
             let memory = Task.powerMining.memory(flagRoomName);
-            if(memory.storageRoom) return Game.rooms[memory.storageRoom];
+            if(memory.storageRoom)
+                return Game.rooms[memory.storageRoom];
             // Otherwise, score it
-            return Room.bestSpawnRoomFor(flagRoomName);
+            return Room.closestSpawnRoomFor(flagRoomName);
         },
         spawnRoom: function(flagRoomName) {
             return Room.findSpawnRoom({
                 targetRoom: flagRoomName,
-                minEnergyCapacity: 1500
+                minEnergyCapacity: 1500,
+                name: 'powerMining'
             });
         },
 

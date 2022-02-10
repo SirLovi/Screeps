@@ -6,7 +6,7 @@ mod.run = function(creep) {
     if (creep.hits < creep.hitsMax && (!creep.action || creep.action.name !== 'travelling')) { // creep injured. move to next owned room
         if (creep.data) {
             if (!creep.data.nearestHome || !Game.rooms[creep.data.nearestHome]) {
-                const nearestSpawnRoom = Room.bestSpawnRoomFor(creep.pos.roomName);
+                const nearestSpawnRoom = Room.closestSpawnRoomFor(creep.pos.roomName);
                 if (nearestSpawnRoom) {
                     creep.data.nearestHome = nearestSpawnRoom.name;
                 }

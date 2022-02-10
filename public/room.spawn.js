@@ -44,7 +44,7 @@ mod.extend = function () {
 		} else delete this.memory.spawns;
 	};
 
-	Room.bestSpawnRoomFor = function (targetRoomName) {
+	Room.closestSpawnRoomFor = function (targetRoomName) {
 		let range = room => global.Util.routeRange(room.name, targetRoomName);
 		return _.min(myRooms, range);
 	};
@@ -68,7 +68,6 @@ mod.extend = function () {
 		if (validRooms.length === 0)
 			return null;
 		// select "best"
-		// range + roomLevelsUntil8/rangeRclRatio + spawnQueueDuration/rangeQueueRatio
 		let queueTime = queue => _.sum(queue, c => (c.parts.length * 3));
 		let roomTime = room => ((queueTime(room.spawnQueueLow) * 0.9) + queueTime(room.spawnQueueMedium) + (queueTime(room.spawnQueueHigh) * 1.1)) / room.structures.spawns.length;
 		let evaluation = room => {
@@ -80,11 +79,26 @@ mod.extend = function () {
 			let energyAvailable = room.energyAvailable * weight.energyAvailable;
 			let ret = distance + rcl + spawnTime - energyAvailable;
 
-			if (global.DEBUG && global.debugger(global.DEBUGGING.findSpawnRoom, room.name))
-				global.logSystem(room.name, `distance: ${distance} rcl: ${rcl} spawnTime: ${spawnTime} energyAvailable: ${energyAvailable} ret: ${ret}`);
+			// console.log(`targetRoom: ${params.targetRoom} spawnRoom: ${room.name}`);
+
+			if (global.DEBUG && global.debugger(global.DEBUGGING.targetRoom, params.targetRoom)) {
+				if (global.DEBUG && global.debugger(global.DEBUGGING.findSpawnRoom, room.name)) {
+					global.logSystem(room.name, `targetRoom: ${params.targetRoom} distance: ${distance} rcl: ${rcl} spawnTime: ${spawnTime} energyAvailable: ${energyAvailable} ret: ${ret}`);
+				}
+			}
 
 			return ret;
 		};
-		return _.min(validRooms, evaluation);
+		// console.log(validRooms);
+		let ret = _.min(validRooms, evaluation);
+		console.log(`retName: ${ret.name}, console: ${global.debugger(global.DEBUGGING.findSpawnRoom, ret.name)}`);
+		if (global.DEBUG && global.debugger(global.DEBUGGING.findSpawnRoom, ret.name)) {
+			if (!params.name && !params.behaviour)
+				console.log(`not name or behaviour at ${ret.name} params: ${global.json(params)}`);
+			global.logSystem(ret.name, `is the spawningRoom for ${params.behavior ? params.behaviour : params.name ? params.name : 'unknown'}`);
+
+		}
+
+		return ret;
 	};
 };

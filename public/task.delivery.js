@@ -48,7 +48,10 @@ mod.checkForRequiredCreeps = function(flag) {
         const deliveryFlag = FlagDir.find(FLAG_COLOR.claim.delivery, flag.pos); // TODO mod, modArgs to re-cost the room?
         let targetRoom = deliveryFlag && deliveryFlag.pos.roomName;
         if( !targetRoom ) {
-            const room = Room.findSpawnRoom({targetRoom: flag.pos.roomName});
+            const room = Room.findSpawnRoom({
+                targetRoom: flag.pos.roomName,
+                name: 'task_delivery'
+            });
             if( !room ) {
                 // TODO error, cloak flag?
                 return;

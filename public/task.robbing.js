@@ -409,13 +409,14 @@ mod.strategies = {
             if (memory.storageRoom)
                 return memory.storageRoom;
             // Otherwise, score it
-            return Room.bestSpawnRoomFor(flag.pos.roomName);
+            return Room.closestSpawnRoomFor(flag.pos.roomName);
         },
         spawnRoom: function (roomName, minWeight) {
             return Room.findSpawnRoom({
                 targetRoom: roomName,
                 allowTargetRoom: true,
-                minEnergyCapacity: minWeight || 250
+                minEnergyCapacity: minWeight || 250,
+                name: 'robbing',
             });
         }
     },

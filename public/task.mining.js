@@ -134,7 +134,6 @@ mod.checkForRequiredCreeps = (flag) => {
 				},
 				{ // spawn room selection params
 					targetRoom: miningRoomName,
-					// minEnergyCapacity: miner.minEnergyCapacity,
 					minEnergyCapacity: Creep.bodyCosts(miner.fixedBody),
 					rangeRclRatio: 1,
 				},
@@ -158,7 +157,7 @@ mod.checkForRequiredCreeps = (flag) => {
 		droppedEnergy = _.sum(room.droppedResources, 'energy');
 
 	if (droppedEnergy && droppedEnergy > 500)
-		maxHaulers = global.round(memory.running.remoteMiner.length * global.REMOTE_HAULER.MULTIPLIER) || 0;
+		maxHaulers = global.round((memory.running.remoteMiner.length || 1) * global.REMOTE_HAULER.MULTIPLIER);
 	else
 		maxHaulers = memory.running.remoteMiner.length || 0;
 
@@ -214,11 +213,12 @@ mod.checkForRequiredCreeps = (flag) => {
 				{
 					targetRoom: miningRoomName,
 					explicit: spawnRoom.name,
-					// minEnergyCapacity: Creep.bodyCosts(hauler.fixedBody),
+					minEnergyCapacity: Creep.bodyCosts(hauler.fixedBody),
 				},
 				creepSetup => { // onQueued callback
 					const memory = global.Task.mining.memory(creepSetup.destiny.room);
-					global.logSystem(miningRoomName, `hauler creepSetup size ${creepSetup.parts.length}`);
+					if (global.DEBUG && global.debugger(global.DEBUGGING.findSpawnRoom, spawnRoomName))
+						global.logSystem(miningRoomName, `hauler creepSetup size ${creepSetup.parts.length}`);
 					// global.logSystem(storageRoomName, `HAULER QUEUED: ${global.json(hauler)}`);
 					memory.queued[creepSetup.behaviour].push({
 						room: creepSetup.queueRoom,
@@ -582,14 +582,13 @@ mod.carryPartsPopulation = function (miningRoomName, homeRoomName) {
 	const totalWeight = global.Task.mining.strategies.hauler.maxWeight(miningRoomName, homeRoomName, undefined, true, true);
 	const ret = 1 - neededWeight / totalWeight;
 
-	if (ret !== 0) {
-		global.logSystem(miningRoomName, `neededWeight: ${neededWeight} totalWeight: ${totalWeight} ret: ${ret}`);
-		// console.log(`miningRoom: ${miningRoomName} homeRoom: ${homeRoomName}`);
-		// console.log(`neededWeight: ${neededWeight} totalWeight: ${totalWeight} ret: ${ret}`);
-	}
 
 	// it is 0, if we need is 0, -ret if we need more
-	return ret;
+	return {
+		ret: ret,
+		neededWeight: neededWeight,
+		totalWeight: totalWeight,
+	};
 };
 mod.creepSize = function (roomName, carry, setup, ignorePopulation) {
 	if (!carry || carry < 0)
@@ -600,12 +599,12 @@ mod.creepSize = function (roomName, carry, setup, ignorePopulation) {
 	const multiBodyCost = Creep.bodyCosts(setup.multiBody);
 	const ret = fixedBodyCost + multiBodyCost * _.ceil(multiCarry * 0.5);
 
-	// if (ignorePopulation) {
+
 	// 	global.logSystem(roomName, `multiCarry: ${multiCarry}`);
 	// 	global.logSystem(roomName, `fixedCost: ${fixedBodyCost}`);
 	// 	global.logSystem(roomName, `multiCost: ${multiBodyCost}`);
 	// 	global.logSystem(roomName, `return => creepSize: ${ret}`);
-	// }
+
 
 	return ret;
 };
@@ -667,7 +666,7 @@ mod.strategies = {
 				return memory.storageRoomName;
 			// Otherwise, score it
 
-			memory.storageRoomName = Room.bestSpawnRoomFor(flagRoomName).name;
+			memory.storageRoomName = Room.closestSpawnRoomFor(flagRoomName).name;
 			return memory.storageRoomName;
 		},
 		getSpawnRoomName: function (flagRoomName, minWeight, fixedCost) {
@@ -716,12 +715,22 @@ mod.strategies = {
 			const validHaulers = _.filter(existingHaulers, c => !global.Task.mining.needsReplacement(c));
 			const existingCarry = _.sum(validHaulers, c => (c && c.data && c.data.body) ? c.data.body.carry : 4);
 			const queuedCarry = _.sum(queuedHaulers, c => (c && c.body) ? c.body.carry : 4);
-			let neededCarry = ept * travel * 2 + (memory.carrySize || 0) - existingCarry - queuedCarry;
-			// const room = Game.rooms[flagRoomName]
-			// const dropped = room ? room.find(FIND_DROPPED_RESOURCES) : null;
-			// mod.checkCarryParts(flagRoomName, dropped);
 
-			// console.log(`this setup: ${global.json(this.setup(flagRoomName))}`);
+			const room = Game.rooms[flagRoomName]
+			const dropped = room ? room.droppedResources : 0;
+			let droppedCarry = function (dropped) {
+				if (dropped.length === 0)
+					return 0;
+				else {
+					let droppedResources = _.sum(dropped, 'amount');
+					if (droppedResources > 500)
+						return Math.ceil(dropped.amount / 1000);
+					else
+						return 0;
+				}
+			}
+
+			let neededCarry = ept * travel * 2 + (memory.carrySize || 0) - existingCarry - queuedCarry + droppedCarry(dropped);
 
 			const maxWeight = mod.creepSize(flagRoomName, neededCarry, this.setup(flagRoomName), ignorePopulation);
 			if (global.DEBUG && global.TRACE)
@@ -730,8 +739,7 @@ mod.strategies = {
 					haulers: existingHaulers.length + queuedHaulers.length, ept, travel, existingCarry, queuedCarry,
 					neededCarry, maxWeight, [mod.name]: 'maxWeight',
 				});
-			// if (ignorePopulation)
-			// 	global.logSystem(flagRoomName, `setup maxWeight: ${maxWeight}`);
+
 			return maxWeight;
 		},
 	},
