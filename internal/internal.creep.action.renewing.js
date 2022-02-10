@@ -32,7 +32,7 @@ action.energyPrice = (creep) => {
 };
 action.newTarget = function (creep) {
 
-	if (creep.room.name !== action.testRoom())
+	if (!global.debugger(global.DEBUGGING.renewing, creep.room.name))
 		return false;
 
 	action.checkMemory(creep);

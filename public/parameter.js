@@ -10,6 +10,7 @@ let mod = {
     DEBUGGING: {
         OCSMemory: false, // boolean or an array of roomNames e.g.: ['E16S27', 'W23E45'] to restrict debug to that rooms
         findSpawnRoom: [''],
+        renewing: false,
     },
     DEBUG_STACKS: false, // add stack frame to EVERY console.log message (spammy!)
     TRACE: false, // use Memory.debugTrace for low-level information
@@ -180,6 +181,12 @@ let mod = {
         REHOME: true, // May haulers choose closer storage for delivery?
         RESET_STORAGE_SPAWN_ROOMS_INTERVAL: 100, // looking for the best spawn room
         RENEW: true, // remoteHaulers will renew himself.
+    },
+    FIND_SPAWN_ROOM_WEIGHT: {
+        routeRange: 10,
+        rcl: 1,
+        roomTime: 1,
+        energyAvailable: 0.001,
     },
     TASK_CREEP_CHECK_INTERVAL: 250, // Maximum number of ticks before a task checks to see if it needs to spawn new creeps
     REMOTE_RESERVE_HAUL_CAPACITY: 0.1, // Percent of allocated haul capacity before sending reservers.
@@ -446,12 +453,6 @@ let mod = {
         enabled: true,
         display: true,
         timing: 100
-    },
-    FIND_SPAWN_ROOM_WEIGHT: {
-        routeRange: 10,
-        rcl: 1,
-        roomTime: 1,
-        energyAvailable: 0.001,
     },
 };
 module.exports = mod;
