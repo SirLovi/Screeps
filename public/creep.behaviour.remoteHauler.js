@@ -58,6 +58,9 @@ mod.renewCreep = function (creep) {
 	if (!global.REMOTE_HAULER.RENEW)
 		return false;
 
+	if (!global.debugger(global.DEBUGGING.renewing, creep.room.name))
+		return false;
+
 	// global.logSystem(creep.pos.roomName, `${creep.name} ttl: ${creep.data.ttl} renewal at: ${creep.data.predictedRenewal * 2} needToRenew: ${creep.data.ttl < creep.data.predictedRenewal * 2}`);
 
 	let ret = this.assignAction(creep, 'renewing');
@@ -126,12 +129,16 @@ mod.nextAction = function (creep) {
 			if (!this.needEnergy(creep)) {
 				return mod.deposit(this, creep);
 			} else if (creep.sum > 0) {
-				ret = this.nextEnergyAction(creep);
-				global.logSystem(creep.room.name, `creep ${creep.name} wants more: ret ${ret}`);
-				if (ret)
-					return;
-				else
+				if (global.DEBUG && global.debugger(global.DEBUGGING.remoteHaulersPicking, creep.room.name)) {
+					ret = this.nextEnergyAction(creep);
+					global.logSystem(creep.room.name, `creep ${creep.name} wants more: ret ${ret}`);
+					if (ret)
+						return;
+					else
+						return mod.deposit(this, creep);
+				} else {
 					return mod.deposit(this, creep);
+				}
 			}
 
 			// renew

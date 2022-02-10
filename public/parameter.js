@@ -9,8 +9,9 @@ let mod = {
     DEBUG: true, // gimme some more details, use false not undefined to unset
     DEBUGGING: {
         OCSMemory: false, // boolean or an array of roomNames e.g.: ['E16S27', 'W23E45'] to restrict debug to that rooms
-        findSpawnRoom: [''],
+        findSpawnRoom: false,
         renewing: false,
+        remoteHaulersPicking: false,
     },
     DEBUG_STACKS: false, // add stack frame to EVERY console.log message (spammy!)
     TRACE: false, // use Memory.debugTrace for low-level information
