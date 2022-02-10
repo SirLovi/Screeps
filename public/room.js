@@ -2468,7 +2468,8 @@ mod.loadCostMatrixCache = function (cache) {
 			Room.pathfinderCache[key] = cache[key];
 		}
 	}
-	if (global.DEBUG && count > 0) logSystem('RawMemory', 'loading pathfinder cache.. updated ' + count + ' stale entries.');
+	if (global.DEBUG && global.debugger(global.DEBUGGING.loadCostMatrixCache) && count > 0)
+		global.logSystem('RawMemory', 'loading pathfinder cache.. updated ' + count + ' stale entries.');
 	Room.pathfinderCacheLoaded = true;
 };
 mod.getCachedStructureMatrix = function (roomName) {

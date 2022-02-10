@@ -9,6 +9,7 @@ let mod = {
     DEBUG: true, // gimme some more details, use false not undefined to unset
     DEBUGGING: {
         OCSMemory: false, // boolean or an array of roomNames e.g.: ['E16S27', 'W23E45'] to restrict debug to that rooms
+        loadCostMatrixCache: false,
         findSpawnRoom: false,
         renewing: false,
         remoteHaulersPicking: false,
