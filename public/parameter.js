@@ -8,8 +8,8 @@ let mod = {
     SAY_PUBLIC: true, // creeps talk public
     DEBUG: true, // gimme some more details, use false not undefined to unset
     DEBUGGING: {
-        OCSMemory: false,
-        findSpawnRoom: true,
+        OCSMemory: false, // boolean or an array of roomNames e.g.: ['E16S27', 'W23E45'] to restrict debug to that rooms
+        findSpawnRoom: [''],
     },
     DEBUG_STACKS: false, // add stack frame to EVERY console.log message (spammy!)
     TRACE: false, // use Memory.debugTrace for low-level information

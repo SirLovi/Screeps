@@ -233,6 +233,7 @@ for (let a in REACTIONS) {
 		mod.LAB_REACTIONS[REACTIONS[a][b]] = [a, b];
 	}
 }
+
 mod.ALL_COMPOUNDS = [];
 for (let a in REACTIONS) {
 	mod.ALL_COMPOUNDS.push(a);
@@ -246,6 +247,16 @@ mod.MEM_SEGMENTS = {
 	},
 	PUBLIC_SEGMENT: 99,
 };
+mod.debugger = (parameter, roomName = false) => {
+	if (!roomName)
+		return parameter;
+	if (_.isArray(parameter)) {
+		return _.some(parameter, room => {
+			return room === roomName;
+		})
+	} else
+		return parameter;
+}
 // mod.ENERGY_VALUE_CREDITS = global.energyPrice;
 // used to log something meaningful instead of numbers
 mod.translateErrorCode = function (code) {
