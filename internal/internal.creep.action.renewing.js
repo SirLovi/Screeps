@@ -1,9 +1,5 @@
 let action = new Creep.Action('renewing');
 module.exports = action;
-action.testRoom = function () {
-	// return 'E16S27';
-	return '';
-};
 action.isValidAction = function (creep) {
 	return !creep.room.situation.invasion;
 };
@@ -128,7 +124,7 @@ action.removeFromQueue = function (creep) {
 };
 action.work = function (creep) {
 
-	if (creep.room.name !== action.testRoom())
+	if (!global.debugger(global.DEBUGGING.renewing, creep.room.name))
 		return false;
 
 	global.logSystem(creep.room.name, `RENEWING IS RUNNING for ${creep.name}`);
