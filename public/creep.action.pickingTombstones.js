@@ -31,7 +31,7 @@ action.newTarget = function (creep) {
 
 	let ret;
 
-	if (creep.behaviour.needEnergy(creep)) {
+	if (creep.behaviour.name === 'remoteHauler' && creep.behaviour.needEnergy(creep)) {
 		const ruins = creep.room.ruins;
 		ret = this.filter(creep, ruins);
 

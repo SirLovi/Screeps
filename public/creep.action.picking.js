@@ -24,7 +24,7 @@ action.isAddableTarget = function (target, creep) {
 		&& target.amount > _.sum(pickers.map(t => t.carryCapacityLeft))));
 };
 action.newTarget = function (creep) {
-	if (creep.behaviour.needEnergy(creep)) {
+	if (creep.behaviour.name === 'remoteHauler' && creep.behaviour.needEnergy(creep)) {
 		const droppedResources = action.getStrategy('energyOnly', creep) ? _.filter(creep.room.droppedResources, {resourceType: RESOURCE_ENERGY}) : creep.room.droppedResources;
 		return this.filter(creep, droppedResources);
 	} else
