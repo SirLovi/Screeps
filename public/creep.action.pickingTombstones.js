@@ -38,6 +38,8 @@ action.newTarget = function (creep) {
 		if (!ret) {
 			const tombStones = creep.room.tombStones;
 			return this.filter(creep, tombStones);
+		} else {
+			return ret;
 		}
 	} else
 		return false;
