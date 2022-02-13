@@ -37,12 +37,15 @@ action.newTarget = function (creep) {
 
 		if (!ret) {
 			const tombStones = creep.room.tombStones;
-			return this.filter(creep, tombStones);
-		} else {
-			return ret;
+			ret = this.filter(creep, tombStones);
 		}
-	} else
+
+		if (ret)
+			return ret;
 		return false;
+	}
+	return false;
+
 };
 action.work = function (creep) {
 	let resourceType = _.last(_.sortBy(_.keys(creep.target.store), resourceType => (creep.target.store[resourceType] || 0)));

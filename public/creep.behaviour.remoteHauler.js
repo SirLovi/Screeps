@@ -238,7 +238,7 @@ mod.gotoTargetRoom = function (creep) {
 		return Creep.action.travelling.assignRoom(creep, targetFlag.pos.roomName);
 };
 mod.goHome = function (creep, homeRoomName) {
-	global.logSystem(creep.room.name, `${creep.name} is going home ${homeRoomName}`);
+	// global.logSystem(creep.room.name, `${creep.name} is going home ${homeRoomName}`);
 	return Creep.action.travelling.assignRoom(creep, homeRoomName);
 };
 
