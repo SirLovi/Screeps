@@ -90,16 +90,21 @@ let mod = {
 
 			for (let core of invadersCore) {
 				let room = Game.rooms[core.pos.roomName];
-				let flag = room.find(FIND_FLAGS, {
+				let attackFlag = room.find(FIND_FLAGS, {
 					filter: {color: COLOR_RED, secondaryColor: COLOR_RED},
-				});
+				})
+				let miningFlag = room.find(FIND_FLAGS, {
+					filter: {color: COLOR_GREEN, secondaryColor: COLOR_BROWN},
+				})
 
-				if (flag.length > 0) {
-					global.logSystem(core.pos.roomName, `flag found!`);
-				} else {
-					global.logSystem(core.pos.roomName, `flag placed`);
-					core.pos.newFlag(FLAG_COLOR.invade);
+				if (miningFlag) {
+					if (attackFlag.length > 0) {
+						global.logSystem(core.pos.roomName, `flag found!`);
+					} else {
+						global.logSystem(core.pos.roomName, `flag placed`);
+						core.pos.newFlag(global.FLAG_COLOR.invade);
 
+					}
 				}
 			}
 		},
