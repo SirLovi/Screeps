@@ -128,7 +128,8 @@ mod.handleSpawningCompleted = function (creep) {
 };
 mod.execute = function () {
     let run = spawn => {
-        if (spawn.room.my) spawn.execute();
+        if (spawn.room.my)
+            spawn.execute();
     }
     _.forEach(Game.spawns, run);
 };

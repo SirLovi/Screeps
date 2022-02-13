@@ -16,19 +16,31 @@ action.isValidTarget = function (target) {
 };
 action.newTarget = function (creep) {
 
-	if (!creep.room.storage)
-		return creep.pos.findClosestByPath(FIND_TOMBSTONES, {filter: (o) => this.isValidTarget(o, creep) && (o.store[RESOURCE_ENERGY] > 0)});
+	// if (!creep.room.storage)
+	// 	return creep.pos.findClosestByPath(FIND_TOMBSTONES, {filter: (o) => this.isValidTarget(o, creep) && (o.store[RESOURCE_ENERGY] > 0)});
 
-	if (!creep.room.storage)
-		return creep.pos.findClosestByPath(FIND_RUINS, {filter: (o) => this.isValidTarget(o, creep) && (o.store[RESOURCE_ENERGY] > 0)});
+	// if (!creep.room.storage)
+	// 	return creep.pos.findClosestByPath(FIND_RUINS, {filter: (o) => this.isValidTarget(o, creep) && (o.store[RESOURCE_ENERGY] > 0)});
 
+	// let target = creep.pos.findClosestByPath(FIND_RUINS, {filter: (o) => this.isValidTarget(o, creep)});
+	//
+	// if (!target)
+	// 	target = creep.pos.findClosestByPath(FIND_TOMBSTONES, {filter: (o) => this.isValidTarget(o, creep)});
+	//
+	// return target;
 
-	let target = creep.pos.findClosestByPath(FIND_RUINS, {filter: (o) => this.isValidTarget(o, creep)});
+	let ret;
 
-	if (!target)
-		target = creep.pos.findClosestByPath(FIND_TOMBSTONES, {filter: (o) => this.isValidTarget(o, creep)});
+	if (creep.behaviour.needEnergy(creep)) {
+		const ruins = creep.room.ruins;
+		ret = this.filter(creep, ruins);
 
-	return target;
+		if (!ret) {
+			const tombStones = creep.room.tombStones;
+			return this.filter(creep, tombStones);
+		}
+	} else
+		return false;
 };
 action.work = function (creep) {
 	let resourceType = _.last(_.sortBy(_.keys(creep.target.store), resourceType => (creep.target.store[resourceType] || 0)));

@@ -189,6 +189,24 @@ mod.extend = function () {
 				return this._droppedResources;
 			},
 		},
+		'tombStones': {
+			configurable: true,
+			get: function () {
+				if (_.isUndefined(this._tombStones)) {
+					this._tombStones = this.find(FIND_TOMBSTONES);
+				}
+				return this._tombStones;
+			},
+		},
+		'ruins': {
+			configurable: true,
+			get: function () {
+				if (_.isUndefined(this._ruins)) {
+					this._ruins = this.find(FIND_RUINS);
+				}
+				return this._ruins;
+			},
+		},
 		'minerals': {
 			configurable: true,
 			get: function () {
@@ -319,4 +337,10 @@ mod.extend = function () {
 			return 0;
 
 	}
+
+	Room.prototype.resourcesToCarry = (energy = false) => {
+
+	}
+
+
 };

@@ -714,18 +714,20 @@ mod.strategies = {
 			const queuedCarry = _.sum(queuedHaulers, c => (c && c.body) ? c.body.carry : mod.creep.hauler.fixedBody[CARRY]);
 
 			// const room = Game.rooms[flagRoomName];
-			let droppedCarry = function () {
+			let addedCarry = function () {
 				let flagRoom = Game.rooms[flagRoomName];
 				let dropped = flagRoom ? flagRoom.droppedResourcesAmount() : 0;
 				if (dropped > 500)
 					return Math.ceil(dropped / 1000);
-				else
+				else if (dropped === 0) {
+
+				}
 					return 0;
 			};
 
-			// global.logSystem(flagRoomName, `droppedCarry final: ${droppedCarry()}`);
+			// global.logSystem(flagRoomName, `addedCarry final: ${addedCarry()}`);
 
-			let neededCarry = ept * travel * 2 + (memory.carrySize || 0) - existingCarry - queuedCarry + droppedCarry();
+			let neededCarry = ept * travel * 2 - existingCarry - queuedCarry + addedCarry() + (memory.carrySize || 0);
 			const maxWeight = mod.creepSize(flagRoomName, neededCarry, this.setup(flagRoomName), ignorePopulation);
 
 			if (global.DEBUG && global.debugger(global.DEBUGGING.targetRoom, flagRoomName)) {

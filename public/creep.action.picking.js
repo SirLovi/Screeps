@@ -24,15 +24,11 @@ action.isAddableTarget = function (target, creep) {
 		&& target.amount > _.sum(pickers.map(t => t.carryCapacityLeft))));
 };
 action.newTarget = function (creep) {
-	const droppedResources = action.getStrategy('energyOnly', creep) ? _.filter(creep.room.droppedResources, {resourceType: RESOURCE_ENERGY}) : creep.room.droppedResources;
-	let filter;
-	if (creep.room.my && creep.room.situation.invasion) {
-		// pickup near sources only
-		filter = (r) => this.isAddableTarget(r, creep) && r.pos.findInRange(creep.room.sources, 1).length > 0;
-	} else {
-		filter = (r) => this.isAddableTarget(r, creep);
-	}
-	return creep.pos.findClosestByPath(droppedResources, {filter: filter});
+	if (creep.behaviour.needEnergy(creep)) {
+		const droppedResources = action.getStrategy('energyOnly', creep) ? _.filter(creep.room.droppedResources, {resourceType: RESOURCE_ENERGY}) : creep.room.droppedResources;
+		return this.filter(creep, droppedResources);
+	} else
+		return false;
 };
 action.work = function (creep) {
 	let result = creep.pickup(creep.target);

@@ -21,22 +21,22 @@ let Action = function(actionName){
     this.getTargetById = function(id){
         return Game.getObjectById(id) || Game.spawns[id] || Game.flags[id];
     };
-    // determines, if an action is (still) valid. Gets validated each tick. 
+    // determines, if an action is (still) valid. Gets validated each tick.
     // check possible override in derived action
     this.isValidAction = function(creep){
         return true;
     };
-    // determines, if a target is (still) valid. Gets validated each tick. 
+    // determines, if a target is (still) valid. Gets validated each tick.
     // check possible override in derived action
     this.isValidTarget = function(target, creep){
         return (target != null);
     };
-    // determines, if an action is valid. Gets validated only once upon assignment. 
+    // determines, if an action is valid. Gets validated only once upon assignment.
     // check possible override in derived action
     this.isAddableAction = function(creep){
         return (this.maxPerAction === Infinity || !creep.room.population || !creep.room.population.actionCount[this.name] || creep.room.population.actionCount[this.name] < this.maxPerAction);
     };
-    // determines, if a target is valid. Gets validated only once upon assignment. 
+    // determines, if a target is valid. Gets validated only once upon assignment.
     // check possible override in derived action
     this.isAddableTarget = function(target, creep){ // target is valid to be given to an additional creep
         return (!target.targetOf || this.maxPerTarget === Infinity || _.filter(target.targetOf, {'actionName': this.name}).length < this.maxPerTarget);
@@ -139,6 +139,16 @@ let Action = function(actionName){
     this.getStrategy = function(strategyName, creep, ...args) {
         if (_.isUndefined(args)) return creep.getStrategyHandler([this.name], strategyName);
         else return creep.getStrategyHandler([this.name], strategyName, ...args);
+    };
+    this.filter = function(creep, resource) {
+        let filter;
+        if (creep.room.my && creep.room.situation.invasion) {
+            // pickup near sources only
+            filter = (r) => this.isAddableTarget(r, creep) && r.pos.findInRange(creep.room.sources, 1).length > 0;
+        } else {
+            filter = (r) => this.isAddableTarget(r, creep);
+        }
+        return creep.pos.findClosestByPath(resource, {filter: filter});
     };
 };
 module.exports = Action;
