@@ -190,6 +190,7 @@ let mod = {
         rcl: 1,
         roomTime: 1,
         energyAvailable: 0.001,
+        availableSpawns: 1.5,
     },
     TASK_CREEP_CHECK_INTERVAL: 250, // Maximum number of ticks before a task checks to see if it needs to spawn new creeps
     REMOTE_RESERVE_HAUL_CAPACITY: 0.1, // Percent of allocated haul capacity before sending reservers.

@@ -35,7 +35,7 @@ mod.outflowActions = (creep) => {
 	}
 	return priority;
 };
-mod.selectInflowAction = function(creep) {
+mod.selectInflowAction = function (creep) {
 	const p = Util.startProfiling('selectInflowAction' + creep.name, {enabled: PROFILING.BEHAVIOUR});
 	const actionChecked = {};
 	const outflowActions = this.outflowActions(creep);
@@ -105,45 +105,49 @@ mod.deposit = (that, creep) => {
 		_.forEach(Object.keys(creep.carry), drop);
 		return this.assignAction(creep, 'idle');
 	}
-}
+};
 mod.nextAction = function (creep) {
 
-	const flag = creep.data.destiny && Game.flags[creep.data.destiny.targetName];
 	// global.logSystem(creep.room.name, `ttl: ${creep.data.ttl} predictedRenewal: ${creep.data.predictedRenewal} flag: ${flag}`);
-
+	const flag = creep.data.destiny && Game.flags[creep.data.destiny.targetName];
+	const creepTargetRoomName = Memory.flags[flag.name].roomName;
+	const homeRoomName = global.Task.mining.strategies.hauler.homeRoomName(creepTargetRoomName);
 
 	if (!flag) {
 		//TODO: in the future look for a nearby room we can support
 		global.logSystem(creep.room.name, `NO FLAG! ${flag}`);
 		return Creep.action.recycling.assign(creep);
 	} else {
-		// at home
-		let creepTargetRoomName = Memory.flags[flag.name].roomName;
-		let miningRoom = global.Task.mining.memory[creepTargetRoomName];
-		let spawnRoomName = miningRoom ? miningRoom.spawnRoomName : false;
 		let ret;
-
-		if (creep.pos.roomName === creep.data.homeRoom || (spawnRoomName ? creep.pos.roomName === spawnRoomName : false)) {
+		// at home
+		if (creep.pos.roomName === creep.data.homeRoom || creep.pos.roomName === homeRoomName) {
 
 			// carrier filled
 			if (!this.needEnergy(creep)) {
-				return mod.deposit(this, creep);
-			} else if (creep.sum > 0) {
+				if (mod.deposit(this, creep))
+					return;
+			} else {
 				if (global.DEBUG && global.debugger(global.DEBUGGING.remoteHaulersPicking, creep.room.name)) {
-					ret = this.nextEnergyAction(creep);
-					global.logSystem(creep.room.name, `creep ${creep.name} wants more: ret ${ret}`);
-					if (ret)
+					if (this.nextEnergyAction(creep)) {
+						global.logSystem(creep.room.name, `creep ${creep.name} wants more: ret ${ret}`);
 						return;
-					else
-						return mod.deposit(this, creep);
-				} else {
-					return mod.deposit(this, creep);
+					}
+
+					if (creep.sum > 0) {
+						if (mod.deposit(this, creep))
+							return;
+					}
+
+					// renew
+					if (mod.renewCreep(creep))
+						return;
+
+				} else if (creep.sum > 0) {
+					if (mod.deposit(this, creep))
+						return;
 				}
 			}
 
-			// renew
-			if (mod.renewCreep(creep))
-				return;
 
 			// travelling
 			let gotoTargetRoom = this.gotoTargetRoom(creep);
@@ -156,7 +160,7 @@ mod.nextAction = function (creep) {
 		else {
 			let casualties = creep.room.casualties.length > 0;
 
-			if (creep.data.destiny.room === creep.pos.roomName) {
+			if (creep.pos.roomName === creep.data.destiny.room || creep.pos.roomName === homeRoomName) {
 
 				// global.logSystem(creep.room.name, `AT TARGET: ${creep.name}`);
 
@@ -172,7 +176,7 @@ mod.nextAction = function (creep) {
 
 				}
 				if (!this.needEnergy(creep)) {
-					ret = this.goHome(creep);
+					ret = this.goHome(creep, homeRoomName);
 				}
 
 				if (!ret && this.needEnergy(creep)) {
@@ -193,7 +197,7 @@ mod.nextAction = function (creep) {
 
 				if (!currentRoom.my) {
 					if (!this.needEnergy(creep)) {
-						ret = this.goHome(creep);
+						ret = this.goHome(creep, homeRoomName);
 					}
 
 					if (this.needEnergy(creep)) {
@@ -205,7 +209,7 @@ mod.nextAction = function (creep) {
 					if (this.needEnergy(creep)) {
 						ret = this.gotoTargetRoom(creep);
 					} else if (!this.needEnergy(creep)) {
-						ret = this.goHome(creep);
+						ret = this.goHome(creep, homeRoomName);
 					}
 				}
 
@@ -233,9 +237,11 @@ mod.gotoTargetRoom = function (creep) {
 	if (targetFlag)
 		return Creep.action.travelling.assignRoom(creep, targetFlag.pos.roomName);
 };
-mod.goHome = function (creep) {
-	return Creep.action.travelling.assignRoom(creep, creep.data.homeRoom);
+mod.goHome = function (creep, homeRoomName) {
+	global.logSystem(creep.room.name, `${creep.name} is going home ${homeRoomName}`);
+	return Creep.action.travelling.assignRoom(creep, homeRoomName);
 };
+
 mod.strategies.picking = {
 	name: `picking-${mod.name}`,
 	energyOnly: false,

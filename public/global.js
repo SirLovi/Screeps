@@ -524,28 +524,28 @@ mod.processReports = function () {
 // get movement range between rooms
 // respecting environmental walls
 // uses memory to cache for ever
-mod.routeRange = function (fromRoom, toRoom) {
-	if (fromRoom === toRoom) return 0;
-	if (_.isUndefined(Memory.routeRange)) {
-		Memory.routeRange = {};
-	}
-	if (_.isUndefined(Memory.routeRange[fromRoom])) {
-		Memory.routeRange[fromRoom] = {};
-	}
-	if (_.isUndefined(Memory.routeRange[fromRoom][toRoom])) {
-		// ensure start room object
-		let room = null;
-		if (fromRoom instanceof Room) room = fromRoom;
-		else room = Game.rooms[fromRoom];
-		if (_.isUndefined(room)) return Room.roomDistance(fromRoom, toRoom, false);
-		// get valid route to room (respecting environmental walls)
-		let route = room.findRoute(toRoom, false, false);
-		if (_.isUndefined(route)) return Room.roomDistance(fromRoom, toRoom, false);
-		// store path length for ever
-		Memory.routeRange[fromRoom][toRoom] = route == ERR_NO_PATH ? Infinity : route.length;
-	}
-	return Memory.routeRange[fromRoom][toRoom];
-};
+// mod.routeRange = function (fromRoom, toRoom) {
+// 	if (fromRoom === toRoom) return 0;
+// 	if (_.isUndefined(Memory.routeRange)) {
+// 		Memory.routeRange = {};
+// 	}
+// 	if (_.isUndefined(Memory.routeRange[fromRoom])) {
+// 		Memory.routeRange[fromRoom] = {};
+// 	}
+// 	if (_.isUndefined(Memory.routeRange[fromRoom][toRoom])) {
+// 		// ensure start room object
+// 		let room = null;
+// 		if (fromRoom instanceof Room) room = fromRoom;
+// 		else room = Game.rooms[fromRoom];
+// 		if (_.isUndefined(room)) return Room.roomDistance(fromRoom, toRoom, false);
+// 		// get valid route to room (respecting environmental walls)
+// 		let route = room.findRoute(toRoom, false, false);
+// 		if (_.isUndefined(route)) return Room.roomDistance(fromRoom, toRoom, false);
+// 		// store path length for ever
+// 		Memory.routeRange[fromRoom][toRoom] = route == ERR_NO_PATH ? Infinity : route.length;
+// 	}
+// 	return Memory.routeRange[fromRoom][toRoom];
+// };
 // turn brown flags into wall construction sites
 // save positions in memory (to ignore them for repairing)
 mod.pave = function (roomName) {

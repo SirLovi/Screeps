@@ -306,4 +306,17 @@ mod.extend = function () {
 			this.memory.minerals = _.map(validMineral, id);
 		} else delete this.memory.minerals;
 	};
+
+	Room.prototype.droppedResourcesAmount = function (energy = false) {
+		let dropped = this.droppedResources ? this.droppedResources : 0;
+		if (_.isArray(dropped)) {
+			if (energy)
+				return _.sum(dropped, 'energy');
+			else
+				return _.sum(dropped, 'amount');
+		}
+		else
+			return 0;
+
+	}
 };
