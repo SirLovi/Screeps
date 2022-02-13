@@ -12,9 +12,6 @@ mod.count = (miningRoomName, type, memory, flag) => {
 	};
 	return countExisting(type);
 };
-mod.remoteHaulers = () => {
-
-};
 mod.handleFlagRemoved = flagName => {
 	// check flag
 	const flagMem = Memory.flags[flagName];
