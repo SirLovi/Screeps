@@ -14,7 +14,7 @@ mod.count = (miningRoomName, type, memory, flag) => {
 };
 mod.remoteHaulers = () => {
 
-}
+};
 mod.handleFlagRemoved = flagName => {
 	// check flag
 	const flagMem = Memory.flags[flagName];
@@ -720,9 +720,10 @@ mod.strategies = {
 				if (dropped > 500)
 					return Math.ceil(dropped / 1000);
 				else if (dropped === 0) {
-
+					// TODO count it
+					return -2;
 				}
-					return 0;
+				return 0;
 			};
 
 			// global.logSystem(flagRoomName, `addedCarry final: ${addedCarry()}`);
