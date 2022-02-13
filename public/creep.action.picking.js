@@ -25,40 +25,43 @@ action.isAddableTarget = function (target, creep) {
 };
 action.newTarget = function (creep) {
 	if (creep.behaviour.name === 'remoteHauler' && creep.behaviour.needEnergy(creep)) {
-		const droppedResources = action.getStrategy('energyOnly', creep) ? _.filter(creep.room.droppedResources, {resourceType: RESOURCE_ENERGY}) : creep.room.droppedResources;
-		return this.filter(creep, droppedResources);
+		const droppedResources = action.defaultStrategy.energyOnly ? _.filter(creep.room.droppedResources, {resourceType: RESOURCE_ENERGY}) : creep.room.droppedResources;
+		return action.lootFilter(droppedResources, creep);
 	} else
 		return false;
 };
 action.work = function (creep) {
 	let result = creep.pickup(creep.target);
 	if (result === OK) {
-		if (creep.sum < creep.carryCapacity * 0.8) {
-			// is there another in range?
-			let loot = creep.pos.findInRange(creep.room.droppedResources, 1, {
-				filter: (o) => o.resourceType !== RESOURCE_ENERGY && this.isAddableTarget(o, creep),
-			});
-			if (!loot || loot.length < 1) loot = creep.pos.findInRange(creep.room.droppedResources, 1, {
-				filter: (o) => this.isAddableTarget(o, creep),
-			});
-			if (loot && loot.length > 0) {
-				this.assign(creep, loot[0]);
-				return result;
-			}
+
+		// is there another in range?
+
+		// let loot = creep.pos.findInRange(creep.room.droppedResources, 1, {
+		// 	filter: (o) => o.resourceType !== RESOURCE_ENERGY && this.isAddableTarget(o, creep),
+		// });
+		// if (!loot || loot.length < 1) loot = creep.pos.findInRange(creep.room.droppedResources, 1, {
+		// 	filter: (o) => this.isAddableTarget(o, creep),
+		// });
+
+		let loot = action.newTarget(creep);
+
+		if (loot && loot.length > 0) {
+			this.assign(creep, loot[0]);
+			return result;
 		}
+
 		// Check for containers to uncharge
-		if (creep.sum < creep.carryCapacity) {
-			let containers = creep.pos.findInRange(creep.room.structures.container.in, 2, {
-				filter: (o) => Creep.action.uncharging.isValidTarget(o, creep),
-			});
-			if (containers && containers.length > 0) {
-				Creep.action.uncharging.assign(creep, containers[0]);
-				return result;
-			}
-		}
+		// if (creep.sum < creep.carryCapacity) {
+		// 	let containers = creep.pos.findInRange(creep.room.structures.container.in, 2, {
+		// 		filter: (o) => Creep.action.uncharging.isValidTarget(o, creep),
+		// 	});
+		// 	if (containers && containers.length > 0) {
+		// 		Creep.action.uncharging.assign(creep, containers[0]);
+		// 		return result;
+		// 	}
+		// }
 		// unregister
-		delete creep.data.actionName;
-		delete creep.data.targetId;
+		this.unassign(creep);
 	}
 	return result;
 };

@@ -40,21 +40,26 @@ mod.handleFlagFound = flag => {
 				}
 			}
 		}
-		if (Task.nextCreepCheck(flag, mod.name)) {
+		if (global.Task.nextCreepCheck(flag, mod.name)) {
 			delete memory.waitForCreeps;
-			Util.set(flag.memory, 'task', mod.name);
+			global.Util.set(flag.memory, 'task', mod.name);
 			// check if a new creep has to be spawned
-			Task.reserve.checkForRequiredCreeps(flag);
+			global.Task.reserve.checkForRequiredCreeps(flag);
 		}
 	}
 };
 // check if a new creep has to be spawned
 mod.checkForRequiredCreeps = function (flag) {
 	let spawnParams;
+	if (_.isUndefined(flag) || _.isUndefined(flag.room)) {
+		flag = Memory.flags[flag];
+		if (!flag || !flag.roomName)
+			return false;
+	}
 	let homeRoom = Room.closestSpawnRoomFor(flag.room.name);
-	if (flag.compareTo(FLAG_COLOR.claim.mining)) {
-		spawnParams = Task.mining.strategies.reserve.spawnParams(flag, homeRoom);
-	} else if (flag.compareTo(FLAG_COLOR.invade.exploit)) {
+	if (flag.compareTo(global.FLAG_COLOR.claim.mining)) {
+		spawnParams = global.Task.mining.strategies.reserve.spawnParams(flag, homeRoom);
+	} else if (flag.compareTo(global.FLAG_COLOR.invade.exploit)) {
 		spawnParams = mod.strategies.defaultStrategy.spawnParams(flag, homeRoom);
 		spawnParams.queue = 'Low'; // privateer reserve is always low queue
 	} else {
@@ -67,10 +72,10 @@ mod.checkForRequiredCreeps = function (flag) {
 	Task.validateAll(memory, flag, mod.name, {roomName: flag.pos.roomName, queues: ['Low', 'Medium'], checkValid: true});
 
 	// if low & creep in low queue => move to medium queue
-	if (spawnParams.queue !== 'Low' && memory.queued.length == 1) {
+	if (spawnParams.queue !== 'Low' && memory.queued.length === 1) {
 		let spawnRoom = Game.rooms[memory.queued[0].room];
 		let elevate = (entry, index) => {
-			if (entry.targetName == memory.queued[0].targetName) {
+			if (entry.targetName === memory.queued[0].targetName) {
 				let spawnData = spawnRoom.spawnQueueLow.splice(index, 1);
 				spawnRoom.spawnQueueMedium.push(spawnData);
 				return true;

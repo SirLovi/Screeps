@@ -335,8 +335,6 @@ mod.creep = {
 			[WORK]: 5,
 		},
 		maxMulti: 1,
-		// minEnergyCapacity: Creep.bodyCosts(this.creep.fixedBody),
-		// minEnergyCapacity: 550,
 		behaviour: 'remoteMiner',
 		queue: 'Medium', // not much point in hauling or working without a miner, and they're a cheap spawn.
 	},
@@ -351,8 +349,6 @@ mod.creep = {
 			[CARRY]: 1,
 			[MOVE]: 1,
 		},
-		// minEnergyCapacity: Creep.bodyCosts(mod.creep.hauler.fixedBody),
-		// minEnergyCapacity: 450,
 		behaviour: 'remoteHauler',
 		queue: 'Low',
 	},
@@ -369,8 +365,6 @@ mod.creep = {
 			[WORK]: 2,
 		},
 		maxMulti: 3,
-		// minEnergyCapacity: Creep.bodyCosts(mod.creep.worker.fixedBody),
-		// minEnergyCapacity: 650,
 		behaviour: 'remoteWorker',
 		queue: 'Low',
 	},
@@ -387,10 +381,9 @@ mod.creep = {
 			[WORK]: 5,
 		},
 		maxMulti: 1,
-		// minEnergyCapacity: Creep.bodyCosts(mod.creep.SKMiner.fixedBody),
-		// minEnergyCapacity: 900,
 		behaviour: 'remoteMiner',
 		queue: 'Medium', // not much point in hauling or working without a miner, and they're a cheap spawn.
+		maxRange: 5,
 	},
 	SKHauler: {
 		fixedBody: {
@@ -403,10 +396,9 @@ mod.creep = {
 			[CARRY]: 1,
 			[MOVE]: 1,
 		},
-		// minEnergyCapacity: Creep.bodyCosts(mod.creep.SKHauler.fixedBody),
-		// minEnergyCapacity: 1350,
 		behaviour: 'remoteHauler',
 		queue: 'Low',
+		maxRange: 5,
 	},
 };
 mod.countBody = function (fixedBody) {
@@ -589,7 +581,7 @@ mod.carryPartsPopulation = function (miningRoomName, homeRoomName) {
 		totalWeight: totalWeight,
 	};
 };
-mod.creepSize = function (roomName, carry, setup, ignorePopulation) {
+mod.creepSize = function (flagRoomName, carry, setup) {
 	if (!carry || carry < 0)
 		return 0;
 
@@ -598,11 +590,12 @@ mod.creepSize = function (roomName, carry, setup, ignorePopulation) {
 	const multiBodyCost = Creep.bodyCosts(setup.multiBody);
 	const ret = fixedBodyCost + multiBodyCost * _.ceil(multiCarry * 0.5);
 
-
-	// 	global.logSystem(roomName, `multiCarry: ${multiCarry}`);
-	// 	global.logSystem(roomName, `fixedCost: ${fixedBodyCost}`);
-	// 	global.logSystem(roomName, `multiCost: ${multiBodyCost}`);
-	// 	global.logSystem(roomName, `return => creepSize: ${ret}`);
+	// global.logSystem(flagRoomName, `behaviour: ${setup.behaviour}`);
+	// global.logSystem(flagRoomName, `name: ${setup.name}`);
+	// global.logSystem(flagRoomName, `multiCarry: ${_.ceil(multiCarry * 0.5)}`);
+	// global.logSystem(flagRoomName, `fixedCost: ${fixedBodyCost}`);
+	// global.logSystem(flagRoomName, `multiCost: ${multiBodyCost}`);
+	// global.logSystem(flagRoomName, `return => creepSize: ${ret}`);
 
 
 	return ret;
@@ -669,8 +662,7 @@ mod.strategies = {
 
 			let params = {
 				targetRoom: flagRoomName,
-				minEnergyCapacity: Math.max(minWeight, fixedCost),
-				maxWeight: maxWeight,
+				minEnergyAvailable: maxWeight,
 				behaviour: behaviour,
 			};
 
@@ -679,7 +671,6 @@ mod.strategies = {
 				params = {
 					targetRoom: flagRoomName,
 					minEnergyCapacity: Math.min(minWeight, fixedCost),
-					maxWeight: maxWeight,
 					behaviour: behaviour,
 				};
 			spawnRoom = Room.findSpawnRoom(params);
@@ -726,7 +717,7 @@ mod.strategies = {
 			// global.logSystem(flagRoomName, `addedCarry final: ${addedCarry()}`);
 
 			let neededCarry = ept * travel * 2 - existingCarry - queuedCarry + addedCarry() + (memory.carrySize || 0);
-			const maxWeight = mod.creepSize(flagRoomName, neededCarry, this.setup(flagRoomName), ignorePopulation);
+			const maxWeight = mod.creepSize(flagRoomName, neededCarry, this.setup(flagRoomName));
 
 			if (global.DEBUG && global.debugger(global.DEBUGGING.targetRoom, flagRoomName)) {
 				global.logSystem(flagRoomName, `maxWeight: ${maxWeight} neededCarry: ${neededCarry} behaviour: ${this.setup(flagRoomName).fixedBody.carry > 4 ? 'SKHauler' : 'remoteHauler'}`);

@@ -37,8 +37,8 @@ mod.createRoomMemory = function () {
     console.log(`Create room memory`);
 
     // reset global.rooms properties
-    delete global._acceptedRooms;
-    delete global._myRooms;
+    // delete global._acceptedRooms;
+    // delete global._myRooms;
     delete global._myRoomsName;
 
     if (_.isUndefined(Memory.stats)) {

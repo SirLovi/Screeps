@@ -172,10 +172,8 @@ mod.nextAction = function (creep) {
 					creep.action = Creep.action.healing;
 					ret = Creep.behaviour.ranger.heal.call(this, creep);
 
-					ret = ret === 0;
-
 				}
-				if (!this.needEnergy(creep)) {
+				if (!ret && !this.needEnergy(creep)) {
 					ret = this.goHome(creep, homeRoomName);
 				}
 

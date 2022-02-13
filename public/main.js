@@ -335,6 +335,9 @@ module.exports.loop = wrapLoop(function () {
 	if (_.isUndefined(Memory.stats))
 		global.Grafana.createRoomMemory();
 
+	delete global._acceptedRooms;
+	delete global._myRooms;
+
 	// if (_.isUndefined(Memory.stats.cpu))
 	// 	global.Grafana.createStatProperties(true);
 

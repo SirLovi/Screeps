@@ -14,6 +14,25 @@ action.isValidTarget = function (target) {
 	return (target != null && (_.sum(target.store) > 0));
 	//return target.store || target.energy || target.mineralAmount;
 };
+
+action.resourcesWithLoot = (resources, creep, energyOnly) => {
+	let loots;
+
+	if (energyOnly) {
+		loots = _.filter(resources, resource => {
+			return action.isValidTarget(resource, creep) && (resource.store[RESOURCE_ENERGY] > 0);
+		});
+	} else {
+		loots = _.filter(resources, resource => {
+			return action.isValidTarget(resource, creep) && (Object.keys(resource.store).length > 0);
+		});
+	}
+
+	if (loots.length === 0)
+		return false;
+	else
+		return action.lootFilter(loots, creep);
+};
 action.newTarget = function (creep) {
 
 	// if (!creep.room.storage)
@@ -32,14 +51,15 @@ action.newTarget = function (creep) {
 	let ret;
 
 	if (creep.behaviour.name === 'remoteHauler' && creep.behaviour.needEnergy(creep)) {
-		const ruins = creep.room.ruins;
-		ret = this.filter(creep, ruins);
+
+		let ruins = creep.room.ruins;
+
+		ret = this.resourcesWithLoot(ruins, creep, action.defaultStrategy.energyOnly);
 
 		if (!ret) {
-			const tombStones = creep.room.tombStones;
-			ret = this.filter(creep, tombStones);
+			let tombStones = creep.room.tombStones;
+			ret = this.resourcesWithLoot(tombStones, creep, action.defaultStrategy.energyOnly);
 		}
-
 		if (ret)
 			return ret;
 		return false;
@@ -48,30 +68,38 @@ action.newTarget = function (creep) {
 
 };
 action.work = function (creep) {
-	let resourceType = _.last(_.sortBy(_.keys(creep.target.store), resourceType => (creep.target.store[resourceType] || 0)));
+
 	if (creep.target == null || _.sum(creep.target.store) < 1)
 		return;
-	if ((!creep.room.storage) && ((creep.target.store[RESOURCE_ENERGY] == null) || (creep.target.store[RESOURCE_ENERGY] < 1)))
-		return;
+
+	let resourceType = _.last(_.sortBy(_.keys(creep.target.store), resourceType => (creep.target.store[resourceType] || 0)));
+
+	// if ((!creep.room.storage) && ((creep.target.store[RESOURCE_ENERGY] == null) || (creep.target.store[RESOURCE_ENERGY] < 1)))
+	// 	return;
+
 	let result = creep.withdraw(creep.target, resourceType);
+
 	if (result === OK) {
 
-		if (creep.sum < creep.carryCapacity * 0.8) {
-			// is there another in range?
-			let loot = creep.pos.findInRange(creep.room.find(FIND_TOMBSTONES), 1, {
-				filter: (o) => this.isAddableTarget(o, creep) && ((_.sum(creep.target.store) > 0)),
-			});
-			if (!loot || loot.length < 1) loot = creep.pos.findInRange(creep.room.find(FIND_TOMBSTONES), 1, {
-				filter: (o) => this.isAddableTarget(o, creep) && ((_.sum(creep.target.store) > 0)),
-			});
-			if (loot && loot.length > 0) {
-				this.assign(creep, loot[0]);
-				return result;
-			}
+		// is there another in range?
+
+		// let loot = creep.pos.findInRange(creep.room.find(FIND_TOMBSTONES), 1, {
+		// 	filter: (o) => this.isAddableTarget(o, creep) && ((_.sum(creep.target.store) > 0)),
+		// });
+
+		let loot = action.newTarget(creep);
+
+		// if (!loot || loot.length < 1) loot = creep.pos.findInRange(creep.room.find(FIND_TOMBSTONES), 1, {
+		// 	filter: (o) => this.isAddableTarget(o, creep) && ((_.sum(creep.target.store) > 0)),
+		// });
+
+		if (loot && loot.length > 0) {
+			this.assign(creep, loot[0]);
+			return result;
 		}
 
-		delete creep.data.actionName;
-		delete creep.data.targetId;
+		this.unassign(creep);
 	}
 	return result;
 };
+action.defaultStrategy.energyOnly = false;

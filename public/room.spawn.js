@@ -69,15 +69,15 @@ mod.extend = function () {
 		if (validRooms.length === 0)
 			return null;
 
-		if (params.maxWeight) {
-			isValidRoom = room => (
-				params.maxWeight <= room.energyAvailable
-			);
-			let bestValidRooms = _.filter(validRooms, isValidRoom);
-			if (bestValidRooms.length > 0) {
-				validRooms = bestValidRooms;
-			}
-		}
+		// if (params.maxWeight) {
+		// 	isValidRoom = room => (
+		// 		params.maxWeight <= room.energyAvailable
+		// 	);
+		// 	let bestValidRooms = _.filter(validRooms, isValidRoom);
+		// 	if (bestValidRooms.length > 0) {
+		// 		validRooms = bestValidRooms;
+		// 	}
+		// }
 
 		// select "best"
 		let queueTime = queue => _.sum(queue, c => (c.parts.length * 3));
@@ -89,7 +89,7 @@ mod.extend = function () {
 			let weight = global.FIND_SPAWN_ROOM_WEIGHT;
 			let distance = global.Util.routeRange(room.name, params.targetRoom) * weight.routeRange;
 			let rcl = (8 - room.controller.level) / (params.rangeRclRatio || 3) * weight.rcl;
-			let spawnTime = (roomTime(room)) * weight.roomTime;
+			let spawnTime = (roomTime(room)) * weight.spawnTime;
 			let energyAvailable = room.energyAvailable * weight.energyAvailable;
 			let availableSpawns = freeSpawns(room) > 0 ? 10: 0;
 			availableSpawns = availableSpawns * weight.availableSpawns;
