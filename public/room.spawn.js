@@ -53,7 +53,8 @@ mod.extend = function () {
 	// params: { targetRoom, minRCL = 0, maxRange = Infinity, minEnergyAvailable = 0, minEnergyCapacity = 0, callBack = null, allowTargetRoom = false, rangeRclRatio = 3, rangeQueueRatio = 51 }
 	// requiredParams: targetRoom
 	Room.findSpawnRoom = function (params) {
-		if (!params || !params.targetRoom) return null;
+		if (!params || !params.targetRoom || (params.maxWeight && params.maxWeight === 0))
+			return null;
 		// filter validRooms
 		let isValidRoom = room => (
 			room.my &&
