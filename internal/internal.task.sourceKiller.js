@@ -123,13 +123,14 @@ mod.creep = {
 		fixedBody: {
 			[ATTACK]: 10,
 			[RANGED_ATTACK]: 10,
-			[TOUGH]: 5,
+			// [TOUGH]: 0,
 			[HEAL]: 5,
-			[MOVE]: 20,
+			[MOVE]: 25,
 		},
 		multiBody: [],
 		sort: (a, b) => {
-			const partsOrder = [TOUGH, MOVE, ATTACK, RANGED_ATTACK, HEAL];
+			// const partsOrder = [TOUGH, MOVE, ATTACK, RANGED_ATTACK, HEAL];
+			const partsOrder = [MOVE, ATTACK, RANGED_ATTACK, HEAL];
 			const indexOfA = partsOrder.indexOf(a);
 			const indexOfB = partsOrder.indexOf(b);
 			return indexOfA - indexOfB;

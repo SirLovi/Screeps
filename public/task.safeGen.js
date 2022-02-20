@@ -12,7 +12,7 @@ mod.handleFlagFound = flag => {
         const room = Game.rooms[flag.pos.roomName];
         const valid = room && ((room.storage && room.storage.store[RESOURCE_GHODIUM]>=1000) ||
         (room.terminal && room.terminal.store[RESOURCE_GHODIUM]>=1000));
-        if(valid){ 
+        if(valid){
             Util.set(flag.memory, 'task', mod.name);
             // check if a new creep has to be spawned
             Task.safeGen.checkForRequiredCreeps(flag);
@@ -29,7 +29,7 @@ mod.checkForRequiredCreeps = (flag) => {
     Task.validateAll(memory, flag, mod.name, {roomName: flag.pos.roomName, checkValid: true});
     // count creeps assigned to task
     const count = memory.queued.length + memory.spawning.length + memory.running.length;
-    // if creep count below requirement spawn a new creep creep 
+    // if creep count below requirement spawn a new creep creep
     if (count < 1) {
         Task.spawn(
             Task.safeGen.creep.safeGen, // creepDefinition
@@ -80,8 +80,8 @@ mod.handleSpawningCompleted = creep => {
     if (flag) {
         // calculate & set time required to spawn and send next substitute creep
         // TODO: implement better distance calculation
-        creep.data.predictedRenewal = creep.data.spawningTime + (routeRange(creep.data.homeRoom, flag.pos.roomName) * 50);
-        
+        creep.data.predictedRenewal = creep.data.spawningTime + (global.Util.routeRange(creep.data.homeRoom, flag.pos.roomName) * 50);
+
         // get task memory
         const memory = Task.safeGen.memory(flag);
         // save running creep to task memory

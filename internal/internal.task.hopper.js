@@ -22,17 +22,17 @@ mod.checkForRequiredCreeps = (flag) => {
     Task.validateAll(memory, flag, mod.name, {roomName: flag.pos.roomName, checkValid: true});
     // count creeps assigned to task
     let count = memory.queued.length + memory.spawning.length + memory.running.length;
-    
-    // if creep count below requirement spawn a new creep creep 
+
+    // if creep count below requirement spawn a new creep creep
     if( count < 1 ) {
         Task.spawn(
             Task.hopper.creep.hopper, // creepDefinition
             { // destiny
                 task: 'hopper', // taskName
                 targetName: flag.name, // targetName
-            }, 
+            },
             { // spawn room selection params
-                targetRoom: flag.pos.roomName, 
+                targetRoom: flag.pos.roomName,
                 minEnergyCapacity: 1000,
                 maxRange: 5,
                 allowTargetRoom: true
@@ -74,7 +74,7 @@ mod.handleSpawningCompleted = creep => {
     if (flag) {
         // calculate & set time required to spawn and send next substitute creep
         // TODO: implement better distance calculation
-        creep.data.predictedRenewal = creep.data.spawningTime + (routeRange(creep.data.homeRoom, flag.pos.roomName)*50);
+        creep.data.predictedRenewal = creep.data.spawningTime + (global.Util.routeRange(creep.data.homeRoom, flag.pos.roomName)*50);
 
         // get task memory
         let memory = Task.hopper.memory(flag);
@@ -103,11 +103,11 @@ mod.handleCreepDied = name => {
 };
 // get task memory
 mod.memory = (flag) => {
-    if( !flag.memory.tasks ) 
+    if( !flag.memory.tasks )
         flag.memory.tasks = {};
     if( !flag.memory.tasks.hopper ) {
         flag.memory.tasks.hopper = {
-            queued: [], 
+            queued: [],
             spawning: [],
             running: []
         };
@@ -117,18 +117,18 @@ mod.memory = (flag) => {
 
 mod.creep = {
     hopper: {
-        fixedBody: [], 
+        fixedBody: [],
         multiBody: {
             [HEAL]: 1,
             [MOVE]: 2,
             [TOUGH]: 1,
         },
-        minAbsEnergyAvailable: 1080, 
+        minAbsEnergyAvailable: 1080,
         minEnergyAvailable: 0.4,
-        maxMulti: 12, 
-        minMulti: 3, 
-        name: "hopper", 
-        behaviour: "hopper", 
+        maxMulti: 12,
+        minMulti: 3,
+        name: "hopper",
+        behaviour: "hopper",
         queue: 'Low'
     },
 };

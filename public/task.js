@@ -309,7 +309,7 @@ mod.validateRunning = function (memory, flag, task, options = {}) {
 			if (creep.data.predictedRenewal)
 				prediction = creep.data.predictedRenewal;
 			else if (creep.data.spawningTime)
-				prediction = (creep.data.spawningTime + (routeRange(creep.data.homeRoom, roomName) * 50));
+				prediction = (creep.data.spawningTime + (global.Util.routeRange(creep.data.homeRoom, roomName) * 50));
 			else prediction = (global.Util.routeRange(creep.data.homeRoom, roomName) + 1) * 50;
 			if (creep.name !== deadCreep && creep.ticksToLive > prediction) {
 				const untilRenewal = creep.ticksToLive - prediction;

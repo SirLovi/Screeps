@@ -23,12 +23,12 @@ mod.handleRoomDied = room => {
                 task: recoveryType, // taskName
                 targetName: room.name, // targetName
                 type: definition.behaviour,
-            }, 
+            },
             { // spawn room selection params
                 explicit: room.name
             }
         );
-    } 
+    }
     if( pioneer ){
         // ensure room has a pioneer flag
         let flag = FlagDir.find(FLAG_COLOR.claim.pioneer, room);
@@ -64,12 +64,12 @@ mod.checkForRequiredCreeps = (flag) => {
 
     // re-validate if too much time has passed in the queue
     Task.validateAll(memory, flag, mod.name, {roomName: flag.pos.roomName, subKey: 'pioneer', checkValid: true});
-    
+
     // decide number of pioneers required
     let count = memory.queued.length + memory.spawning.length + memory.running.length;
-        
+
     // count creeps assigned to task
-    // if creep count below requirement spawn a new creep creep 
+    // if creep count below requirement spawn a new creep creep
     if( count < 1 ) {
         const definition = Task.pioneer.creep.pioneer;
         Task.spawn(
@@ -79,9 +79,9 @@ mod.checkForRequiredCreeps = (flag) => {
                 targetName: flag.name, // targetName
                 flagName: flag.name, // custom
                 type: definition.behaviour,
-            }, 
+            },
             { // spawn room selection params
-                targetRoom: flag.pos.roomName, 
+                targetRoom: flag.pos.roomName,
                 minEnergyCapacity: 400, // weight of fixedBody
                 rangeRclRatio: 2 // stronger preference of higher RCL rooms
             },
@@ -126,7 +126,7 @@ mod.handleSpawningCompleted = creep => {
     if (flag) {
         // calculate & set time required to spawn and send next substitute creep
         // TODO: implement better distance calculation
-        creep.data.predictedRenewal = creep.data.spawningTime + (routeRange(creep.data.homeRoom, flag.pos.roomName)*50);
+        creep.data.predictedRenewal = creep.data.spawningTime + (global.Util.routeRange(creep.data.homeRoom, flag.pos.roomName)*50);
 
         // get task memory
         let memory = Task.pioneer.memory(flag);
@@ -152,11 +152,11 @@ mod.handleCreepDied = name => {
 };
 // get task memory
 mod.memory = (flag) => {
-    if( !flag.memory.tasks ) 
+    if( !flag.memory.tasks )
         flag.memory.tasks = {};
     if( !flag.memory.tasks.pioneer ) {
         flag.memory.tasks.pioneer = {
-            queued: [], 
+            queued: [],
             spawning: [],
             running: []
         };
@@ -171,8 +171,8 @@ mod.creep = {
             [WORK]: 2,
         },
         multiBody: [WORK, MOVE, CARRY],
-        name: "pioneer", 
-        behaviour: "pioneer", 
+        name: "pioneer",
+        behaviour: "pioneer",
         queue: 'Low'
     },
     worker: {

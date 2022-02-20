@@ -181,7 +181,7 @@ Setup.maxPerFlag = function(flagFilter, maxRoomRange, measureByHome) {
         let max = 0;
         let distance, flag;
         let calcMax = flagEntry => {
-            distance = routeRange(room.name, flagEntry.roomName);
+            distance = global.Util.routeRange(room.name, flagEntry.roomName);
             if( distance > maxRoomRange ) {
                 return;
             }

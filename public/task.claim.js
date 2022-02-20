@@ -30,9 +30,9 @@ mod.checkForRequiredCreeps = (flag) => {
                 task: 'claim', // taskName
                 targetName: flag.name, // targetName
                 flagName: flag.name // custom
-            }, 
+            },
             { // spawn room selection params
-                targetRoom: flag.pos.roomName, 
+                targetRoom: flag.pos.roomName,
                 minEnergyCapacity: 650
             },
             creepSetup => { // callback onQueued
@@ -72,7 +72,7 @@ mod.handleSpawningCompleted = creep => {
     if (flag) {
         // calculate & set time required to spawn and send next substitute creep
         // TODO: implement better distance calculation
-        creep.data.predictedRenewal = creep.data.spawningTime + (routeRange(creep.data.homeRoom, flag.pos.roomName)*50);
+        creep.data.predictedRenewal = creep.data.spawningTime + (global.Util.routeRange(creep.data.homeRoom, flag.pos.roomName)*50);
 
         // get task memory
         let memory = global.Task.claim.memory(flag);
@@ -99,11 +99,11 @@ mod.handleCreepDied = name => {
 };
 // get task memory
 mod.memory = (flag) => {
-    if( !flag.memory.tasks ) 
+    if( !flag.memory.tasks )
         flag.memory.tasks = {};
     if( !flag.memory.tasks.claim ) {
         flag.memory.tasks.claim = {
-            queued: [], 
+            queued: [],
             spawning: [],
             running: []
         };
@@ -114,7 +114,7 @@ mod.nextAction = creep => {
     // override behaviours nextAction function
     // this could be a global approach to manipulate creep behaviour
 
-    //Claim - once claimed, recycle 
+    //Claim - once claimed, recycle
     let priority = [
         Creep.action.claiming,
         Creep.action.recycling
@@ -132,8 +132,8 @@ mod.creep = {
     claimer: {
         fixedBody: [CLAIM, MOVE],
         multiBody: [],
-        name: "claimer", 
-        behaviour: "claimer", 
+        name: "claimer",
+        behaviour: "claimer",
         queue: 'Low'
     },
 };

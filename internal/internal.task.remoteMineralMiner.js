@@ -100,7 +100,7 @@ mod.handleSpawningCompleted = creep => {
     }
     const flag = Game.flags[creep.data.destiny.targetName];
     if (flag) {
-        creep.data.predictedRenewal = creep.data.spawningTime + routeRange(creep.data.homeRoom, creep.data.destiny.room) * 50;
+        creep.data.predictedRenewal = creep.data.spawningTime + global.Util.routeRange(creep.data.homeRoom, creep.data.destiny.room) * 50;
 
         const memory = Task.remoteMineralMiner.memory(creep.data.destiny.room);
         memory.running[creep.data.destiny.type].push(creep.name);
