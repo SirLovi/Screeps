@@ -45,8 +45,8 @@ mod.isValidMineralToTerminal = function (room, mineral) {
             ret = (storedMineral || 0)
                 && (isStorageFull || storedMineral > global.MAX_STORAGE_NOT_ROOM_MINERAL)
                 && isTerminalFreeSpace;
-
-            // global.logSystem(room.name, `isValidToTerminal NOT ROOM Mineral: ${mineral} RET: ${ret}`);
+            // if (room.name === 'E16S27')
+            //     global.logSystem(room.name, `isValidToTerminal NOT ROOM Mineral: ${mineral} RET: ${ret}`);
         }
 
     } else if (Memory.compoundsManage[mineral] && Memory.compoundsManage[mineral].sell) {

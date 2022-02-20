@@ -24,7 +24,7 @@ action.resourcesWithLoot = (resources, creep, energyOnly) => {
 		});
 	} else {
 		loots = _.filter(resources, resource => {
-			return action.isValidTarget(resource, creep) && (Object.keys(resource.store).length > 0);
+			return action.isValidTarget(resource, creep);
 		});
 	}
 
@@ -60,8 +60,13 @@ action.newTarget = function (creep) {
 			let tombStones = creep.room.tombStones;
 			ret = this.resourcesWithLoot(tombStones, creep, action.defaultStrategy.energyOnly);
 		}
-		if (ret)
+		if (ret) {
+			if (global.DEBUG && global.debugger(global.DEBUGGING.targetRoom, creep.room.name)) {
+				global.logSystem(creep.room.name, `${creep.name} tombStones: ${ret.length}`);
+				global.logSystem(creep.room.name, `${creep.name} picking: ${ret}`);
+			}
 			return ret;
+		}
 		return false;
 	}
 	return false;

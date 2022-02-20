@@ -31,6 +31,7 @@ mod.executeRoom = function (memory, roomName) {
 	}
 };
 mod.extend = function () {
+
 	Object.defineProperties(Room.prototype, {
 		'combatCreeps': {
 			configurable: true,
@@ -105,12 +106,13 @@ mod.extend = function () {
 			configurable: true,
 			get: function () {
 				if (_.isUndefined(this._hostileThreatLevel)) {
-					// TODO: add towers when in foreign room
 					this._hostileThreatLevel = 0;
 					let evaluateBody = creep => {
 						this._hostileThreatLevel += creep.threat;
 					};
 					this.hostiles.forEach(evaluateBody);
+					if (!this.my)
+						this._hostileThreatLevel += this.structures.towers.length * Creep.partThreat.tower;
 				}
 				return this._hostileThreatLevel;
 			},
@@ -127,7 +129,7 @@ mod.extend = function () {
 		}
 
 		let registerHostile = creep => {
-			if (Room.isCenterNineRoom(this.name)) return;
+			// if (Room.isCenterNineRoom(this.name)) return;
 			// if invader id unregistered
 			if (!that.memory.hostileIds.includes(creep.id)) {
 				// handle new invader
@@ -173,20 +175,23 @@ mod.extend = function () {
 	};
 
 	Room.prototype.registerIsHostile = function () {
+
+		if (_.isUndefined(this.memory))
+			this.memory = {};
+
 		if (this.controller) {
 			if (_.isUndefined(this.memory.hostile) || typeof this.memory.hostile === 'number') { // not overridden by user
 				if (this.controller.owner && !this.controller.my && !this.ally)
-					this.memory.hostile = this.controller.level;
+					this.memory.hostile = this.hostileThreatLevel || this.controller.level;
 				else
 					delete this.memory.hostile;
 			}
-
 		} else if (this.strongHold) {
-			if (_.isUndefined(this.memory.hostile) || typeof this.memory.hostile === 'number' || this.memory.hostile !== this.strongHold)
-				this.memory.hostile = this.strongHold;
-
-		} else
-			delete this.memory.hostile;
+			if (_.isUndefined(this.memory.hostileStrongHold) || typeof this.memory.hostileStrongHold === 'number')
+				this.memory.hostileStrongHold = this.hostileThreatLevel || this.strongHold;
+			else
+				delete this.memory.hostileStrongHold;
+		}
 	};
 };
 mod.flushRoom = function (room) {

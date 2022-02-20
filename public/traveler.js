@@ -31,6 +31,7 @@ module.exports = function(globalOpts = {}){
         constructor() {
             this.registerHostileRoom = (room) => room.registerIsHostile();
             this.getHostileRoom = (roomName) => _.get(Memory, ['rooms', roomName, 'hostile']);
+            this.getStrongHoldRoom = (roomName) => _.get(Memory, ['rooms', roomName, 'hostileStrongHold']);
         }
         findAllowedRooms(origin, destination, options = {}) {
             _.defaults(options, { restrictDistance: 16 });
@@ -70,10 +71,18 @@ module.exports = function(globalOpts = {}){
                             return 10;
                         }
                     }
+
                     if (!options.allowHostile && this.getHostileRoom(roomName) &&
                         roomName !== destination && roomName !== origin) {
                         return Number.POSITIVE_INFINITY;
                     }
+
+                    if (!options.allowStrongHold && this.getStrongHoldRoom(roomName) &&
+                        roomName !== destination && roomName !== origin) {
+                        return Number.POSITIVE_INFINITY;
+                    }
+
+
                     return 2.5;
                 }
             });
@@ -92,6 +101,8 @@ module.exports = function(globalOpts = {}){
                 ignoreCreeps: true,
                 avoidSKCreeps: true,
                 allowHostile: false,
+                allowStrongHold: false,
+                ignoreStructures: false,
                 range: 1,
                 maxOps: gOpts.maxOps,
                 obstacles: [],
@@ -113,7 +124,14 @@ module.exports = function(globalOpts = {}){
                     if (!allowedRooms[roomName]) {
                         return false;
                     }
-                } else if (this.getHostileRoom(roomName) && !options.allowHostile &&
+                }
+
+                if (this.getHostileRoom(roomName) && !options.allowHostile &&
+                    roomName !== origPos.roomName && roomName !== destPos.roomName) {
+                    return false;
+                }
+
+                if (this.getStrongHoldRoom(roomName) && !options.allowStrongHold &&
                     roomName !== origPos.roomName && roomName !== destPos.roomName) {
                     return false;
                 }
@@ -404,6 +422,8 @@ module.exports = function(globalOpts = {}){
                 allowSK: true,
                 avoidSKCreeps: true,
                 allowHostile: false,
+                allowStrongHold: false,
+                ignoreStructures: false,
                 debug: global.DEBUG,
                 reportThreshold: global.TRAVELER_THRESHOLD,
                 useFindRoute: _.get(global, 'ROUTE_PRECALCULATION', true),

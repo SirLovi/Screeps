@@ -6,6 +6,13 @@ mod.creep = {
         multiBody: [TOUGH, ATTACK, RANGED_ATTACK, HEAL, MOVE, MOVE, MOVE, MOVE],
         name: "defender",
         behaviour: "warrior",
-        queue: 'Low'
+        queue: 'Medium',
+        sort: (a, b) => {
+            const partsOrder = [TOUGH, MOVE, ATTACK, RANGED_ATTACK, HEAL];
+            const indexOfA = partsOrder.indexOf(a);
+            const indexOfB = partsOrder.indexOf(b);
+            return indexOfA - indexOfB;
+        },
+        maxRange: 3,
     },
 };

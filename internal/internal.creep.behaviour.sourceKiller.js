@@ -3,7 +3,7 @@ module.exports = mod;
 const super_run = mod.run;
 mod.run = function(creep) {
     if (creep.flag && !creep.data.predictedRenewal) {
-        creep.data.predictedRenewal = creep.data.spawningTime + 50 + 50 * routeRange(creep.data.homeRoom, creep.flag.pos.roomName);
+        creep.data.predictedRenewal = creep.data.spawningTime + 50 + 50 * global.Util.routeRange(creep.data.homeRoom, creep.flag.pos.roomName);
     }
     creep.flee = creep.flee || !creep.hasActiveBodyparts([ATTACK, RANGED_ATTACK]);
     creep.attacking = false;

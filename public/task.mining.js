@@ -340,13 +340,13 @@ mod.creep = {
 	},
 	hauler: {
 		fixedBody: {
-			[CARRY]: 3,
+			[CARRY]: 2,
 			[MOVE]: 2,
 			[WORK]: 1,
 			[HEAL]: 0,
 		},
 		multiBody: {
-			[CARRY]: 1,
+			[CARRY]: 2,
 			[MOVE]: 1,
 		},
 		behaviour: 'remoteHauler',
@@ -387,13 +387,13 @@ mod.creep = {
 	},
 	SKHauler: {
 		fixedBody: {
-			[CARRY]: 7,
-			[MOVE]: 3,
+			[CARRY]: 1,
+			[MOVE]: 2,
 			[WORK]: 1,
 			[HEAL]: 1,
 		},
 		multiBody: {
-			[CARRY]: 1,
+			[CARRY]: 2,
 			[MOVE]: 1,
 		},
 		behaviour: 'remoteHauler',
@@ -720,7 +720,7 @@ mod.strategies = {
 			const maxWeight = mod.creepSize(flagRoomName, neededCarry, this.setup(flagRoomName));
 
 			if (global.DEBUG && global.debugger(global.DEBUGGING.targetRoom, flagRoomName)) {
-				global.logSystem(flagRoomName, `maxWeight: ${maxWeight} neededCarry: ${neededCarry} behaviour: ${this.setup(flagRoomName).fixedBody.carry > 4 ? 'SKHauler' : 'remoteHauler'}`);
+				global.logSystem(flagRoomName, `maxWeight: ${maxWeight} neededCarry: ${neededCarry} behaviour: ${this.setup(flagRoomName).fixedBody[HEAL] > 0 ? 'SKHauler' : 'remoteHauler'}`);
 			}
 
 

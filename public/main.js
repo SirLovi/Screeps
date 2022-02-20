@@ -342,16 +342,27 @@ module.exports.loop = wrapLoop(function () {
 	// 	global.Grafana.createStatProperties(true);
 
 	if(Game.cpu.bucket === 10000) {
-		if (global.GRAFANA) {
+
+		if (global.ENABLE_PIXEL_GENERATION) {
+			if (global.GRAFANA) {
+				if (_.isUndefined(Memory.stats.cpu))
+					global.Grafana.createStatProperties(false);
+				let bucketData = Memory.stats.cpu.bucketData;
+				bucketData.bucketFillIntervals.push(Game.time)
+				bucketData.bucketFillTime = bucketData.bucketFillIntervals[2] - bucketData.bucketFillIntervals[1];
+				bucketData.bucketFillIntervals.shift();
+			}
+			Game.cpu.generatePixel();
+		} else if (global.GRAFANA)  {
 			if (_.isUndefined(Memory.stats.cpu))
 				global.Grafana.createStatProperties(false);
 			let bucketData = Memory.stats.cpu.bucketData;
 			bucketData.bucketFillIntervals.push(Game.time)
-			bucketData.bucketFillTime = bucketData.bucketFillIntervals[2] - bucketData.bucketFillIntervals[1];
+			let fillTime = bucketData.bucketFillIntervals[2] - bucketData.bucketFillIntervals[1];
+			if (fillTime > 1)
+				bucketData.bucketFillTime = fillTime;
 			bucketData.bucketFillIntervals.shift();
 		}
-		if (global.ENABLE_PIXEL_GENERATION)
-			Game.cpu.generatePixel();
 	}
 
 	try {

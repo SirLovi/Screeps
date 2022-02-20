@@ -356,4 +356,15 @@ mod.nextCreepCheck = function (flag, task) {
 		return true;
 	}
 };
+mod.reCycleOrIdle = function (creep) {
+	global.logSystem(creep.room.name, `${creep.name} has no action => recycle/idle`);
+	let mother = Room.closestSpawnRoomFor(creep.room.name).structures.spawns[0];
+	if (mother) {
+		global.logSystem(creep.room.name, `${creep.name} is recycling`);
+		Creep.action.recycling.assign(creep, mother);
+	} else {
+		global.logSystem(creep.room.name, `${creep.name} is idle`);
+		return this.assignAction(creep, 'idle');
+	}
+}
 const cache = {};

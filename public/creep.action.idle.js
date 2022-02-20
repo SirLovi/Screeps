@@ -27,7 +27,7 @@ mod.step = function (creep) {
     if (creep.data.idleCooldown === 0 || creep.ticksToLive > 1450) {
         delete creep.data.actionName;
         delete creep.data.targetId;
-        delete  creep.data.idleCooldown;
+        delete creep.data.idleCooldown;
     }
 
 };

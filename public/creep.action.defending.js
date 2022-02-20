@@ -1,7 +1,8 @@
 let mod = new Creep.Action('defending');
 module.exports = mod;
+mod.name = 'defending';
 mod.isValidAction = function (creep) {
-	return creep.room.hostiles.length > 0;
+	return creep.room.hostiles.length > 0 && (global.FlagDir.find(global.FLAG_COLOR.claim.mining, creep.pos, true) || creep.room.my);
 };
 mod.isAddableAction = function () {
 	return true;
@@ -18,12 +19,15 @@ mod.isValidTarget = function (target) {
 };
 mod.newTarget = function (creep) {
 	let closestHostile = creep.pos.findClosestByRange(creep.room.hostiles, {
-		filter: creep.getStrategyHandler([mod.name], 'priorityTargetFilter', creep),
+		filter: mod.defaultStrategy.priorityTargetFilter(creep),
 	});
 	if (!closestHostile) {
 		closestHostile = creep.pos.findClosestByRange(creep.room.hostiles, {
-			filter: creep.getStrategyHandler([mod.name], 'targetFilter', creep),
+			filter: mod.defaultStrategy.targetFilter(creep),
 		});
+		if (!closestHostile) {
+			closestHostile = creep.pos.findClosestByRange(creep.room.hostiles);
+		}
 	}
 	return closestHostile;
 };

@@ -35,24 +35,24 @@ mod.outflowActions = (creep) => {
 	}
 	return priority;
 };
-mod.selectInflowAction = function (creep) {
-	const p = Util.startProfiling('selectInflowAction' + creep.name, {enabled: PROFILING.BEHAVIOUR});
-	const actionChecked = {};
-	const outflowActions = this.outflowActions(creep);
-	for (const action of this.inflowActions(creep)) {
-		if (!actionChecked[action.name]) {
-			actionChecked[action.name] = true;
-			if (this.assignAction(creep, action, undefined, outflowActions)) {
-				p.checkCPU('assigned' + action.name, 1.5);
-				return;
-			}
-		}
-	}
-	if (creep.room.name !== creep.data.homeRoom) {
-		p.checkCPU('!assigned', 1.5);
-		return Creep.action.idle.assign(creep);
-	}
-};
+// mod.selectInflowAction = function (creep) {
+// 	const p = Util.startProfiling('selectInflowAction' + creep.name, {enabled: PROFILING.BEHAVIOUR});
+// 	const actionChecked = {};
+// 	const outflowActions = this.outflowActions(creep);
+// 	for (const action of this.inflowActions(creep)) {
+// 		if (!actionChecked[action.name]) {
+// 			actionChecked[action.name] = true;
+// 			if (this.assignAction(creep, action, undefined, outflowActions)) {
+// 				p.checkCPU('assigned' + action.name, 1.5);
+// 				return;
+// 			}
+// 		}
+// 	}
+// 	if (creep.room.name !== creep.data.homeRoom) {
+// 		p.checkCPU('!assigned', 1.5);
+// 		return Creep.action.idle.assign(creep);
+// 	}
+// };
 mod.renewCreep = function (creep) {
 
 	if (!global.REMOTE_HAULER.RENEW)
@@ -103,64 +103,105 @@ mod.deposit = (that, creep) => {
 			if (creep.carry[r] > 0) creep.drop(r);
 		};
 		_.forEach(Object.keys(creep.carry), drop);
-		return this.assignAction(creep, 'idle');
+		return that.assignAction(creep, 'idle');
 	}
 };
 mod.nextAction = function (creep) {
 
 	// global.logSystem(creep.room.name, `ttl: ${creep.data.ttl} predictedRenewal: ${creep.data.predictedRenewal} flag: ${flag}`);
-	const flag = creep.data.destiny && Game.flags[creep.data.destiny.targetName];
-	const creepTargetRoomName = Memory.flags[flag.name].roomName;
+	let flag = creep.data.destiny && Game.flags[creep.data.destiny.targetName];
+
+	if (_.isUndefined(flag))
+		flag = global.FlagDir.find(global.FLAG_COLOR.claim.mining, creep.pos, false);
+
+	let creepTargetRoomName = Memory.flags[flag.name].roomName;
 	const homeRoomName = global.Task.mining.strategies.hauler.homeRoomName(creepTargetRoomName);
+	let casualties = creep.room.casualties.length > 0;
 
 	if (!flag) {
 		//TODO: in the future look for a nearby room we can support
-		global.logSystem(creep.room.name, `NO FLAG! ${flag}`);
+		global.logSystem(creep.room.name, `${creep.name} NO FLAG! ${flag}`);
 		return Creep.action.recycling.assign(creep);
 	} else {
-		let ret;
 		// at home
-		if (creep.pos.roomName === creep.data.homeRoom || creep.pos.roomName === homeRoomName) {
+		if (creep.pos.roomName === creep.data.homeRoom || creep.pos.roomName === homeRoomName || creep.room.my) {
+
+			let ret = false;
 
 			// carrier filled
+
+
 			if (!this.needEnergy(creep)) {
-				if (mod.deposit(this, creep))
-					return;
-			} else {
+				ret = mod.deposit(this, creep);
+			}
+
+			if (!ret && this.needEnergy(creep) && creep.data.creepType.indexOf('remote') === 0) {
+				if (creep.sum > 0) {
+					ret = this.nextEnergyAction(creep) && creep.action.name !== 'idle';
+					if (ret && global.DEBUG && global.debugger(global.DEBUGGING.remoteHaulersPicking, creep.room.name)) {
+						global.logSystem(creep.room.name, `${creep.name} remote nextEnergyAction: ${ret}`);
+						global.logSystem(creep.room.name, `${creep.name} remote current action: ${creep.action.name}`);
+					}
+				} else {
+					ret = this.gotoTargetRoom(creep, flag);
+					global.logSystem(creep.room.name, `${creep.name} go to target: ret ${ret}`);
+
+				}
+			} else if (!ret && this.needEnergy(creep)) {
+				ret = this.nextEnergyAction(creep);
 				if (global.DEBUG && global.debugger(global.DEBUGGING.remoteHaulersPicking, creep.room.name)) {
-					if (this.nextEnergyAction(creep)) {
-						global.logSystem(creep.room.name, `creep ${creep.name} wants more: ret ${ret}`);
-						return;
-					}
-
-					if (creep.sum > 0) {
-						if (mod.deposit(this, creep))
-							return;
-					}
-
-					// renew
-					if (mod.renewCreep(creep))
-						return;
-
-				} else if (creep.sum > 0) {
-					if (mod.deposit(this, creep))
-						return;
+					global.logSystem(creep.room.name, `${creep.name} nextEnergyAction: ${ret}`);
+					global.logSystem(creep.room.name, `${creep.name} current action: ${creep.action.name}`);
 				}
 			}
 
 
+			// if (!this.needEnergy(creep)) {
+			// 	if (mod.deposit(this, creep))
+			// 		return;
+			// }
+			// else {
+			// 	if (global.DEBUG && global.debugger(global.DEBUGGING.remoteHaulersPicking, creep.room.name)) {
+			// 		let ret = this.nextEnergyAction(creep);
+			// 		if (ret) {
+			// 			global.logSystem(creep.room.name, `creep ${creep.name} wants more: ret ${ret}`);
+			// 			global.logSystem(creep.room.name, `creep ${creep.name} action ${global.json(creep.action)}`);
+			// 			return;
+			// 		}
+			//
+			// 		if (creep.sum > 0) {
+			// 			if (mod.deposit(this, creep))
+			// 				return;
+			// 		}
+			//
+			// 		// renew
+			// 		if (mod.renewCreep(creep))
+			// 			return;
+			//
+			// 	} else if (creep.sum > 0) {
+			// 		if (mod.deposit(this, creep))
+			// 			return;
+			// 	}
+			// }
+
+
 			// travelling
-			let gotoTargetRoom = this.gotoTargetRoom(creep);
-			if (gotoTargetRoom) {
-				return;
+
+			if (!ret) {
+				ret = this.gotoTargetRoom(creep, flag);
 			}
+
+			if (ret)
+				return ret;
+
+			return false;
 
 		}
 		// at target room
 		else {
-			let casualties = creep.room.casualties.length > 0;
 
-			if (creep.pos.roomName === creep.data.destiny.room || creep.pos.roomName === homeRoomName) {
+
+			if (creep.pos.roomName === creep.data.destiny.room) {
 
 				// global.logSystem(creep.room.name, `AT TARGET: ${creep.name}`);
 
@@ -179,6 +220,10 @@ mod.nextAction = function (creep) {
 
 				if (!ret && this.needEnergy(creep)) {
 					ret = this.nextEnergyAction(creep);
+					if (global.DEBUG && global.debugger(global.DEBUGGING.targetRoom, creep.room.name)) {
+						global.logSystem(creep.room.name, `${creep.name} nextEnergyAction: ${ret}`);
+						global.logSystem(creep.room.name, `${creep.name} current action: ${creep.action.name}`);
+					}
 				}
 
 				if (ret)
@@ -191,24 +236,23 @@ mod.nextAction = function (creep) {
 			else {
 				// TODO: This should perhaps check which distance is greater and make this decision based on that plus its load size
 				let ret = false;
-				let currentRoom = Game.rooms[creep.pos.roomName];
+				// let currentRoom =
 
-				if (!currentRoom.my) {
-					if (!this.needEnergy(creep)) {
-						ret = this.goHome(creep, homeRoomName);
-					}
 
-					if (this.needEnergy(creep)) {
-						ret = this.nextEnergyAction(creep);
-					} else if (!ret && this.needEnergy(creep)) {
-						ret = this.gotoTargetRoom(creep);
-					}
-				} else {
-					if (this.needEnergy(creep)) {
-						ret = this.gotoTargetRoom(creep);
-					} else if (!this.needEnergy(creep)) {
-						ret = this.goHome(creep, homeRoomName);
-					}
+				if (casualties) {
+					creep.action = Creep.action.healing;
+					ret = Creep.behaviour.ranger.heal.call(this, creep);
+
+				}
+
+				if (!this.needEnergy(creep)) {
+					ret = this.goHome(creep, homeRoomName);
+				}
+
+				if (this.needEnergy(creep)) {
+					ret = this.nextEnergyAction(creep);
+				} else if (!ret && this.needEnergy(creep)) {
+					ret = this.gotoTargetRoom(creep, flag);
 				}
 
 				if (ret)
@@ -229,11 +273,13 @@ mod.nextAction = function (creep) {
 mod.needEnergy = function (creep) {
 	return creep.sum / creep.carryCapacity < global.REMOTE_HAULER.MIN_LOAD;
 };
-mod.gotoTargetRoom = function (creep) {
-	const targetFlag = creep.data.destiny ? Game.flags[creep.data.destiny.targetName] : null;
+mod.gotoTargetRoom = function (creep, flag) {
 	// global.logSystem(creep.room.name, `TARGET FLAG: ${targetFlag}`);
-	if (targetFlag)
-		return Creep.action.travelling.assignRoom(creep, targetFlag.pos.roomName);
+	if (flag) {
+		return Creep.action.travelling.assignRoom(creep, flag.pos.roomName);
+	} else {
+		return false;
+	}
 };
 mod.goHome = function (creep, homeRoomName) {
 	// global.logSystem(creep.room.name, `${creep.name} is going home ${homeRoomName}`);

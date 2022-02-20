@@ -109,8 +109,10 @@ mod.registerAction = function (creep, action, target, entry) {
 	creep.data = entry;
 };
 mod.registerCreepFlag = function (creep, flag) {
+
 	if (flag && creep.data && creep.data.flagName && creep.data.flagName === flag.name && creep.flag.name === flag.name)
 		return;
+
 	if (creep.data && creep.data.flagName) {
 		// unregister flag
 		let oldFlag = Game.flags[creep.data.flagName];

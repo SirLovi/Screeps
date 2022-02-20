@@ -463,11 +463,9 @@ mod.extend = function () {
 							reserved = flag.targetOf && flag.targetOf ? _.sum(flag.targetOf.map(t => t.creepType == 'claimer' ? t.weight : 0)) : 0;
 							that._claimerMaxWeight += (base - reserved);
 						}
-						;
 					};
 					flagEntries.forEach(calcWeight);
 				}
-				;
 				return this._claimerMaxWeight;
 			},
 		},
@@ -733,6 +731,22 @@ mod.extend = function () {
 					}
 				}
 				return this._strongHold;
+			},
+		},
+		'invadersCore': {
+			configurable: true,
+			get: function () {
+				if (_.isUndefined(this._invadersCore)) {
+					this._invadersCore = false;
+					let invadersCores = global.getInvadersCoreRooms().invadersCore;
+					for (const invadersCore of invadersCores) {
+						if (invadersCore.room.name === this.name) {
+							this._invadersCore = invadersCore.id;
+							break;
+						}
+					}
+				}
+				return this._invadersCore;
 			},
 		},
 		'roads': {
@@ -2095,6 +2109,11 @@ mod.extend = function () {
 
 		let isAvailable = function (nuker, room, target) {
 
+			if (!nuker) {
+				console.log(`MO NUKE ${room.name}`);
+				return false;
+			}
+
 			if (nuker.pos.roomName === this.name)
 				return false;
 
@@ -2111,7 +2130,7 @@ mod.extend = function () {
 			}
 
 			if (nuker.store['G'] < nuker.store.getCapacity('G')) {
-				console.log(`not enough G to launch nuke! ghodium: ${nuker.store['G']} ghodiumCapacity: ${nuker.store.getCapacity('G')}`);
+				global.logSystem(room.name, `not enough G to launch nuke! ghodium: ${nuker.store['G']} ghodiumCapacity: ${nuker.store.getCapacity('G')}`);
 				return false;
 			}
 

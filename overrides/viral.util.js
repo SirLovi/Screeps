@@ -108,8 +108,8 @@ mod.resetBoostProduction = function (roomName) {
 					room.memory.resources.terminal = [];
 					room.memory.resources.terminal.push({
 							id: room.terminal.id,
-							orders: []
-						}
+							orders: [],
+						},
 					);
 				}
 
@@ -117,8 +117,8 @@ mod.resetBoostProduction = function (roomName) {
 					room.memory.resources.storage = [];
 					room.memory.resources.storage.push({
 							id: room.storage.id,
-							orders: []
-						}
+							orders: [],
+						},
 					);
 				}
 
@@ -958,7 +958,7 @@ mod.requiresEnergyRoom = () => {
 
 			if (targetRoom instanceof Room) {
 
-				let transAction = function() {
+				let transAction = function () {
 					global.logSystem(roomFrom.name, `TARGET_ROOM: ${targetRoom.name}`);
 
 					targetRoom._isReceivingEnergy = true;
@@ -981,8 +981,7 @@ mod.requiresEnergyRoom = () => {
 				if (targetRoomCharge < 0.5 && transactionCost > (roomFrom.terminal.store.energy - global.ENERGY_BALANCE_TRANSFER_AMOUNT)) {
 					transactionAmount = global.changeAmount(roomFrom.name, targetRoom.name, global.ENERGY_BALANCE_TRANSFER_AMOUNT, roomFrom.terminal.store.energy, true);
 					transAction();
-				}
-				else if (transactionCost < (roomFrom.terminal.store.energy - global.ENERGY_BALANCE_TRANSFER_AMOUNT)) {
+				} else if (transactionCost < (roomFrom.terminal.store.energy - global.ENERGY_BALANCE_TRANSFER_AMOUNT)) {
 					transAction();
 				}
 
@@ -1033,9 +1032,9 @@ mod.requiresEnergy = (roomName) => {
 
 mod.resetBody = () => {
 	for (const roomName in Memory.tasks.mining) {
-		Memory.tasks.mining[roomName].carrySize = 0
-		Memory.tasks.mining[roomName].harvestSize = 0
-		Memory.tasks.mining[roomName].healSize = 0
+		Memory.tasks.mining[roomName].carrySize = 0;
+		Memory.tasks.mining[roomName].harvestSize = 0;
+		Memory.tasks.mining[roomName].healSize = 0;
 	}
 };
 
@@ -1083,6 +1082,35 @@ mod.renewable = () => {
 
 	}
 };
+
+mod.killSmallCreeps = () => {
+	let toKill = _.filter(Game.creeps, creep => {
+		return creep.body.length <= 3;
+	});
+
+	console.log(`defenders: ${toKill.length}`);
+
+	for (const creep of toKill) {
+		creep.suicide();
+		console.log(`killed: ${creep.name}`);
+	}
+
+	// while (toKill.length > 0) {
+	// 	for (const creep of toKill) {
+	// 		creep.suicide();
+	// 		console.log(`killed: ${creep.name}`);
+	// 	}
+	// 	toKill = _.filter(Game.creeps, creep => {
+	// 		return creep.body.length <= 3;
+	// 	});
+	// }
+};
+
+mod.hostileRooms = () => {
+	for (const [room, data] of Object.entries(Memory.rooms)) {
+		global.logSystem(room, `hostile: ${data.hostile}`);
+	}
+}
 
 
 // HERE comes room.memory.resources

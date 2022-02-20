@@ -26,7 +26,15 @@ action.isAddableTarget = function (target, creep) {
 action.newTarget = function (creep) {
 	if (creep.behaviour.name === 'remoteHauler' && creep.behaviour.needEnergy(creep)) {
 		const droppedResources = action.defaultStrategy.energyOnly ? _.filter(creep.room.droppedResources, {resourceType: RESOURCE_ENERGY}) : creep.room.droppedResources;
-		return action.lootFilter(droppedResources, creep);
+		let ret = action.lootFilter(droppedResources, creep);
+		if (action.isValidTarget(ret)) {
+			if (global.DEBUG && global.debugger(global.DEBUGGING.targetRoom, creep.room.name)) {
+				global.logSystem(creep.room.name, `${creep.name} droppedResources: ${droppedResources.length}`);
+				global.logSystem(creep.room.name, `${creep.name} picking: ${ret}`);
+			}
+			return ret;
+		} else
+			return false;
 	} else
 		return false;
 };

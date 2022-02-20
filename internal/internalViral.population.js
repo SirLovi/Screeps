@@ -11,10 +11,10 @@ mod.getCombatStats = function(body) {
     let armor = 99;
     let hullHits = body.length * 100 - 99;
     for(;i < body.length - 1; i++) {
-        if (!Population.stats.creep.armorParts[body[i].type]) {
+        if (!global.Population.stats.creep.armorParts[body[i].type]) {
             break;
         }
-        armor = armor + (Population.stats.creep.boost.hits[body[i].boost] || 100);
+        armor = armor + (global.Population.stats.creep.boost.hits[body[i].boost] || 100);
         hullHits = hullHits - 100;
     }
 
@@ -23,7 +23,7 @@ mod.getCombatStats = function(body) {
 
     if (i === body.length - 1) {
         for (; i >= 0; i--) {
-            if (body[i].type !== MOVE && !Population.stats.creep.coreParts[body[i].type]) {
+            if (body[i].type !== MOVE && !global.Population.stats.creep.coreParts[body[i].type]) {
                 break;
             }
             armor = armor - 100;
@@ -31,10 +31,10 @@ mod.getCombatStats = function(body) {
         }
     } else {
         for (; i < body.length; i++) {
-            if (Population.stats.creep.coreParts[body[i].type]) {
+            if (global.Population.stats.creep.coreParts[body[i].type]) {
                 break;
             }
-            hull = hull + (Population.stats.creep.boost.hits[body[i].boost] || 100);
+            hull = hull + (global.Population.stats.creep.boost.hits[body[i].boost] || 100);
             coreHits = coreHits - 100;
         }
     }

@@ -42,7 +42,7 @@ const Behaviour = function(name) {
         return false;
     };
     this.selectInflowAction = function(creep) {
-        const p = Util.startProfiling('selectInflowAction' + creep.name, {enabled: PROFILING.BEHAVIOUR});
+        const p = global.Util.startProfiling('selectInflowAction' + creep.name, {enabled: global.PROFILING.BEHAVIOUR});
         const actionChecked = {};
         const outflowActions = this.outflowActions(creep);
         for (const action of this.inflowActions(creep)) {
@@ -50,7 +50,8 @@ const Behaviour = function(name) {
                 actionChecked[action.name] = true;
                 if (this.assignAction(creep, action, undefined, outflowActions)) {
                     p.checkCPU('assigned' + action.name, 1.5);
-                    return;
+                    // global.logSystem(creep.room.name, `${creep.name} next inflowAction assigned: ${action.name} `);
+                    return true;
                 }
             }
         }

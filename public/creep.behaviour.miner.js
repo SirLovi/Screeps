@@ -3,7 +3,6 @@ module.exports = mod;
 mod.actions = function(creep) {
     return [
         Creep.action.mining,
-        // Creep.action.healing,
         Creep.action.recycling,
     ];
 };

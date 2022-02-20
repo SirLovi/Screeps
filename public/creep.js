@@ -145,7 +145,7 @@ mod.extend = function () {
 	};
 	Creep.prototype.leaveBorder = function () {
 
-		RoomPosition.prototype.fromDirection = function (direction) {
+		RoomPosition.prototype.fromDirection = function (direction, creep) {
 			const
 				DIRECTIONS = {
 					1: [0, -1],
@@ -157,7 +157,25 @@ mod.extend = function () {
 					7: [-1, 0],
 					8: [-1, -1],
 				};
-			return new RoomPosition(this.x + DIRECTIONS[direction][0], this.y + DIRECTIONS[direction][1], this.roomName);
+
+			let x = this.x + DIRECTIONS[direction][0];
+			let y = this.y + DIRECTIONS[direction][1];
+			// global.logSystem(creep.room.name, `x: ${x} y: ${y} room: ${this.roomName}`);
+			// let stepPoint = new RoomPosition(x, y, this.roomName);
+			// let validFields = [];
+			// let findValidFields = field => {
+			// 	validFields = _(validFields).concat(Room.validFields(this.roomName, field.pos.x - 1, field.pos.x + 1, field.pos.y - 1, field.pos.y + 1, true));
+			// };
+			//
+			// let validStepPoints = _.filter(stepPoint, findValidFields);
+			//
+			// if (validStepPoints.length > 0)
+			// 	return new RoomPosition(x, y, this.roomName);
+			// else {
+			// 	global.logSystem(this.roomName, `${creep.name} has problem with leave border`);
+			// }
+			return new RoomPosition(x, y, this.roomName);
+
 		};
 
 		function getDirectionPriorities(lastDirection) {
@@ -213,9 +231,9 @@ mod.extend = function () {
 
 		for (let direction of allowedDirections) {
 
-			roomPos = this.pos.fromDirection(direction);
+			roomPos = this.pos.fromDirection(direction, this);
 
-			if (roomPos.x >= 0 && roomPos.y >= 0) {
+			if (roomPos && roomPos.x >= 0 && roomPos.y >= 0) {
 
 				let stuff = roomPos.look();
 
@@ -274,16 +292,30 @@ mod.extend = function () {
 		if (this.fatigue > 0)
 			return;
 
-		// if (this.data.creepType === 'remoteHauler') {
-		// 	// global.logSystem(this.room.name, `remoteHauler IDLE ${this.name}`);
-		// 	return;
-		// }
+		let validFields = (fields) => {
+			for (const field of fields) {
+				if (field < 1 || field > 48) {
+					return false;
+				}
+			}
+			return true;
+		};
 
 		// check if on road/structure
-		const needToMove = _(this.room.structures.piles).filter('pos', this.pos)
-		.concat(this.pos.lookFor(LOOK_STRUCTURES))
-		.concat(this.pos.lookFor(LOOK_CONSTRUCTION_SITES))
-		.size();
+		// TODO room.validFields to check if lookForAtArea parameters are valid
+		let needToMove;
+		if (validFields([this.pos.y - 1, this.pos.x - 1, this.pos.y + 1, this.pos.x + 1]))
+			needToMove = _(this.room.structures.piles).filter('pos', this.pos)
+			.concat(this.room.lookForAtArea(LOOK_STRUCTURES, this.pos.y - 1, this.pos.x - 1, this.pos.y + 1, this.pos.x + 1, true))
+			.concat(this.room.lookForAtArea(LOOK_CONSTRUCTION_SITES, this.pos.y - 1, this.pos.x - 1, this.pos.y + 1, this.pos.x + 1, true))
+			.size();
+		else {
+			needToMove = _(this.room.structures.piles).filter('pos', this.pos)
+			.concat(this.pos.lookFor(LOOK_STRUCTURES))
+			.concat(this.pos.lookFor(LOOK_CONSTRUCTION_SITES))
+			.size();
+		}
+
 		if (needToMove) {
 			if (!this.data.idle || !this.data.idle.path || !this.data.idle.path.length || this.pos.isEqualTo(this.data.idle.lastPos)) {
 				const idleFlag = global.FlagDir.find(global.FLAG_COLOR.command.idle, this.pos, true, (r, flagEntry) => {
@@ -296,7 +328,9 @@ mod.extend = function () {
 					}
 				});
 				let ret;
+
 				if (idleFlag) {
+
 					ret = PathFinder.search(
 						this.pos, {pos: idleFlag.pos, range: 0}, {
 							plainCost: 2,
@@ -350,7 +384,8 @@ mod.extend = function () {
 				delete this.data.idle;
 			}
 		}
-	};
+	}
+	;
 	Creep.prototype.repairNearby = function () {
 		// only repair in rooms that we own, have reserved, or belong to our allies, also SK rooms and highways.
 		if (this.room.controller && this.room.controller.owner && !(this.room.my || this.room.reserved || this.room.ally)) return;

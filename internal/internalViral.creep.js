@@ -6,7 +6,7 @@ mod.compileBody = function (room, params, spawn = false, sort = true) {
 
 	const moveRatio = 1 - (_.isNumber(params.moveRatio) && params.moveRatio > 0) ? params.moveRatio : 0.5;
 	const parts = this.baseOf.internalViral.compileBody.apply(this, [room, params, sort]);
-	if (!sort) {
+	if ((!sort && typeof params.sort !== 'boolean') || params.sort === false) {
 		return parts;
 	}
 	const attackCount = _.sum(parts, p => p === ATTACK);
@@ -14,8 +14,8 @@ mod.compileBody = function (room, params, spawn = false, sort = true) {
 	const hasTough = _.some(parts, p => p === TOUGH);
 	const moveCount = _.sum(parts, p => p === MOVE);
 	const partsSize = _.sum(parts, p => p !== CARRY);
-	// if (params.moveRatio !== undefined || (attackCount || hasTough) && moveCount * 2 >= partsSize && attackCount >= rangedCount) {
-	if (params.moveRatio !== undefined || (attackCount || hasTough) && moveCount * 2 >= partsSize) {
+	if (params.moveRatio !== undefined || (attackCount || hasTough) && moveCount * 2 >= partsSize && attackCount >= rangedCount) {
+	// if (params.moveRatio !== undefined || (attackCount || hasTough) && moveCount * 2 >= partsSize) {
 		// relocate move parts as armor so that 2:1 move when hits === hullHits
 		const movedMoves = parts.splice(_.findIndex(parts, p => p === MOVE),
 			Math.floor(moveRatio * moveCount));

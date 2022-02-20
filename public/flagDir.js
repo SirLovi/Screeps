@@ -57,18 +57,21 @@ mod.findName = function (flagColor, pos, mod, modArgs, local = true) {
 	// some flags found - find nearest
 	if (pos && pos.roomName) {
 		let range = flag => {
-			let r = 0;
+			// console.log(`flag: ${global.json(flag)} pos: ${global.json(flag)}`);
+			let range;
 			let roomDist = global.Util.routeRange(pos.roomName, flag.roomName);
 			if (roomDist === 0) {
-				r = _.max([Math.abs(flag.x - pos.x), Math.abs(flag.y - pos.y)]);
+				// range = _.max([Math.abs(flag.x - pos.x), Math.abs(flag.y - pos.y)]);
+				range = global.Util.getDistance(flag, pos);
 			} else {
-				r = roomDist * 50;
+				range = roomDist * 50;
 			}
 			if (mod) {
-				r = mod(r, flag, modArgs);
+				range = mod(range, flag, modArgs);
 			}
-			flag.valid = r < Infinity;
-			return r;
+			flag.valid = range < Infinity;
+			return range;
+
 		};
 		let flag = _.min(flags, range); //_.sortBy(flags, range)[0];
 		// console.log(`FLAG: ${flag}`);
@@ -77,10 +80,10 @@ mod.findName = function (flagColor, pos, mod, modArgs, local = true) {
 		return flags[0].name;
 	}
 };
-mod.find = function (flagColor, pos, local = true, mod, modArgs) {
+mod.find = function (flagColor, pos, local = true, module, modArgs) {
 	if (pos instanceof Room)
 		pos = pos.getPositionAt(25, 25);
-	let id = this.findName(flagColor, pos, mod, modArgs, local);
+	let id = mod.findName(flagColor, pos, module, modArgs, local);
 	if (id === null)
 		return null;
 	return Game.flags[id];
@@ -172,9 +175,15 @@ mod.exploitMod = function (range, flagItem, creepName) {
 };
 mod.hasInvasionFlag = function () {
 	if (_.isUndefined(this._hasInvasionFlag)) {
-		this._hasInvasionFlag = (this.findName(FLAG_COLOR.invade) != null) || (this.findName(FLAG_COLOR.destroy) != null);
+		this._hasInvasionFlag = (this.findName(global.FLAG_COLOR.invade) !== null) || (this.findName(global.FLAG_COLOR.destroy) !== null);
 	}
 	return this._hasInvasionFlag;
+};
+mod.hasDefenseFlag = function () {
+	if (_.isUndefined(this._hasDefenseFlag)) {
+		this._hasDefenseFlag = (this.findName(global.FLAG_COLOR.defense) !== null);
+	}
+	return this._hasDefenseFlag;
 };
 
 mod.extend = function () {

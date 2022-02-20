@@ -93,7 +93,11 @@ mod.extend = function () {
 			let energyAvailable = room.energyAvailable * weight.energyAvailable;
 			let availableSpawns = freeSpawns(room) > 0 ? 10: 0;
 			availableSpawns = availableSpawns * weight.availableSpawns;
-			let ret = distance + rcl + spawnTime - energyAvailable - availableSpawns;
+			let ret;
+			if (availableSpawns)
+				ret = distance + rcl - energyAvailable - availableSpawns;
+			else
+				ret = distance + rcl + spawnTime - energyAvailable - availableSpawns;
 
 			// console.log(`targetRoom: ${params.targetRoom} home: ${room.name} availableSpawns: ${availableSpawns}`);
 

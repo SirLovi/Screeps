@@ -102,9 +102,10 @@ let Action = function (actionName) {
 			target = this.newTarget(creep);
 
 		if (target && this.isAddableTarget(target, creep)) {
-			if (global.DEBUG && global.TRACE) trace('Action', {creepName: creep.name, assign: this.name, target: !target || target.name || target.id, Action: 'assign'});
-			if (!creep.action || creep.action.name != this.name || !creep.target || creep.target.id !== target.id || creep.target.name != target.name) {
-				Population.registerAction(creep, this, target);
+			if (global.DEBUG && global.TRACE)
+				global.trace('Action', {creepName: creep.name, assign: this.name, target: !target || target.name || target.id, Action: 'assign'});
+			if (!creep.action || creep.action.name !== this.name || !creep.target || creep.target.id !== target.id || creep.target.name !== target.name) {
+				global.Population.registerAction(creep, this, target);
 				this.onAssignment(creep, target);
 			}
 			return true;
@@ -153,10 +154,11 @@ let Action = function (actionName) {
 		if (creep.room.my && creep.room.situation.invasion) {
 			// pickup near sources only
 			filter = (loot) => creep.pos.findInRange(loot, 1).length > 0;
+			return creep.pos.findClosestByPath(loots, {filter: filter});
 		} else {
-			filter = true;
+			return creep.pos.findClosestByPath(loots);
 		}
-		return creep.pos.findClosestByPath(loots, {filter: filter});
+
 	};
 };
 module.exports = Action;

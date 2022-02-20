@@ -1,6 +1,7 @@
 const mod = new Creep.Behaviour('warrior');
 module.exports = mod;
 const super_invalidAction = mod.invalidAction;
+mod.name = 'warrior'
 mod.invalidAction = function (creep) {
 	return super_invalidAction.call(this, creep) ||
 		(creep.action.name === 'guarding' &&
@@ -19,8 +20,8 @@ mod.actions = function (creep) {
 	let temp = [
 		Creep.action.invading,
 		Creep.action.defending,
-		Creep.action.healing,
 		Creep.action.guarding,
+		Creep.action.healing,
 	];
 	if (creep.data.destiny.boosted)
 		temp.unshift(Creep.action.boosting);
@@ -35,7 +36,7 @@ mod.strategies = {
 		moveOptions: function (options) {
 			// console.log(`DEFAULT:`);
 			// allow routing in and through hostile rooms
-			if (_.isUndefined(options.allowHostile))
+			if (_.isUndefined(options.allowHostile) || !options.allowHostile)
 				options.allowHostile = true;
 			return options;
 		},
