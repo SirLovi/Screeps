@@ -16,9 +16,9 @@ mod.handleFlagFound = flag => {
 		// if (flag.memory.nextCheck.undefined)
 		// 	delete flag.memory.nextCheck.undefined
 
-		let roomName = flag.room ? flag.room.name : flag.memory.roomName;
-		let nextCheck = flag.memory.nextCheck.guard - Game.time;
-		let runningCheck = (flag.memory.tasks.guard.nextRunningCheck - Game.time) || 0;
+		// let roomName = flag.room ? flag.room.name : flag.memory.roomName;
+		// let nextCheck = flag.memory.nextCheck.guard - Game.time;
+		// let runningCheck = flag.memory.tasks ? (flag.memory.tasks.guard.nextRunningCheck - Game.time) || 0 : 'undefined yet';
 		// global.logSystem(roomName, `GUARD FLAG FOUND: ${global.json(flag.memory)} nextCheck: ${nextCheck} nextRunningCheck: ${runningCheck}`);
 		// check if a new creep has to be spawned
 		global.Task.guard.checkForRequiredCreeps(flag);
