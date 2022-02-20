@@ -17,7 +17,7 @@ action.isAddableTarget = function (target, creep) {
 		if (target.targetOf) {
 			let assignedCreeps = target.targetOf.length;
 			let flagName = creep.data.destiny.targetName;
-			let invadersCore = Game.getObjectById(target.room.invadersCore)
+			let invadersCore = Game.getObjectById(target.room.invadersCore);
 			let invadersCoreHits = invadersCore.hits / invadersCore.hitsMax;
 			let needMoreGuard = invadersCoreHits >= 0.4 && assignedCreeps <= 1;
 			// global.logSystem(creep.room.name, `${creep.name} INVADING: ${target} targetRoom: ${target.room.name} creepTarget: ${Game.flags[flagName].room.name} ret: ${needMoreGuard && isDistanceOk}`);
@@ -55,8 +55,8 @@ action.getFlaggedStructure = function (flagColor, pos) {
 };
 action.newTarget = function (creep) {
 
-	if (creep.name === 'guard-Flag44-2')
-		global.logSystem(creep.room.name, `INVADING!!! - NEW TARGET`);
+	// if (creep.name === 'guard-Flag44-2')
+	// 	global.logSystem(creep.room.name, `INVADING!!! - NEW TARGET`);
 
 	let flag = global.FlagDir.find(global.FLAG_COLOR.invade, creep.pos, false);
 
@@ -89,8 +89,8 @@ action.newTarget = function (creep) {
 
 	if (!flag.room.controller || !flag.room.controller.my || flag.room.reserved) {
 
-		if (creep.name === 'guard-Flag44-2')
-			global.logSystem(creep.room.name, `INVADING!!!`);
+		// if (creep.name === 'guard-Flag44-2')
+		// 	global.logSystem(creep.room.name, `INVADING!!!`);
 
 
 		//attack healer
@@ -157,14 +157,11 @@ action.step = function (creep) {
 
 	let ret;
 
-
 	if ((creep.target instanceof Flag) && (creep.target.pos.roomName === creep.pos.roomName))
 		ret = this.assign(creep);
 
-	if (creep.name === 'guard-Flag44-2')
-		global.logSystem(creep.room.name, `INVADE => ${creep.name} target: ${creep.target} type: ${creep.data.creepType} assign: ${ret}`);
-
-
+	// if (creep.name === 'guard-Flag44-2')
+	// 	global.logSystem(creep.room.name, `INVADE => ${creep.name} target: ${creep.target} type: ${creep.data.creepType} assign: ${ret}`);
 
 	this.run[creep.data.creepType](creep);
 };

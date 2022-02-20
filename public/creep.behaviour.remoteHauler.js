@@ -144,7 +144,7 @@ mod.nextAction = function (creep) {
 					}
 				} else {
 					ret = this.gotoTargetRoom(creep, flag);
-					global.logSystem(creep.room.name, `${creep.name} go to target: ret ${ret}`);
+					// global.logSystem(creep.room.name, `${creep.name} go to target: ret ${ret}`);
 
 				}
 			} else if (!ret && this.needEnergy(creep)) {

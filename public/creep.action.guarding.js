@@ -35,8 +35,8 @@ mod.newTarget = function (creep) {
 	// if (Room.isSKRoom(creep.pos.roomName) && creep.pos.roomName === creep.flag.pos.roomName) {
 	if (creep.pos.roomName === flag.pos.roomName) {
 
-		if (creep.name === 'guard-Flag42-1')
-			global.logSystem(creep.room.name, `GUARDiNG!!!`);
+		// if (creep.name === 'guard-Flag42-1')
+		// 	global.logSystem(creep.room.name, `GUARDiNG!!!`);
 
 
 		let SKCreeps = _.filter(creep.room.hostiles, hostile => {
@@ -73,8 +73,8 @@ mod.newTarget = function (creep) {
 			return creep.pos.findClosestByPath(SKCreeps);
 		}
 	} else {
-		if (creep.name === 'guard-Flag42-1')
-			global.logSystem(creep.room.name, `${creep.name} not at targetRoom`);
+		// if (creep.name === 'guard-Flag42-1')
+		// 	global.logSystem(creep.room.name, `${creep.name} not at targetRoom`);
 	}
 
 
@@ -85,8 +85,8 @@ mod.newTarget = function (creep) {
 	if (flag)
 		global.Population.registerCreepFlag(creep, flag);
 
-	if (creep.name === 'guard-Flag42-1')
-		global.logSystem(creep.room.name, `${creep.name} action: ${creep.action} flag: ${flag}`);
+	// if (creep.name === 'guard-Flag42-1')
+	// 	global.logSystem(creep.room.name, `${creep.name} action: ${creep.action} flag: ${flag}`);
 
 	return flag;
 };

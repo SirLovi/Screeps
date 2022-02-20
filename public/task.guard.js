@@ -19,7 +19,7 @@ mod.handleFlagFound = flag => {
 		let roomName = flag.room ? flag.room.name : flag.memory.roomName;
 		let nextCheck = flag.memory.nextCheck.guard - Game.time;
 		let runningCheck = (flag.memory.tasks.guard.nextRunningCheck - Game.time) || 0;
-		global.logSystem(roomName, `GUARD FLAG FOUND: ${global.json(flag.memory)} nextCheck: ${nextCheck} nextRunningCheck: ${runningCheck}`);
+		// global.logSystem(roomName, `GUARD FLAG FOUND: ${global.json(flag.memory)} nextCheck: ${nextCheck} nextRunningCheck: ${runningCheck}`);
 		// check if a new creep has to be spawned
 		global.Task.guard.checkForRequiredCreeps(flag);
 	}
