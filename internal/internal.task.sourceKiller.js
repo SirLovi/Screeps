@@ -121,16 +121,17 @@ mod.memory = (flag) => {
 mod.creep = {
 	sourceKiller: {
 		fixedBody: {
-			[ATTACK]: 10,
-			[RANGED_ATTACK]: 10,
-			// [TOUGH]: 0,
+			[ATTACK]: 20,
+			// [RANGED_ATTACK]: 10,
+			// [TOUGH]: 5,
 			[HEAL]: 5,
 			[MOVE]: 25,
 		},
 		multiBody: [],
 		sort: (a, b) => {
 			// const partsOrder = [TOUGH, MOVE, ATTACK, RANGED_ATTACK, HEAL];
-			const partsOrder = [MOVE, ATTACK, RANGED_ATTACK, HEAL];
+			// const partsOrder = [MOVE, ATTACK, RANGED_ATTACK, HEAL];
+			const partsOrder = [MOVE, ATTACK, HEAL];
 			const indexOfA = partsOrder.indexOf(a);
 			const indexOfB = partsOrder.indexOf(b);
 			return indexOfA - indexOfB;
