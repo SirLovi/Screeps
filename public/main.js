@@ -359,7 +359,7 @@ module.exports.loop = wrapLoop(function () {
 			let bucketData = Memory.stats.cpu.bucketData;
 			bucketData.bucketFillIntervals.push(Game.time)
 			let fillTime = bucketData.bucketFillIntervals[2] - bucketData.bucketFillIntervals[1];
-			if (fillTime > 1)
+			if (fillTime > 100)
 				bucketData.bucketFillTime = fillTime;
 			bucketData.bucketFillIntervals.shift();
 		}

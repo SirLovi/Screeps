@@ -62,13 +62,15 @@ action.step = function (creep) {
 };
 action.assignRoom = function (creep, roomName) {
 	if (!roomName) {
-		logError(creep.name + 'Creep.action.travelling.assignRoom called with no room.');
+		global.Util.logError(creep.name + 'Creep.action.travelling.assignRoom called with no room.');
 		return;
 	}
-	if (_.isUndefined(creep.data.travelRange)) creep.data.travelRange = TRAVELLING_BORDER_RANGE || 22;
+	if (_.isUndefined(creep.data.travelRange))
+		creep.data.travelRange = global.TRAVELLING_BORDER_RANGE || 22;
 	creep.data.travelRoom = roomName;
-	if (global.DEBUG && global.TRACE) trace('Action', {creepName: creep.name, assign: this.name, roomName, Action: 'assign'});
-	return Creep.action.travelling.assign(creep, FlagDir.specialFlag());
+	if (global.DEBUG && global.TRACE)
+		global.trace('Action', {creepName: creep.name, assign: this.name, roomName, Action: 'assign'});
+	return Creep.action.travelling.assign(creep, global.FlagDir.specialFlag());
 };
 action.unregister = function (creep) {
 	delete creep.action;

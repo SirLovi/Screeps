@@ -9,7 +9,10 @@ setup.maxMulti = function (room) {
 	contSum += _.sum(room.droppedResources, 'amount');
 	max += Math.floor(contSum / 1000);
 	max += Creep.setup.upgrader._maxMulti(room);
-	return Math.min(max, 16);
+
+	let ret = Math.min(max, 16);
+	global.logSystem(room.name, `HAULER maxMulti: ${ret}`);
+	return ret;
 };
 setup.maxCount = function (room) {
 	if (!room.population) return 0;
@@ -49,6 +52,7 @@ setup.default = {
 	multiBody: [CARRY, CARRY, MOVE],
 	minAbsEnergyAvailable: 200,
 	minEnergyAvailable: 0.4,
+	behaviour: 'hauler',
 	maxMulti: room => setup.maxMulti(room),
 	maxCount: room => setup.maxCount(room),
 	maxWeight: room => setup.maxWeight(room),
@@ -61,6 +65,7 @@ setup.high = {
 	maxMulti: room => setup.maxMulti(room),
 	maxCount: room => setup.maxCount(room),
 	maxWeight: room => setup.maxWeight(room),
+	behaviour: 'hauler',
 };
 setup.RCL = {
 	1: setup.none,

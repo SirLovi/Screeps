@@ -5,7 +5,7 @@ const Behaviour = function(name) {
     this.inflowActions = (creep) => []; // priority list of actions for getting resources
     this.outflowActions = (creep) => []; // priority list of actions for using resources
     this.assignAction = function(creep, action, target, debouncePriority) {
-        const p = Util.startProfiling(creep.name + '.assignAction' + ':' + action.name || action, {enabled: PROFILING.BEHAVIOUR});
+        const p = global.Util.startProfiling(creep.name + '.assignAction' + ':' + action.name || action, {enabled: PROFILING.BEHAVIOUR});
         if (typeof action === 'string')
             action = Creep.action[action];
         const valid = action.isValidAction(creep);
@@ -59,14 +59,14 @@ const Behaviour = function(name) {
         return Creep.action.idle.assign(creep);
     };
     this.selectAction = function(creep, actions) {
-        const p = Util.startProfiling('selectAction' + creep.name, {enabled: PROFILING.BEHAVIOUR});
+        const p = global.Util.startProfiling('selectAction' + creep.name, {enabled: PROFILING.BEHAVIOUR});
         const actionChecked = {};
         for (const action of actions) {
             if (!actionChecked[action.name]) {
                 actionChecked[action.name] = true;
                 if (this.assignAction(creep, action)) {
                     p.checkCPU('assigned' + action.name, 1.5);
-                    return;
+                    return true;
                 }
             }
         }

@@ -1,18 +1,26 @@
 const mod = new Creep.Behaviour('remoteHauler');
 module.exports = mod;
 // mod.actions = (creep) => {
-// 	if (global.REMOTE_HAULER.RENEW)
-// 		return [Creep.action.renewing];
-// 	else
-// 		return [];
-// 	return [Creep.action.renewing];
+// 	return [
+// 		Creep.action.healing,
+// 	];
 // };
 mod.inflowActions = (creep) => {
+
+	// at home
+	// if (creep.room.name === creep.data.destiny.homeRoom
+	// 	&& (creep.sum / creep.carryCapacity < global.REMOTE_HAULER.MIN_LOAD)) {
+	// 	return [
+	// 		Creep.action.picking,
+	// 		Creep.action.pickingTombstones,
+	// 	];
+	// }
 	return [
-		// Creep.action.renewing,
 		Creep.action.picking,
 		Creep.action.pickingTombstones,
 		Creep.action.uncharging,
+		// Creep.action.healing,
+
 	];
 };
 mod.outflowActions = (creep) => {
@@ -23,7 +31,7 @@ mod.outflowActions = (creep) => {
 		Creep.action.charging,
 		Creep.action.fueling,
 		Creep.action.storing,
-		Creep.action.healing,
+		// Creep.action.healing,
 	];
 	if (creep.sum > creep.carry.energy ||
 		(!creep.room.situation.invasion &&
@@ -90,6 +98,7 @@ mod.deposit = (that, creep) => {
 			return true; // prefer storage
 
 	}
+
 	if (that.assignAction(creep, 'charging'))
 		return true;
 	// no deposit :/
@@ -118,6 +127,12 @@ mod.nextAction = function (creep) {
 	const homeRoomName = global.Task.mining.strategies.hauler.homeRoomName(creepTargetRoomName);
 	let casualties = creep.room.casualties.length > 0;
 
+	// store homeRoom in creep.data
+	if (creep.data.destiny.homeRoom !== homeRoomName) {
+		creep.data.destiny.homeRoom = homeRoomName;
+	}
+
+
 	if (!flag) {
 		//TODO: in the future look for a nearby room we can support
 		global.logSystem(creep.room.name, `${creep.name} NO FLAG! ${flag}`);
@@ -129,31 +144,33 @@ mod.nextAction = function (creep) {
 			let ret = false;
 
 			// carrier filled
-
-
-			if (!this.needEnergy(creep)) {
-				ret = mod.deposit(this, creep);
+			if (!this.needEnergy(creep, true)) {
+				return mod.deposit(this, creep);
 			}
 
-			if (!ret && this.needEnergy(creep) && creep.data.creepType.indexOf('remote') === 0) {
+			if (this.needEnergy(creep, true))
+				// && creep.data.creepType.indexOf('remote') === 0)
+			{
 				if (creep.sum > 0) {
 					ret = this.nextEnergyAction(creep) && creep.action.name !== 'idle';
 					if (ret && global.DEBUG && global.debugger(global.DEBUGGING.remoteHaulersPicking, creep.room.name)) {
 						global.logSystem(creep.room.name, `${creep.name} remote nextEnergyAction: ${ret}`);
 						global.logSystem(creep.room.name, `${creep.name} remote current action: ${creep.action.name}`);
+						return ret;
 					}
 				} else {
-					ret = this.gotoTargetRoom(creep, flag);
+					return this.gotoTargetRoom(creep, flag);
 					// global.logSystem(creep.room.name, `${creep.name} go to target: ret ${ret}`);
 
 				}
-			} else if (!ret && this.needEnergy(creep)) {
-				ret = this.nextEnergyAction(creep);
-				if (global.DEBUG && global.debugger(global.DEBUGGING.remoteHaulersPicking, creep.room.name)) {
-					global.logSystem(creep.room.name, `${creep.name} nextEnergyAction: ${ret}`);
-					global.logSystem(creep.room.name, `${creep.name} current action: ${creep.action.name}`);
-				}
 			}
+			// else if (!ret && this.needEnergy(creep, true)) {
+			// 	ret = this.nextEnergyAction(creep);
+			// 	if (global.DEBUG && global.debugger(global.DEBUGGING.remoteHaulersPicking, creep.room.name)) {
+			// 		global.logSystem(creep.room.name, `${creep.name} nextEnergyAction: ${ret}`);
+			// 		global.logSystem(creep.room.name, `${creep.name} current action: ${creep.action.name}`);
+			// 	}
+			// }
 
 
 			// if (!this.needEnergy(creep)) {
@@ -187,19 +204,12 @@ mod.nextAction = function (creep) {
 
 			// travelling
 
-			if (!ret) {
-				ret = this.gotoTargetRoom(creep, flag);
-			}
+			return this.gotoTargetRoom(creep, flag);
 
-			if (ret)
-				return ret;
-
-			return false;
 
 		}
 		// at target room
 		else {
-
 
 			if (creep.pos.roomName === creep.data.destiny.room) {
 
@@ -270,7 +280,15 @@ mod.nextAction = function (creep) {
 		this.assignAction(creep, Creep.action.recycling, mother);
 	}
 };
-mod.needEnergy = function (creep) {
+mod.needEnergy = function (creep, atHome = false) {
+
+	if (creep.data.creepType.indexOf('remote') === 0 && (creep.room.name === creep.data.destiny.homeRoom || creep.room.my))
+		if (creep.sum === 0)
+			return true;
+		else
+			return creep.sum / creep.carryCapacity < global.REMOTE_HAULER.MIN_LOAD * 0.25
+				&& creep.sum > 0;
+
 	return creep.sum / creep.carryCapacity < global.REMOTE_HAULER.MIN_LOAD;
 };
 mod.gotoTargetRoom = function (creep, flag) {

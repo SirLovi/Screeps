@@ -12,10 +12,6 @@ mod.handleFlagFound = flag => {
 	if ((flag.compareTo(global.FLAG_COLOR.defense) || flag.compareTo(global.FLAG_COLOR.defense.boosted) || flag.compareTo(global.FLAG_COLOR.invade)) && global.Task.nextCreepCheck(flag, mod.name)) {
 		global.Util.set(flag.memory, 'task', mod.name);
 
-		// TODO it is temporary
-		// if (flag.memory.nextCheck.undefined)
-		// 	delete flag.memory.nextCheck.undefined
-
 		// let roomName = flag.room ? flag.room.name : flag.memory.roomName;
 		// let nextCheck = flag.memory.nextCheck.guard - Game.time;
 		// let runningCheck = flag.memory.tasks ? (flag.memory.tasks.guard.nextRunningCheck - Game.time) || 0 : 'undefined yet';
@@ -57,7 +53,7 @@ mod.creep = {
 		behaviour: 'warrior',
 		queue: 'High',
 		sort: (a, b) => {
-			const partsOrder = [TOUGH, MOVE, ATTACK, RANGED_ATTACK, HEAL];
+			const partsOrder = [TOUGH, ATTACK, MOVE, RANGED_ATTACK, HEAL];
 			const indexOfA = partsOrder.indexOf(a);
 			const indexOfB = partsOrder.indexOf(b);
 			return indexOfA - indexOfB;
