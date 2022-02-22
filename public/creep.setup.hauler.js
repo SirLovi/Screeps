@@ -2,7 +2,7 @@ let setup = new Creep.Setup('hauler');
 module.exports = setup;
 setup.minControllerLevel = 2;
 setup.maxMulti = function (room) {
-	let max = 7;
+	let max = 5;
 	if (room.minerals.length > 0)
 		max += 2;
 	let contSum = _.sum(room.structures.container.in, 'sum');
@@ -10,7 +10,7 @@ setup.maxMulti = function (room) {
 	max += Math.floor(contSum / 1000);
 	max += Creep.setup.upgrader._maxMulti(room);
 
-	let ret = Math.min(max, 16);
+	let ret = Math.min(max, 15);
 	global.logSystem(room.name, `HAULER maxMulti: ${ret}`);
 	return ret;
 };
@@ -49,7 +49,7 @@ setup.maxWeight = function (room) {
 };
 setup.default = {
 	fixedBody: [WORK, CARRY, MOVE],
-	multiBody: [CARRY, CARRY, MOVE],
+	multiBody: [CARRY, MOVE],
 	minAbsEnergyAvailable: 200,
 	minEnergyAvailable: 0.4,
 	behaviour: 'hauler',
@@ -58,14 +58,14 @@ setup.default = {
 	maxWeight: room => setup.maxWeight(room),
 };
 setup.high = {
-	fixedBody: [WORK, CARRY, MOVE],
+	fixedBody: [WORK, CARRY, CARRY, MOVE, MOVE],
 	multiBody: [CARRY, CARRY, MOVE],
 	minAbsEnergyAvailable: 200,
 	minEnergyAvailable: 0.1,
+	behaviour: 'hauler',
 	maxMulti: room => setup.maxMulti(room),
 	maxCount: room => setup.maxCount(room),
 	maxWeight: room => setup.maxWeight(room),
-	behaviour: 'hauler',
 };
 setup.RCL = {
 	1: setup.none,

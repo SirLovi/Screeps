@@ -124,7 +124,7 @@ mod.nextAction = function (creep) {
 		flag = global.FlagDir.find(global.FLAG_COLOR.claim.mining, creep.pos, false);
 
 	let creepTargetRoomName = Memory.flags[flag.name].roomName;
-	const homeRoomName = global.Task.mining.strategies.hauler.homeRoomName(creepTargetRoomName);
+	const homeRoomName = global.Task.mining.strategies.remoteHauler.homeRoomName(creepTargetRoomName);
 	let casualties = creep.room.casualties.length > 0;
 
 	// store homeRoom in creep.data
