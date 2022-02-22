@@ -101,11 +101,11 @@ mod.extend = function () {
 
 			// console.log(`targetRoom: ${params.targetRoom} home: ${room.name} availableSpawns: ${availableSpawns}`);
 
-			if (global.DEBUG && global.debugger(global.DEBUGGING.targetRoom, params.targetRoom)) {
-				if (global.DEBUG && global.debugger(global.DEBUGGING.findSpawnRoom, room.name)) {
-					global.logSystem(room.name, `targetRoom: ${params.targetRoom} distance: ${distance} rcl: ${rcl} spawnTime: ${spawnTime} energyAvailable: ${energyAvailable} availableSpawns: ${availableSpawns} ret: ${ret}`);
-				}
-			}
+			// if (global.DEBUG && global.debugger(global.DEBUGGING.targetRoom, params.targetRoom)) {
+			// 	if (global.DEBUG && global.debugger(global.DEBUGGING.findSpawnRoom, room.name)) {
+			// 		global.logSystem(room.name, `targetRoom: ${params.targetRoom} distance: ${distance} rcl: ${rcl} spawnTime: ${spawnTime} energyAvailable: ${energyAvailable} availableSpawns: ${availableSpawns} ret: ${ret}`);
+			// 	}
+			// }
 
 			return ret;
 		};

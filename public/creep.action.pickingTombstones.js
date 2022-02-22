@@ -50,7 +50,7 @@ action.newTarget = function (creep) {
 
 	let ret;
 
-	if (creep.behaviour.name === 'remoteHauler' && creep.behaviour.needEnergy(creep)) {
+	if (creep.behaviour.needEnergy(creep)) {
 
 		let ruins = creep.room.ruins;
 
