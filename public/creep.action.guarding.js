@@ -10,17 +10,18 @@ mod.isAddableTarget = function () {
 mod.reachedRange = 0;
 mod.newTarget = function (creep) {
 
+
 	let flag = creep.flag;
 
 	if (!flag && creep.data.destiny)
 		flag = Game.flags[creep.data.destiny.flagName];
 
 	if (!flag) {
-		// flag = global.FlagDir.find(global.FLAG_COLOR.defense, creep.pos, false, global.FlagDir.rangeMod, {
-		// 	rangeModPerCrowd: 5,
-		// 	//rangeModByType: creep.data.creepType
-		// });
-		flag = global.FlagDir.find(global.FLAG_COLOR.defense, creep.pos, true);
+		flag = global.FlagDir.find(global.FLAG_COLOR.defense, creep.pos, false, global.FlagDir.rangeMod, {
+			rangeModPerCrowd: 5,
+			//rangeModByType: creep.data.creepType
+		});
+		// flag = global.FlagDir.find(global.FLAG_COLOR.defense, creep.pos, true);
 
 		if (!flag)
 			flag = global.FlagDir.find(global.FLAG_COLOR.defense, creep.pos, false);
@@ -33,10 +34,15 @@ mod.newTarget = function (creep) {
 	}
 
 	// if (Room.isSKRoom(creep.pos.roomName) && creep.pos.roomName === creep.flag.pos.roomName) {
+
+
+
+
 	if (creep.pos.roomName === flag.pos.roomName) {
 
-		// if (creep.name === 'guard-Flag42-1')
+		// if (creep.name === 'guard-Flag152-1')
 		// 	global.logSystem(creep.room.name, `GUARDiNG!!!`);
+
 
 
 		let SKCreeps = _.filter(creep.room.hostiles, hostile => {
@@ -85,8 +91,8 @@ mod.newTarget = function (creep) {
 	if (flag)
 		global.Population.registerCreepFlag(creep, flag);
 
-	// if (creep.name === 'guard-Flag42-1')
-	// 	global.logSystem(creep.room.name, `${creep.name} action: ${creep.action} flag: ${flag}`);
+	if (creep.name === 'guard-Flag42-1')
+		global.logSystem(creep.room.name, `${creep.name} action: ${creep.action} flag: ${flag}`);
 
 	return flag;
 };

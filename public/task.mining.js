@@ -409,7 +409,7 @@ mod.creep = {
 		},
 		behaviour: 'remoteHauler',
 		queue: 'Low',
-		maxRange: 3,
+		maxRange: 4,
 	},
 };
 mod.countBody = function (fixedBody) {
@@ -425,141 +425,16 @@ mod.countBody = function (fixedBody) {
 };
 mod.setupCreep = function (roomName, definition) {
 
-	// mod.checkCarryParts(roomName);
-	// mod.checkHealParts(roomName);
-	// mod.checkWorkParts(roomName);
-
-	const memory = Memory.tasks.mining[roomName];
-	// const carrySize = memory.carrySize || 0;
-	// const workSize = memory.harvestSize || 0;
-	// const healSize = memory.healSize || 0;
-
 	let fixedLength = mod.countBody(definition.fixedBody) % 2;
-	if (definition.behaviour === 'remoteMiner') {
+	definition.moveRatio = fixedLength * -0.5 + (definition.moveRatio || 0);
+	definition.fixedBody[MOVE] += Math.ceil(fixedLength * 0.5 + (definition.moveRatio || 0));
 
-		// definition.fixedBody[WORK] += workSize;
-		// definition.fixedBody[HEAL] += healSize;
-		// definition.moveRatio = ((healSize + workSize) % 2) * -0.5 + (definition.moveRatio || 0);
-
-		definition.moveRatio = fixedLength * -0.5 + (definition.moveRatio || 0);
-		definition.fixedBody[MOVE] += Math.ceil(fixedLength * 0.5 + (definition.moveRatio || 0));
-
-		return definition;
-
-
-	} else if (definition.behaviour === 'remoteHauler') {
-
-		// definition.fixedBody[CARRY] += carrySize;
-		// definition.fixedBody[HEAL] += healSize;
-		// definition.moveRatio = ((healSize + carrySize) % 2) * -0.5 + (definition.moveRatio || 0);
-		definition.moveRatio = fixedLength * -0.5 + (definition.moveRatio || 0);
-		definition.fixedBody[MOVE] += Math.ceil(fixedLength * 0.5 + (definition.moveRatio || 0));
-
-		return definition;
-
-	}
+	return definition;
 };
 mod.getFlag = function (roomName) {
 	return global.FlagDir.find(global.FLAG_COLOR.claim.mining, new RoomPosition(25, 25, roomName));
 };
-// mod.carry = function (roomName, partChange, population, message) {
-// 	let memory = Memory.tasks.mining[roomName];
-// 	memory.carrySize = (memory.carrySize || 0) + (partChange || 0);
-// 	// const population = Math.round(mod.carryPartsPopulation(roomName) * 100);
-// 	if (partChange) {
-// 		global.Task.forceCreepCheck(global.Task.mining.getFlag(roomName), mod.name);
-// 		delete memory.capacityLastChecked;
-// 	}
-// 	// memory.carrySize = (memory.carrySize || 0) <= 0 ? 0 : memory.carrySize;
-// 	memory.carrySize = (memory.carrySize || 0) >= 6 ? 6 : memory.carrySize;
-// 	global.logSystem(roomName, `Task.${mod.name}: remoteHauler carry capacity for ${roomName} ${partChange >= 0 ? 'increased' : 'decreased'} by ${partChange}. Currently at ${population}% of desired carryPartsPopulation. Currently added ${memory.carrySize}`);
-// 	global.logSystem(roomName, `Currently at ${population}% of desired carryPartsPopulation. Currently added ${memory.carrySize} ${message}`);
-// };
-// mod.work = function (roomName, partChange) {
-// 	let memory = Memory.tasks.mining[roomName];
-// 	memory.harvestSize = (memory.harvestSize || 0) + (partChange || 0);
-// 	memory.harvestSize = (memory.harvestSize || 0) < 0 ? 0 : memory.harvestSize;
-// 	global.logSystem(roomName, `Task.${mod.name}: harvesting work capacity for ${roomName} ${partChange >= 0 ? 'increased' : 'decreased'} by ${partChange} for remoteMiner. Currently added ${memory.harvestSize}`);
-// };
-// mod.heal = function (roomName, partChange) {
-// 	let memory = Memory.tasks.mining[roomName];
-// 	memory.healSize = (memory.healSize || 0) + (partChange || 0);
-// 	memory.healSize = (memory.healSize || 0) <= 0 ? 0 : memory.healSize;
-// 	memory.healSize = (memory.healSize || 0) >= 2 ? 2 : memory.healSize;
-// 	global.logSystem(roomName, `Task.${this.name}: healing capacity for ${roomName} ${memory.healSize >= 0 ? 'increased' : 'decreased'} to ${memory.healSize} for remoteMiner/remoteHauler. Currently added ${memory.healSize}`);
-// };
-// mod.checkWorkParts = function (roomName) {
-// 	console.log(`BodyParts count WORK for ${roomName} is started`);
-// 	mod.work(roomName, 0);
-// };
-// mod.checkHealParts = function (roomName) {
-// 	let room = Game.rooms[roomName];
-// 	if (_.isUndefined(room))
-// 		return;
-// 	console.log(`BodyParts count HEAL for ${roomName} is started. Defense level: ${room.defenseLevel.sum} Threat level: ${room.hostileThreatLevel}`);
-// 	if (room.hostileThreatLevel > room.defenseLevel.sum) {
-// 		mod.heal(roomName, 2);
-// 	} else if (room) {
-// 		mod.heal(roomName, -2);
-// 	}
-// };
-// mod.checkCarryParts = function (roomName) {
-//
-// 	// if (Game.rooms[roomName].hostiles.length > 0 && !Game.rooms[roomName].isCenterNineRoom) {
-// 	// 	return `Task.${mod.name} in ${roomName} is under attack, check carryCapacity later `;
-// 	// }
-//
-// 	const checkRoomCapacity = function (roomName, minCarryPartsPercent, maxDropped) {
-// 		const carryPartsPercent = Math.round(mod.carryPartsPopulation(roomName) * 100);
-//
-// 		if (carryPartsPercent === 100)
-// 			return false;
-//
-// 		const room = Game.rooms[roomName];
-// 		const dropped = room ? room.find(FIND_DROPPED_RESOURCES) : null;
-//
-// 		let message = '';
-// 		// if room is visible
-// 		if (!_.isNull(dropped)) {
-// 			let totalDropped = 0;
-// 			if (dropped.length >= 1) {
-// 				totalDropped = _.sum(dropped, d => d.energy);
-// 				message = 'with ' + totalDropped + ' dropped energy.';
-// 			}
-//
-// 			console.log(`BodyParts count CARRY for ${roomName} is started`);
-// 			console.log(`dropped: ${totalDropped} carryPartsPercent: ${carryPartsPercent}`);
-//
-// 			if (carryPartsPercent === 100 && totalDropped === 0) {
-// 				mod.carry(roomName, -2, carryPartsPercent, message);
-// 				return true;
-// 			} else if (carryPartsPercent >= minCarryPartsPercent && totalDropped >= maxDropped) {
-// 				mod.carry(roomName, 2, carryPartsPercent, message);
-// 				return true;
-//
-// 			}
-// 			// global.logSystem(roomName, `carryPartsPercent: ${global.Task.mining.memory(roomName).carryPartsPercent}`);
-//
-// 		} else
-// 			console.log(`${roomName} unknown dropped energy, room not visible.`);
-// 		// console.log(mod.harvest(roomName));
-// 		// console.log(mod.heal(roomName));
-//
-// 		return false;
-// 	};
-// 	if (roomName) {
-// 		checkRoomCapacity(roomName, 0, 500);
-// 	} else {
-// 		let count = 0;
-// 		let total = 0;
-// 		for (const roomName in Memory.tasks.mining) {
-// 			total++;
-// 			if (checkRoomCapacity(roomName, 0, 500))
-// 				count++;
-// 		}
-// 		return `Task.${mod.name} ${count} rooms under-capacity out of ${total}.`;
-// 	}
-// };
+
 mod.storage = function (miningRoom, storageRoom) {
 
 	const memory = global.Task.mining.memory(miningRoom);

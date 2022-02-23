@@ -58,7 +58,7 @@ mod.creep = {
 			const indexOfB = partsOrder.indexOf(b);
 			return indexOfA - indexOfB;
 		},
-		maxRange: 3,
+		maxRange: 4,
 	},
 };
 // check if a new creep has to be spawned
