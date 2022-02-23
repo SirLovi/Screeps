@@ -4,8 +4,8 @@ const super_invalidAction = mod.invalidAction;
 mod.name = 'warrior'
 mod.invalidAction = function (creep) {
 	return super_invalidAction.call(this, creep) ||
-		(creep.action.name === 'guarding' &&
-			(!creep.flag || creep.flag.pos.roomName === creep.pos.roomName || creep.leaveBorder())
+		(creep.action.name === 'guarding' && !creep.room.isCenterRoom
+			&& (!creep.flag || creep.flag.pos.roomName === creep.pos.roomName || creep.leaveBorder())
 		);
 };
 const super_run = mod.run;
