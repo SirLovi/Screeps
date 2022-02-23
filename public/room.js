@@ -865,8 +865,13 @@ mod.extend = function () {
 				&& creep.data.roomName !== creep.data.homeRoom)
 				return;
 
-			if (creep.data.creepType === 'upgrader' || creep.data.creepType === 'miner')
+			if (creep.data.creepType === 'upgrader'
+			|| creep.data.creepType === 'miner'
+			|| creep.data.creepType === 'reserver'
+			|| creep.data.creepType === 'claimer'
+			|| creep.data.creepType === 'pioneer') {
 				return;
+			}
 
 			if ((creep.data.creepType === 'hauler' || creep.data.creepType === 'worker' || creep.data.creepType === 'labTech')
 				&& creep.sum === 0)
