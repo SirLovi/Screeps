@@ -372,18 +372,6 @@ mod.extend = function () {
 				return this._immobileCreeps;
 			},
 		},
-		'situation': {
-			configurable: true,
-			get: function () {
-				if (_.isUndefined(this._situation)) {
-					this._situation = {
-						noEnergy: this.sourceEnergyAvailable == 0,
-						invasion: this.hostiles.length > 0 && (!this.controller || !this.controller.safeMode),
-					};
-				}
-				return this._situation;
-			},
-		},
 		'adjacentRooms': {
 			configurable: true,
 			get: function () {
@@ -759,6 +747,19 @@ mod.extend = function () {
 					});
 				}
 				return this._roads;
+			},
+		},
+		'situation': {
+			configurable: true,
+			get: function () {
+				if (_.isUndefined(this._situation)) {
+					this._situation = {
+						noEnergy: this.sourceEnergyAvailable === 0,
+						invasion: this.hostiles.length > 0 && (!this.controller || !this.controller.safeMode),
+						remoteInvasion: this.hostiles.length > 1 && (this.isCenterNineRoom || this.myReservation)
+					};
+				}
+				return this._situation;
 			},
 		},
 

@@ -17,9 +17,9 @@ mod.inflowActions = (creep) => {
 	// }
 	return [
 		Creep.action.picking,
-		Creep.action.pickingTombstones,
 		Creep.action.uncharging,
-		// Creep.action.healing,
+		Creep.action.pickingTombstones,
+		Creep.action.healing,
 
 	];
 };
@@ -31,7 +31,7 @@ mod.outflowActions = (creep) => {
 		Creep.action.charging,
 		Creep.action.fueling,
 		Creep.action.storing,
-		// Creep.action.healing,
+		Creep.action.healing,
 	];
 	if (creep.sum > creep.carry.energy ||
 		(!creep.room.situation.invasion &&

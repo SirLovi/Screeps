@@ -3,10 +3,30 @@ module.exports = mod;
 const super_invalidAction = mod.invalidAction;
 mod.name = 'warrior'
 mod.invalidAction = function (creep) {
-	return super_invalidAction.call(this, creep) ||
-		(creep.action.name === 'guarding' && !creep.room.isCenterRoom
+
+	// let isInvasionRoom = (creep) => {
+	// 	let adjacentRooms = creep.room.adjacentAccessibleRooms;
+	//
+	// 	for (const roomName of adjacentRooms) {
+	// 		let room = Game.rooms[roomName];
+	// 		if (!!room && room.situation.remoteInvasion)
+	// 			return true
+	// 	}
+	// 	return false;
+	// }
+	//
+	// let remoteRoom = creep.action.name === 'guarding' && (!creep.flag || creep.flag.pos.roomName === creep.pos.roomName || creep.leaveBorder())
+	// let isAdjacentRoomInvasionRoom = creep.action.name === 'guarding' && !isInvasionRoom(creep);
+	// return super_invalidAction.call(this, creep) || remoteRoom || isAdjacentRoomInvasionRoom;
+
+	// return super_invalidAction.call(this, creep)
+
+
+	// TODO Check situation.remoteInvasion in adjacentAccessibleRooms
+	return super_invalidAction.call(this, creep) || (creep.action.name === 'guarding'
 			&& (!creep.flag || creep.flag.pos.roomName === creep.pos.roomName || creep.leaveBorder())
 		);
+
 };
 const super_run = mod.run;
 mod.run = function (creep) {
