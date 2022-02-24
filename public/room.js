@@ -1351,8 +1351,8 @@ mod.extend = function () {
 				if (offer.id === order.id && resourcesAll >= offer.amount)
 					return true;
 				else if (offer.id === order.id) {
-					// orderRoom.memory.resources.orders[i].offers = [];
-					orderRoom.memory.resources.orders.offers.splice(i--, 1);
+					orderRoom.memory.resources.orders[i].offers = [];
+					//orderRoom.memory.resources.orders.offers.splice(i--, 1);
 					return false;
 				}
 			}

@@ -157,7 +157,7 @@ mod.resetBoostProduction = function (roomName) {
 
 
 				data.boostTiming = {};
-				data.boostTiming.checkRoomAt = Game.time + 5;
+				data.boostTiming.checkRoomAt = Game.time + 25;
 				// delete data.seedCheck;
 			} else
 				console.log(`${room.name} has no memory.resources`);
