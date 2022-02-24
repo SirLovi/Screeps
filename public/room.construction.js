@@ -380,17 +380,17 @@ mod.extend = function () {
 		}
 
 		// Walls
-		global.FlagDir.filter(global.FLAG_COLOR.construct.wall, ...ARGS).forEach(flag => {
+		global.FlagDir.filter(global.FLAG_COLOR.construct.wall).forEach(flag => {
 			CONSTRUCT(flag, STRUCTURE_WALL);
 		});
 
 		// Ramparts
-		global.FlagDir.filter(global.FLAG_COLOR.construct.rampart, ...ARGS).forEach(flag => {
+		global.FlagDir.filter(global.FLAG_COLOR.construct.rampart).forEach(flag => {
 			CONSTRUCT(flag, STRUCTURE_RAMPART);
 		});
 
 		// Roads
-		global.FlagDir.filter(global.FLAG_COLOR.construct.road, ...ARGS).forEach(flag => {
+		global.FlagDir.filter(global.FLAG_COLOR.construct.road).forEach(flag => {
 			CONSTRUCT(flag, STRUCTURE_ROAD);
 		});
 	};
