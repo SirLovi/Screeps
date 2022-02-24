@@ -7,7 +7,7 @@ action.getLabOrder = function (lab) {
 		return null;
 	let order = null;
 	let room = lab.room;
-	if (!room.memory || !room.memory.resources) return null;
+	if (!room.memory || !room.memory.resources || !room.memory.resources.lab) return null;
 
 	let data = room.memory.resources.lab.find((s) => s.id === lab.id);
 	if (data) {
