@@ -17,20 +17,20 @@ mod.checkValidRoom = flag => {
     return Room.isCenterNineRoom(flag.pos.roomName);
 };
 mod.handleFlagFound = flag => {
-    if (Task.remoteMineralMiner.checkValidRoom(flag) && flag.compareTo(FLAG_COLOR.claim.mining) && Task.nextCreepCheck(flag, mod.name)) {
-        Util.set(flag.memory, 'task', mod.name);
-        Task.remoteMineralMiner.checkForRequiredCreeps(flag);
+    if (global.Task.remoteMineralMiner.checkValidRoom(flag) && flag.compareTo(global.FLAG_COLOR.claim.mining) && global.Task.nextCreepCheck(flag, mod.name)) {
+        global.Util.set(flag.memory, 'task', mod.name);
+        global.Task.remoteMineralMiner.checkForRequiredCreeps(flag);
     }
 };
 mod.handleFlagRemoved = flagName => {
     const flagMem = Memory.flags[flagName];
 
     if (flagMem && flagMem.task === mod.name && flagMem.roomName) {
-        const flags = FlagDir.filter(FLAG_COLOR.claim.mining, new RoomPosition(25, 25, flagMem.roomName), true);
+        const flags = global.FlagDir.filter(global.FLAG_COLOR.claim.mining, new RoomPosition(25, 25, flagMem.roomName), true);
         if (flags && flags.length > 0) {
             return;
         }
-        Task.clearMemory(mod.name, flagMem.roomName);
+        global.Task.clearMemory(mod.name, flagMem.roomName);
     }
 };
 mod.fieldOrFunction = (flag, value) => {
@@ -44,25 +44,27 @@ mod.checkForRequiredCreeps = flag => {
 
     const type = mod.name;
 
-    const memory = Task.remoteMineralMiner.memory(roomName);
+    const memory = global.Task.remoteMineralMiner.memory(roomName);
     // re-validate if too much time has passed in the queue
-    Task.validateAll(memory, flag, mod.name, {roomName: flag.pos.roomName, subKey: 'remoteMineralMiner', checkValid: true});
+    global.Task.validateAll(memory, flag, mod.name, {roomName: flag.pos.roomName, subKey: 'remoteMineralMiner', checkValid: true});
     const mineralMinerCount = memory.queued[type].length + memory.spawning[type].length + memory.running[type].length;
 
-    if(DEBUG && TRACE) trace('Task', {Task: mod.name, flagName, mineralMinerCount, [mod.name]: 'Flag.found'}, 'checking flag@', flag.pos);
+    if(global.DEBUG && global.TRACE)
+        global.trace('Task', {Task: mod.name, flagName, mineralMinerCount, [mod.name]: 'Flag.found'}, 'checking flag@', flag.pos);
 
-    if (mineralMinerCount < Task.remoteMineralMiner.fieldOrFunction(flag, mod.maxCount)) {
-        if (DEBUG && TRACE) trace('Task', {Task: mod.name, room: roomName, mineralMinerCount, mineralMinerTTLs: _.map(_.map(memory.running.remoteMineralMiner, n => Game.creeps[n]), 'ticksToLive'), [mod.name]: 'mineralMinerCount'});
+    if (mineralMinerCount < global.Task.remoteMineralMiner.fieldOrFunction(flag, mod.maxCount)) {
+        if (global.DEBUG && global.TRACE)
+            global.trace('Task', {Task: mod.name, room: roomName, mineralMinerCount, mineralMinerTTLs: _.map(_.map(memory.running.remoteMineralMiner, n => Game.creeps[n]), 'ticksToLive'), [mod.name]: 'mineralMinerCount'});
 
         const mineralMiner = mod.setupCreep(roomName, Task.remoteMineralMiner.creep);
 
         for (let i = mineralMinerCount; i < Task.remoteMineralMiner.fieldOrFunction(flag, mod.maxCount); i++) {
-            Task.spawn(
+            global.Task.spawn(
                 mineralMiner,
                 {
                     task: mod.name,
                     targetName: flag.name,
-                    type: Task.remoteMineralMiner.creep.behaviour,
+                    type: global.Task.remoteMineralMiner.creep.behaviour,
                 },
                 {
                     targetRoom: roomName,
@@ -70,7 +72,7 @@ mod.checkForRequiredCreeps = flag => {
                     rangeRclRatio: 1,
                 },
                 creepSetup => {
-                    const memory = Task.remoteMineralMiner.memory(creepSetup.destiny.room);
+                    const memory = global.Task.remoteMineralMiner.memory(creepSetup.destiny.room);
                     memory.queued[creepSetup.behaviour].push({
                         room: creepSetup.queueRoom,
                         name: creepSetup.name,
@@ -84,8 +86,8 @@ mod.handleSpawningStarted = params => {
     if (!params.destiny || !params.destiny.task || params.destiny.task !== mod.name) return;
     const flag = Game.flags[params.destiny.targetName];
     if (flag) {
-        const memory = Task.remoteMineralMiner.memory(params.destiny.room);
-        Task.validateQueued(memory, mod.name, {subKey: params.destiny.type});
+        const memory = global.Task.remoteMineralMiner.memory(params.destiny.room);
+        global.Task.validateQueued(memory, mod.name, {subKey: params.destiny.type});
 
         if (params.body) params.body = _.countBy(params.body);
         memory.spawning[params.destiny.type].push(params);
@@ -102,9 +104,9 @@ mod.handleSpawningCompleted = creep => {
     if (flag) {
         creep.data.predictedRenewal = creep.data.spawningTime + global.Util.routeRange(creep.data.homeRoom, creep.data.destiny.room) * 50;
 
-        const memory = Task.remoteMineralMiner.memory(creep.data.destiny.room);
+        const memory = global.Task.remoteMineralMiner.memory(creep.data.destiny.room);
         memory.running[creep.data.destiny.type].push(creep.name);
-        Task.validateSpawning(memory, flag, mod.name, {roomName: creep.data.destiny.room, subKey: creep.data.destiny.type});
+        global.Task.validateSpawning(memory, flag, mod.name, {roomName: creep.data.destiny.room, subKey: creep.data.destiny.type});
     }
 };
 mod.handleCreepDied = name => {
@@ -113,8 +115,8 @@ mod.handleCreepDied = name => {
     if (!mem || !mem.destiny || !mem.destiny.task || mem.destiny.task !== mod.name) return;
     const flag = Game.flags[mem.destiny.targetName];
     if (flag) {
-        const memory = Task.mining.memory(mem.destiny.room);
-        Task.validateRunning(memory, flag, mod.name, {subKey: mem.creepType, deadCreep: name});
+        const memory = global.Task.mining.memory(mem.destiny.room);
+        global.Task.validateRunning(memory, flag, mod.name, {subKey: mem.creepType, deadCreep: name});
     }
 };
 mod.needsReplacement = creep => {
@@ -125,7 +127,7 @@ mod.findSpawning = (roomName, type) => {
     _(Game.spawns)
         .filter(s => s.spawning && (_.includes(s.spawning.name, type) || (s.newSpawn && _.includes(s.newSpawn.name, type))))
         .forEach(s => {
-            const c = Population.getCreep(s.spawning.name);
+            const c = global.Population.getCreep(s.spawning.name);
             if (c && c.destiny.room === roomName) {
                 spawning.push({
                     spawn: s.name,
@@ -142,7 +144,7 @@ mod.findRunning = (roomName, type) => {
         .map(c => c.name);
 };
 mod.memory = key => {
-    const memory = Task.memory(mod.name, key);
+    const memory = global.Task.memory(mod.name, key);
     if (!Reflect.has(memory, 'queued')) {
         memory.queued = {
             remoteMineralMiner: [],
@@ -150,12 +152,12 @@ mod.memory = key => {
     }
     if (!Reflect.has(memory, 'spawning')) {
         memory.spawning = {
-            remoteMineralMiner: Task.remoteMineralMiner.findSpawning(key, 'remoteMineralMiner'),
+            remoteMineralMiner: global.Task.remoteMineralMiner.findSpawning(key, 'remoteMineralMiner'),
         };
     }
     if (!Reflect.has(memory, 'running')) {
         memory.running = {
-            remoteMineralMiner: Task.remoteMineralMiner.findRunning(key, 'remoteMineralMiner'),
+            remoteMineralMiner: global.Task.remoteMineralMiner.findRunning(key, 'remoteMineralMiner'),
         };
     }
     return memory;
@@ -169,7 +171,7 @@ mod.creep = {
     queue: 'Low',
 };
 mod.setupCreep = (roomName, definition) => {
-    const memory = Task.remoteMineralMiner.memory(roomName);
+    const memory = global.Task.remoteMineralMiner.memory(roomName);
     if (!memory.harvestSize) {
         return definition;
     }

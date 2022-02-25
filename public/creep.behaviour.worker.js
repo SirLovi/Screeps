@@ -2,7 +2,7 @@ const mod = new Creep.Behaviour('worker');
 module.exports = mod;
 mod.inflowActions = function (creep) {
     let priority = [];
-    
+
     if (creep.room.situation.invasion){
         priority = [
             Creep.action.withdrawing,
@@ -54,6 +54,9 @@ mod.outflowActions = function (creep) {
                 Creep.action.fortifying,
                 Creep.action.repairing,
                 Creep.action.storing,
+                Creep.action.feeding,
+                Creep.action.fueling,
+                Creep.action.charging,
                 Creep.action.upgrading
             ];
         else if (creep.room.controller && creep.room.controller.level === 1)
@@ -76,6 +79,7 @@ mod.outflowActions = function (creep) {
                 Creep.action.repairing,
                 Creep.action.charging,
                 Creep.action.storing,
+                Creep.action.feeding,
                 Creep.action.upgrading
             ];
 
@@ -140,6 +144,10 @@ mod.nextAction = function (creep) {
         if (global.DEBUG && global.TRACE)
             global.trace('Behaviour', {actionName: 'travelling', behaviourName: this.name, creepName: creep.name, assigned: true, Behaviour: 'nextAction', Action: 'assign'});
         Creep.action.travelling.assignRoom(creep, creep.data.homeRoom);
+        return true;
+    }
+    if (creep.sum === 0 && Creep.behaviour.remoteHauler.renewCreep(creep)) {
+        global.logSystem(creep.room.name, `${creep.name} ${creep.data.ttl} renewing`);
         return true;
     }
     return this.nextEnergyAction(creep);

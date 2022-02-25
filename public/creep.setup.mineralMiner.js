@@ -8,7 +8,8 @@ setup.maxCount = function(room) {
     if( haulers === 0 ) return 0;
     if( room.storage && room.storage.sum < room.storage.store.getCapacity() * 0.9 ) {
         let add = mineral => {
-            if(mineral.mineralAmount > 0) max++;
+            if(mineral.mineralAmount > 0)
+                max++;
         };
         room.minerals.forEach(add);
     }

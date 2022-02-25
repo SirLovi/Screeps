@@ -1,5 +1,8 @@
 let action = new Creep.Action('renewing');
 module.exports = action;
+action.memory = (creep) => {
+	return global.RENEW[creep.data.creepType]
+}
 action.isValidAction = function (creep) {
 	return !creep.room.situation.invasion;
 };
@@ -28,8 +31,8 @@ action.energyPrice = (creep) => {
 };
 action.newTarget = function (creep) {
 
-	if (!global.debugger(global.DEBUGGING.renewing, creep.room.name))
-		return false;
+	// if (!global.debugger(global.DEBUGGING.renewing, creep.room.name))
+	// 	return false;
 
 	action.checkMemory(creep);
 
@@ -44,18 +47,18 @@ action.newTarget = function (creep) {
 	// global.logSystem(currentRoomName, `room.my: ${room.my} creep.data.homeRoom: ${creep.data.homeRoom}`);
 
 	if (!inMyRoom) {
-		global.logSystem(currentRoomName, `RENEWING IS SELECT NEW TARGET for ${creep.name} is INVALID (not my room), 'NEW_TARGET')`);
+		global.logSystem(currentRoomName, `${creep.name} is not at Home, no renew`);
 		return false;
 	}
 
-	let needToRenew = creep.data.ttl <= creep.data.predictedRenewal * 2;
+	let needToRenew = creep.data.ttl < creep.data.predictedRenewal * action.memory(creep).prMultiplier;
 
 	if (!needToRenew) {
-		global.logSystem(currentRoomName, `RENEWING IS SELECT NEW TARGET for ${creep.name} is INVALID (no need to renew), 'NEW_TARGET'`);
+		global.logSystem(currentRoomName, `${creep.name} no need to renew`);
 		return false;
 	}
 
-	global.logSystem(currentRoomName, `RENEWING IS SELECT NEW TARGET for ${creep.name}, 'NEW_TARGET'`);
+	global.logSystem(currentRoomName, `${creep.name} selecting target spawn for renew`);
 
 	let spawns = room.structures.spawns;
 	let availableSpawns = _.filter(spawns, spawn => {
@@ -104,7 +107,6 @@ action.addToQueue = function (creep) {
 
 	return renewQueue;
 };
-
 action.removeFromQueue = function (creep) {
 
 	let roomName = creep.room.name;
@@ -126,32 +128,13 @@ action.work = function (creep) {
 
 	if (!global.debugger(global.DEBUGGING.renewing, creep.room.name))
 		return false;
-
-	global.logSystem(creep.room.name, `RENEWING IS RUNNING for ${creep.name}`);
-
 	let roomName = creep.room.name;
 	let room = Game.rooms[roomName];
-	let needToRenew = creep.data.ttl <= creep.data.predictedRenewal * 2;
-	let finishedRenew = creep.data.ttl >= creep.data.predictedRenewal * 3;
-	let inMyRoom = room && room.my;
-
-	if (!inMyRoom) {
-		global.logSystem(creep.room.name, `RENEWING for ${creep.name} is INVALID (not my room), 'WORK'`);
-		return false;
-	}
-
-	if (!needToRenew) {
-		global.logSystem(roomName, `RENEWING IS SELECT NEW TARGET for ${creep.name} is INVALID (no need to renew), 'WORK'`);
-		return false;
-	} else if (finishedRenew) {
-		global.logSystem(roomName, `RENEWING IS FINISHED for ${creep.name} 'WORK'`);
-		return false;
-	}
-
-	global.logSystem(creep.room.name, `RENEWING STARTED!!! ${creep.name} time: ${Game.time}`);
+	let needToRenew = creep.data.ttl < creep.data.predictedRenewal * action.memory(creep).prMultiplier;
+	let finishedRenew = creep.data.ttl >= creep.data.predictedRenewal * action.memory(creep).prMultiplier;
+	// let inMyRoom = room && room.my;
 
 	action.checkMemory(creep);
-
 
 	let spawn = creep.target;
 	let flee = false;
@@ -165,20 +148,20 @@ action.work = function (creep) {
 	// }
 
 	if (needToRenew) {
+		global.logSystem(creep.room.name, `${creep.name} is RENEWING. TTL: ${creep.data.ttl}`);
 		renewQueue = action.addToQueue(creep);
 		// step toward spawn and request renew
 		if (spawn.pos.isNearTo(creep)) {
 			if (_.first(renewQueue) === creep.name) {
 				let ret = spawn.renewCreep(creep);
 				if (ret === ERR_NOT_ENOUGH_ENERGY || ret === ERR_BUSY) {
+					action.removeFromQueue(creep);
 					console.log(`old target: ${creep.target}`);
 					let retNewTarget = action.newTarget(creep);
 
 					if (!retNewTarget) {
 						console.log(`no new target for ${creep.name}`);
-						action.removeFromQueue(creep);
-						delete creep.target;
-						delete creep.action;
+						this.unassign(creep)
 						return false;
 					} else {
 						creep.target = retNewTarget;
@@ -191,7 +174,9 @@ action.work = function (creep) {
 			creep.move(creep.pos.getDirectionTo(spawn));
 		}
 	} else if (finishedRenew) {
+		console.log(`finishedRenew: ${creep.target.name}`);
 		action.removeFromQueue(creep);
+		this.unassign(creep);
 		flee = true;
 	}
 
@@ -200,9 +185,10 @@ action.work = function (creep) {
 		if (spawn.pos.isNearTo(creep)) {
 			creep.move((creep.pos.getDirectionTo(spawn) + 3 % 8) + 1);
 		}
-		return true;
+		return false;
 	}
 
+	this.unassign(creep);
 	return false;
 };
 

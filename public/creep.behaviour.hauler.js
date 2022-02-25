@@ -37,6 +37,10 @@ mod.nextAction = function (creep) {
 	if (creep.pos.roomName !== creep.data.homeRoom && Game.rooms[creep.data.homeRoom] && Game.rooms[creep.data.homeRoom].controller) {
 		return Creep.action.travelling.assignRoom(creep, creep.data.homeRoom);
 	}
+	if (creep.sum === 0 && Creep.behaviour.remoteHauler.renewCreep(creep)) {
+		global.logSystem(creep.room.name, `${creep.name} ${creep.data.ttl} renewing`);
+		return true;
+	}
 	return this.nextEnergyAction(creep);
 };
 mod.strategies.picking = {

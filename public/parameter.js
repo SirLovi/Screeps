@@ -192,6 +192,24 @@ let mod = {
         energyAvailable: 0.001,
         availableSpawns: 1.5,
     },
+    RENEW: {
+        hauler: {
+            renew: true,
+            ttl: 3 // creep.data.predictedRenewal multiplier
+        },
+        worker: {
+            renew: true,
+            ttl: 3 // creep.data.predictedRenewal multiplier
+        },
+        remoteHauler: {
+            renew: true,
+            ttl: 3 // creep.data.predictedRenewal multiplier
+        },
+        labTech: {
+            renew: true,
+            prMultiplier: 3 // creep.data.predictedRenewal multiplier
+        },
+    },
     TASK_CREEP_CHECK_INTERVAL: 250, // Maximum number of ticks before a task checks to see if it needs to spawn new creeps
     REMOTE_RESERVE_HAUL_CAPACITY: 0.1, // Percent of allocated haul capacity before sending reservers.
     PIONEER_UNOWNED: false, // True: pioneers may attempt to work in unowned rooms.

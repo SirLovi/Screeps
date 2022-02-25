@@ -358,7 +358,12 @@ module.exports.loop = wrapLoop(function () {
 				global.Grafana.createStatProperties(false);
 			let bucketData = Memory.stats.cpu.bucketData;
 			bucketData.bucketFillIntervals.push(Game.time)
-			bucketData.bucketFillTime = bucketData.bucketFillIntervals[2] - bucketData.bucketFillIntervals[1];
+			let fillTime = bucketData.bucketFillIntervals[2] - bucketData.bucketFillIntervals[1];
+			if (fillTime > 100)
+				bucketData.bucketFillTime = fillTime;
+			else
+				bucketData.bucketFillTime = 0;
+
 			bucketData.bucketFillIntervals.shift();
 		}
 	}
