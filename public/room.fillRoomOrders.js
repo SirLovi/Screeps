@@ -47,7 +47,7 @@ let mod = {
 			Memory.boostTiming.timeStamp = Game.time;
 		}
 
-		if (numberOfOrderingRooms === 1) {
+		if (numberOfOrderingRooms >= 1) {
 
 			let room = orderingRoom[0];
 
@@ -71,7 +71,7 @@ let mod = {
 			}
 		}
 
-		if (numberOfOrderingRooms === 1
+		if (numberOfOrderingRooms >= 1
 			&& Game.time >= orderingRoom[0].memory.resources.boostTiming.checkRoomAt
 			&& !Memory.boostTiming.multiOrderingRoomName) {
 			let room = orderingRoom[0],

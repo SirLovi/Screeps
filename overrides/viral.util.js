@@ -99,6 +99,10 @@ mod.resetBoostProduction = function (roomName) {
 
 			console.log(room.name);
 
+			if (_.isUndefined(data)) {
+				room.memory.resources = {};
+			}
+
 			if (!_.isUndefined(data)) {
 
 				data.offers = [];
@@ -144,7 +148,7 @@ mod.resetBoostProduction = function (roomName) {
 				if (data.reactions)
 					data.reactions.orders = [];
 
-				if (data.lab) {
+				if (data.lab && data.lab.length > 0) {
 					data.lab = [];
 					_.values(Game.structures).filter(i => i.structureType === 'lab').map(i => i.room.setStore(i.id, RESOURCE_ENERGY, 2000));
 				}
@@ -153,6 +157,7 @@ mod.resetBoostProduction = function (roomName) {
 
 
 				data.boostTiming = {};
+				data.boostTiming.checkRoomAt = Game.time + 25;
 				// delete data.seedCheck;
 			} else
 				console.log(`${room.name} has no memory.resources`);
