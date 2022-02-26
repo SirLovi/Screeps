@@ -2,7 +2,15 @@ let mod = new Creep.Action('defending');
 module.exports = mod;
 mod.name = 'defending';
 mod.isValidAction = function (creep) {
-	return creep.room.hostiles.length > 0 && (global.FlagDir.find(global.FLAG_COLOR.claim.mining, creep.pos, true) || creep.room.my);
+	let hostilesExist = creep.room ? creep.room.hostiles.length > 0 : creep.room.memory.hostileIds.length > 0;
+	let flagExist = !!global.FlagDir.find(global.FLAG_COLOR.claim.mining, creep.pos, true);
+	let myRoom = !!creep.room.my;
+	let inPosition = flagExist || myRoom;
+	let ret = hostilesExist && inPosition;
+
+	if (creep.name === 'guard-Flag176-2')
+		global.logSystem(creep.room.name, `${creep.name} WARRIOR: defending, IS VALID ACTION: hostileExist: ${hostilesExist} flagExist: ${inPosition} myRoom: ${myRoom} ret: ${ret}`);
+	return ret;
 };
 mod.isAddableAction = function () {
 	return true;
@@ -29,6 +37,10 @@ mod.newTarget = function (creep) {
 			closestHostile = creep.pos.findClosestByRange(creep.room.hostiles);
 		}
 	}
+
+	if (creep.name === 'guard-Flag176-2')
+		global.logSystem(creep.room.name, `${creep.name} WARRIOR: defensing, target: ${closestHostile}`);
+
 	return closestHostile;
 };
 mod.step = function (creep) {

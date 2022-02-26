@@ -1,5 +1,10 @@
 const mod = new Creep.Behaviour('hauler');
 module.exports = mod;
+mod.actions = (creep) => {
+	return [
+		Creep.action.renewing,
+	];
+};
 mod.inflowActions = (creep) => {
 	if (creep.room.situation.invasion) {
         return [
@@ -37,8 +42,8 @@ mod.nextAction = function (creep) {
 	if (creep.pos.roomName !== creep.data.homeRoom && Game.rooms[creep.data.homeRoom] && Game.rooms[creep.data.homeRoom].controller) {
 		return Creep.action.travelling.assignRoom(creep, creep.data.homeRoom);
 	}
-	if (creep.sum === 0 && Creep.behaviour.remoteHauler.renewCreep(creep)) {
-		global.logSystem(creep.room.name, `${creep.name} ${creep.data.ttl} renewing`);
+	if (creep.sum === 0 && this.assignAction(creep, 'renewing')) {
+		global.logSystem(creep.room.name, `${creep.name} renewing => ttl: ${creep.data.ttl} action:${creep.action.name}`);
 		return true;
 	}
 	return this.nextEnergyAction(creep);

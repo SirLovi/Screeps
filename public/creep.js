@@ -145,6 +145,10 @@ mod.extend = function () {
 	};
 	Creep.prototype.leaveBorder = function () {
 
+
+		if (this.name === 'guard-Flag176-2')
+			global.logSystem(this.room.name, `${this.name} LEAVEBORDER`);
+
 		RoomPosition.prototype.fromDirection = function (direction, creep) {
 			const
 				DIRECTIONS = {
@@ -238,6 +242,8 @@ mod.extend = function () {
 				let stuff = roomPos.look();
 
 				if (_.findIndex(stuff, p => p.type === 'creep' || (p.structure && OBSTACLE_OBJECT_TYPES[p.structure.structureType]) || p.terrain === 'wall') === -1) {
+					if (this.name === 'guard-Flag176-2')
+						global.logSystem(this.room.name, `${this.name} LEAVEBORDER - direction: ${direction}`);
 					this.move(direction);
 					return direction;
 				}

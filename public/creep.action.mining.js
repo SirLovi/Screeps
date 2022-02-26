@@ -91,7 +91,7 @@ action.determineSpot = function(creep, source) {
         }
     }
     if( !creep.data.determinatedSpot ) {
-        logError('Unable to determine working location for miner in room ' + creep.pos.roomName);
+        global.Util.logError('Unable to determine working location for miner in room ' + creep.pos.roomName);
     }
 };
 action.work = function(creep) {

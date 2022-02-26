@@ -27,7 +27,7 @@ mod.extend = function () {
 			for (let i = 0; i < data[structureType].length; i++) {
 				let structure = data[structureType][i];
 				// don't reset busy labs
-				if (structureType === STRUCTURE_LAB && structure.reactionState !== LAB_IDLE)
+				if (structureType === STRUCTURE_LAB && structure.reactionState !== global.LAB_IDLE)
 					continue;
 				if (!structure.orders)
 					continue;
@@ -37,13 +37,13 @@ mod.extend = function () {
 						let baseAmount = 0;
 						let rcl = this.controller.level;
 						if (structureType === STRUCTURE_STORAGE)
-							baseAmount = order.type === RESOURCE_ENERGY ? MIN_STORAGE_ENERGY[rcl] : MAX_STORAGE_MINERAL;
+							baseAmount = order.type === RESOURCE_ENERGY ? global.MIN_STORAGE_ENERGY[rcl] : global.MAX_STORAGE_MINERAL;
 						else if (structureType === STRUCTURE_TERMINAL)
-							baseAmount = order.type === RESOURCE_ENERGY ? TERMINAL_ENERGY : 0;
+							baseAmount = order.type === RESOURCE_ENERGY ? global.TERMINAL_ENERGY : 0;
 						baseAmount += order.storeAmount;
 						let amount = 0;
 						let cont = Game.getObjectById(structure.id);
-						if (cont && structureType === STRUCTURE_LAB) {
+						if (cont) {
 							switch (structureType) {
 								case STRUCTURE_LAB:
 									// get lab amount
@@ -316,26 +316,12 @@ mod.extend = function () {
 		if (!RESOURCES_ALL.includes(resourceType)) {
 			return ERR_INVALID_ARGS;
 		}
-		// if (this.memory.resources === undefined) {
-		// 	this.memory.resources = {
-		// 		lab: [],
-		// 		powerSpawn: [],
-		// 		nuker: [],
-		// 		container: [],
-		// 		terminal: [],
-		// 		storage: [],
-		// 	};
-		// }
-		// if (this.memory.resources.powerSpawn === undefined)
-		// 	this.memory.resources.powerSpawn = [];
-		// if (this.memory.resources.nuker === undefined)
-		// 	this.memory.resources.nuker = [];
 
 		if (!this.memory.resources[container.structureType].find((s) => s.id === containerId)) {
 			this.memory.resources[container.structureType].push(container.structureType === STRUCTURE_LAB ? {
 				id: containerId,
 				orders: [],
-				reactionState: LAB_IDLE,
+				reactionState: global.LAB_IDLE,
 			} : {
 				id: containerId,
 				orders: [],

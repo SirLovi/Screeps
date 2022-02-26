@@ -26,7 +26,7 @@ mod.checkForRequiredCreeps = (flag) => {
 
 	// if creep count below requirement spawn a new creep creep
 	if (count < 1) {
-		let sourceKiller = global.Task.sourceKiller.creep.sourceKiller;
+		let sourceKiller = mod.creep.sourceKiller;
 		global.Task.spawn(
 			sourceKiller, // creepDefinition
 			{ // destiny

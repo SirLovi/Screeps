@@ -28,8 +28,9 @@ mod.invalidAction = function (creep) {
 	// 		&& (!creep.flag || (creep.flag.pos.roomName !== creep.pos.roomName && !creep.leaveBorder()))
 	// 	);
 
-	return super_invalidAction.call(this, creep) || (creep.action.name === 'guarding'
-		&& (!creep.flag || creep.flag.pos.roomName === creep.pos.roomName || creep.leaveBorder())
+	return super_invalidAction.call(this, creep)
+		// || ((creep.action.name === 'guarding')
+		&& (!creep.flag || creep.flag.pos.roomName === creep.pos.roomName || creep.leaveBorder()
 	);
 
 };
@@ -44,8 +45,8 @@ mod.run = function (creep) {
 mod.actions = function (creep) {
 	let temp = [
 		Creep.action.invading,
-		Creep.action.defending,
 		Creep.action.guarding,
+		Creep.action.defending,
 		Creep.action.healing,
 	];
 	if (creep.data.destiny.boosted)
