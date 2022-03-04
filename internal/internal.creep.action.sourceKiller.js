@@ -33,7 +33,8 @@ action.newTarget = function (creep) {
 
 	if (creep.pos.roomName === _.get(flag, ['pos', 'roomName'], creep.pos.roomName)) {
 		const lowLair = _(creep.room.structures.all).filter({structureType: STRUCTURE_KEEPER_LAIR}).sortBy('ticksToSpawn').first();
-		if (DEBUG && TRACE) trace('Action', {creepName: creep.name, lair: lowLair && lowLair.pos, newTarget: 'searched for low lair', [action.name]: 'newTarget', Action: action.name});
+		if (global.DEBUG && global.TRACE)
+			global.Util.trace('Action', {creepName: creep.name, lair: lowLair && lowLair.pos, newTarget: 'searched for low lair', [action.name]: 'newTarget', Action: action.name});
 		return lowLair;
 	}
 
@@ -45,5 +46,6 @@ action.work = function (creep) {
 	else return ERR_INVALID_ARGS;
 };
 action.onAssignment = function (creep, target) {
-	if (SAY_ASSIGNMENT) creep.say(String.fromCharCode(9929), SAY_PUBLIC);
+	if (global.SAY_ASSIGNMENT)
+		creep.say(String.fromCharCode(9929), global.SAY_PUBLIC);
 };

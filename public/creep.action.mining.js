@@ -112,8 +112,10 @@ action.work = function(creep) {
                 };
                 _.forEach(Object.keys(creep.carry), transfer);
             } else {
-                if (global.CHATTY) creep.say('dropmining', global.SAY_PUBLIC);
-                if (global.OOPS) creep.say(String.fromCharCode(8681), global.SAY_PUBLIC);
+                if (global.CHATTY)
+                    creep.say('dropmining', global.SAY_PUBLIC);
+                if (global.OOPS)
+                    creep.say(String.fromCharCode(8681), global.SAY_PUBLIC);
                 const drop = r => {
                     if (creep.carry[r] > 0) creep.drop(r);
                 };
@@ -183,7 +185,7 @@ action.getEnergy = function(creep) {
 action.maintain = function(creep) {
     const minCarry = (creep.data.body && creep.data.body.work ? (creep.data.body.work * 5) : (creep.carryCapacity / 2));
     if (global.DEBUG && global.TRACE)
-        global.trace('Action', {actionName:this.name, method: 'maintain', creepName:creep.name, pos:creep.pos, energy: creep.carryenergy, minCarry});
+        global.trace('Action', {actionName:this.name, method: 'maintain', creepName:creep.name, pos:creep.pos, energy: creep.carry.energy, minCarry});
     if (creep.carry.energy <= minCarry) {
         if (!creep.data.energyChecked || Game.time - creep.data.energyChecked > global.MINER_WORK_THRESHOLD) {
             this.getEnergy(creep);

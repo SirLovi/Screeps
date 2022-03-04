@@ -1,11 +1,23 @@
 const action = new Creep.Action('avoiding');
 module.exports = action;
-action.lairDangerTime = 24;
-action.lairDangerRange = 14;
+action.lairDangerTime = 10;
+action.lairDangerRange = 5;
 action.targetRange = 0;
 action.reachedRange = 0;
+action.isGuardNearToIt = (target) => {
+
+    let ret = _.some(target.room.creeps, creep => {
+        return (creep.data.creepType === 'sourceKiller' || creep.data.creepType === 'warrior') && creep.pos.isNearTo(target);
+    })
+
+    if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, target.room.name))
+        global.logSystem(target.room.name, `${target} has a guard nearBy: ${ret}`);
+
+
+    return ret;
+}
 action.isActiveLair = function(target) {
-    return !_.isUndefined(target.ticksToSpawn) && target.ticksToSpawn <= action.lairDangerTime;
+    return !_.isUndefined(target.ticksToSpawn) && target.ticksToSpawn <= action.lairDangerTime && !action.isGuardNearToIt(target);
 };
 action.isValidAction = function(creep){
     return creep.data.destiny && creep.data.destiny.room === creep.room.name &&
@@ -15,10 +27,10 @@ action.isAddableAction = function(creep) {
     return true;
 };
 action.isValidTarget = function(target, creep){
-    if (Task.reputation.npcOwner(target)) {
+    if (global.Task.reputation.npcOwner(target)) {
         // not a lair(creep most likely), or an active lair
         return _.isUndefined(target.ticksToSpawn) || action.isActiveLair(target);
-    } else if (Task.reputation.hostileOwner(target) && target.hasActiveBodyparts) {
+    } else if (global.Task.reputation.hostileOwner(target) && target.hasActiveBodyparts) {
         return target.hasActiveBodyparts([ATTACK,RANGED_ATTACK]);
     }
     return false;

@@ -14,7 +14,8 @@ mod.run = function(creep) {
 mod.actions = function(creep) {
     return [
         Creep.action.defending,
-        Creep.action.sourceKiller
+        Creep.action.sourceKiller,
+        Creep.action.healing,
     ];
 };
 const super_nextAction = mod.nextAction;
