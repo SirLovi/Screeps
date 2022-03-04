@@ -4,8 +4,12 @@ const super_run = mod.run;
 mod.run = function(creep) {
     let casualties = creep.room.casualties.length > 0;
     if (!Creep.action.avoiding.run(creep)) {
-        const flag = creep.data.destiny && Game.flags[creep.data.destiny.targetName];
+        let flag = creep.data.destiny ? Game.flags[creep.data.destiny.targetName] : null;
         if (!flag) {
+
+            global.logSystem(creep.room.name, `${creep.name} no flag for remoteMiner`);
+
+
             if (!creep.action || creep.action.name !== 'recycling') {
                 this.assignAction(creep, 'recycling');
             }

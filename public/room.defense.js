@@ -1,7 +1,8 @@
 const mod = {};
 module.exports = mod;
 mod.analyzeRoom = function (room) {
-	if (room.hostiles.length || (room.memory.hostileIds && room.memory.hostileIds.length)) room.processInvaders();
+	if (room.hostiles.length || (room.memory.hostileIds && room.memory.hostileIds.length))
+		room.processInvaders();
 };
 const triggerNewInvaders = creep => {
 	// create notification
@@ -88,7 +89,7 @@ mod.extend = function () {
 			configurable: true,
 			get: function () {
 				if (_.isUndefined(this._hostiles)) {
-					this._hostiles = this.find(FIND_HOSTILE_CREEPS, {filter: Task.reputation.hostileOwner});
+					this._hostiles = this.find(FIND_HOSTILE_CREEPS, {filter: global.Task.reputation.hostileOwner});
 				}
 				return this._hostiles;
 			},

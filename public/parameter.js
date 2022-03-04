@@ -209,6 +209,10 @@ let mod = {
             renew: true,
             prMultiplier: 3 // creep.data.predictedRenewal multiplier
         },
+        collapseWorker: {
+            renew: false,
+            prMultiplier: 3 // creep.data.predictedRenewal multiplier
+        },
     },
     TASK_CREEP_CHECK_INTERVAL: 250, // Maximum number of ticks before a task checks to see if it needs to spawn new creeps
     REMOTE_RESERVE_HAUL_CAPACITY: 0.1, // Percent of allocated haul capacity before sending reservers.

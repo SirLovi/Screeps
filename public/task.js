@@ -352,7 +352,7 @@ mod.nextCreepCheck = function (flag, task) {
 		return false;
 	} else {
 		// set default, we will get a better nextCheck if it exists because we return true
-		_.set(flag.memory, ['nextCheck', task], Game.time + TASK_CREEP_CHECK_INTERVAL);
+		_.set(flag.memory, ['nextCheck', task], Game.time + global.TASK_CREEP_CHECK_INTERVAL);
 		return true;
 	}
 };

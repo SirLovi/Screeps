@@ -575,6 +575,12 @@ const STRUCTURE_NUKER = "nuker";
  */
 const STRUCTURE_FACTORY = "factory";
 
+/**
+ * @constant
+ * @type {string}
+ */
+const STRUCTURE_INVADER_CORE = "invaderCore";
+
 /** RESOURCE CONSTANTS **/
 
 /**

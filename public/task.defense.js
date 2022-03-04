@@ -6,11 +6,17 @@ mod.register = () => {
 };
 // When a new invader has been spotted
 mod.handleNewInvader = invaderCreep => {
+
+	if (global.DEBUG && global.debugger(global.DEBUGGING.invadersCreep, invaderCreep.room.name)) {
+		global.logSystem(invaderCreep.room.name, `INVADERS: found: ${invaderCreep.name}`);
+	}
+
+
 	// ignore if on blacklist
 	if (!global.SPAWN_DEFENSE_ON_ATTACK || global.DEFENSE_BLACKLIST.includes(invaderCreep.pos.roomName))
 		return;
-	// if not our room and not our reservation
 
+	// if not our room and not our reservation
 	global.logSystem(invaderCreep.pos.roomName, `Hostile Invaders detected`);
 
 	// if ((!invaderCreep.room.my && !invaderCreep.room.reserved) || invaderCreep.room.isCenterNineRoom) {
@@ -48,7 +54,7 @@ mod.handleGoneInvader = invaderId => {
 	let invader = Game.getObjectById(invaderId);
 	if (!invader) {
 		// Invader not found anymore
-		// remove queued creeps
+		// remove queued creepsHostile Invaders detected
 		let taskMemory = global.Task.defense.memory(invaderId);
 		if (taskMemory && taskMemory.defender) {
 			let defender = [];
@@ -111,7 +117,7 @@ mod.creep = {
 		},
 		name: 'defender',
 		behaviour: 'warrior',
-		queue: 'Medium',
+		queue: 'High',
 		sort: true,
 		maxRange: 3,
 	},

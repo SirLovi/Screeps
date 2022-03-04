@@ -8,8 +8,9 @@ mod.isValidAction = function (creep) {
 	let inPosition = flagExist || myRoom;
 	let ret = hostilesExist && inPosition;
 
-	if (creep.name === 'guard-Flag176-2')
-		global.logSystem(creep.room.name, `${creep.name} WARRIOR: defending, IS VALID ACTION: hostileExist: ${hostilesExist} flagExist: ${inPosition} myRoom: ${myRoom} ret: ${ret}`);
+	if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, creep.room.name))
+		global.logSystem(creep.room.name, `${creep.name} ${creep.data.actionName} WARRIOR: defending, IS VALID ACTION: hostileExist: ${hostilesExist} flagExist: ${inPosition} myRoom: ${myRoom} ret: ${ret}`);
+
 	return ret;
 };
 mod.isAddableAction = function () {
@@ -26,6 +27,7 @@ mod.isValidTarget = function (target) {
 		target.my === false);
 };
 mod.newTarget = function (creep) {
+
 	let closestHostile = creep.pos.findClosestByRange(creep.room.hostiles, {
 		filter: mod.defaultStrategy.priorityTargetFilter(creep),
 	});
@@ -38,8 +40,8 @@ mod.newTarget = function (creep) {
 		}
 	}
 
-	if (creep.name === 'guard-Flag176-2')
-		global.logSystem(creep.room.name, `${creep.name} WARRIOR: defensing, target: ${closestHostile}`);
+	if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, creep.room.name))
+		global.logSystem(creep.room.name, `${creep.name} data.actionName: ${creep.data.actionName} action: ${creep.action} WARRIOR: defending, target: ${closestHostile}`);
 
 	return closestHostile;
 };

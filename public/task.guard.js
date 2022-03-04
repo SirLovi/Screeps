@@ -9,7 +9,8 @@ mod.register = () => {
 // for each flag
 mod.handleFlagFound = flag => {
 	// if it is a yellow/yellow or red/red flag
-	if ((flag.compareTo(global.FLAG_COLOR.defense) || flag.compareTo(global.FLAG_COLOR.defense.boosted) || flag.compareTo(global.FLAG_COLOR.invade)) && global.Task.nextCreepCheck(flag, mod.name)) {
+	// if ((flag.compareTo(global.FLAG_COLOR.defense) || flag.compareTo(global.FLAG_COLOR.defense.boosted) || flag.compareTo(global.FLAG_COLOR.invade)) && global.Task.nextCreepCheck(flag, mod.name)) {
+	if ((flag.compareTo(global.FLAG_COLOR.defense) || flag.compareTo(global.FLAG_COLOR.defense.boosted)) && global.Task.nextCreepCheck(flag, mod.name)) {
 		global.Util.set(flag.memory, 'task', mod.name);
 
 		// let roomName = flag.room ? flag.room.name : flag.memory.roomName;

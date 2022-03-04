@@ -274,7 +274,7 @@ module.exports = {
 			}
 		}
 
-		console.log(Game.time, Util.dye(CRAYON.error, category), ...msg, Util.dye(CRAYON.birth, JSON.stringify(entityWhere)), Util.stack());
+		console.log(Game.time, global.Util.dye(global.CRAYON.error, category), ...msg, global.Util.dye(global.CRAYON.birth, JSON.stringify(entityWhere)), global.Util.stack());
 	},
 
 	/**

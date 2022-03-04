@@ -149,7 +149,7 @@ mod.nextAction = function (creep) {
 
 
 		if (!ret) {
-			ret = mod.gotoTargetRoom(creep, flag);
+			ret = this.gotoTargetRoom(creep, flag);
 		}
 
 		return ret;
@@ -170,12 +170,14 @@ mod.nextAction = function (creep) {
 			// }
 		}
 
-		if (!ret) {
-			ret = this.assignAction(creep, 'healing');
-		}
+
 
 		if (!ret) {
 			ret = mod.goHome(creep, homeRoomName);
+		}
+
+		if (!ret) {
+			ret = this.assignAction(creep, 'healing');
 		}
 
 		return ret;
@@ -195,11 +197,11 @@ mod.nextAction = function (creep) {
 		}
 
 		if (!ret) {
-			ret = this.assignAction(creep, 'healing');
+			ret = this.gotoTargetRoom(creep, flag);
 		}
 
 		if (!ret) {
-			ret = mod.gotoTargetRoom(creep, flag);
+			ret = this.assignAction(creep, 'healing');
 		}
 
 		return ret;
@@ -224,16 +226,6 @@ mod.needEnergy = function (creep, atHome = false) {
 
 	return creep.sum / creep.carryCapacity < global.REMOTE_HAULER.MIN_LOAD;
 };
-mod.gotoTargetRoom = function (creep, flag) {
-
-	global.logSystem(creep.room.name, `${creep.name} flag: ${flag.name} go to target`);
-
-	if (flag) {
-		return Creep.action.travelling.assignRoom(creep, flag.pos.roomName);
-	} else {
-		return false;
-	}
-};
 mod.goHome = function (creep, homeRoomName) {
 	// global.logSystem(creep.room.name, `${creep.name} is going home ${homeRoomName}`);
 	return Creep.action.travelling.assignRoom(creep, homeRoomName);
@@ -245,6 +237,7 @@ mod.strategies.picking = {
 };
 mod.strategies.defaultStrategy.moveOptions = function (options) {
 	options.avoidSKCreeps = true;
+	// options.allowHostile = false;
 	return options;
 };
 mod.strategies.healing = {

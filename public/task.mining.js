@@ -631,7 +631,8 @@ mod.strategies = {
 			}
 			// TODO count 15 (max) in every MaxMulti (fixedBody.length - 50) / multiBody.length
 			let ret = Math.min(max, 15);
-			global.logSystem(room.name, `HAULER maxMulti: ${ret}`);
+			if (room)
+				global.logSystem(room.name, `HAULER maxMulti: ${ret}`);
 			return ret;
 		},
 	},

@@ -120,7 +120,6 @@ const Behaviour = function(name) {
                 // ret = this.nextOtherAction(creep);
                 // if (!ret)
                 ret = this.nextAction(creep);
-
                 return ret;
             }
         }
@@ -132,6 +131,7 @@ const Behaviour = function(name) {
             creep.action.step(creep);
         } else {
             global.logError('Creep without action/activity!\nCreep: ' + creep.name + '\ndata: ' + JSON.stringify(creep.data));
+            global.Task.reCycleOrIdle(creep);
         }
     };
     this.assign = function(creep) {
@@ -144,6 +144,20 @@ const Behaviour = function(name) {
     };
     this.selectStrategies = function(actionName) {
         return [this.strategies.defaultStrategy, this.strategies[actionName]];
+    };
+    this.gotoTargetRoom = function (creep, flag) {
+
+        if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, creep.room.name))
+            global.logSystem(creep.room.name, `${creep.name} flag: ${flag} go to target, BEHAVIOUR`);
+
+        if (flag) {
+            let ret = Creep.action.travelling.assignRoom(creep, flag.pos.roomName);
+            if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, creep.room.name))
+                global.logSystem(creep.room.name, `${creep.name} WARRIOR: go to target ret: ${ret}`);
+            return ret;
+        } else {
+            return false;
+        }
     };
 };
 module.exports = Behaviour;

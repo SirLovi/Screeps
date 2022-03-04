@@ -20,8 +20,10 @@ mod.actions = function(creep) {
 const super_nextAction = mod.nextAction;
 mod.nextAction = function(creep) {
     const flag = creep.flag || Game.flags[creep.data.destiny.targetName];
-    if (!flag) return this.assignAction(creep, 'recycling');
-    else if (creep.pos.roomName !== flag.pos.roomName) return Creep.action.travelling.assignRoom(creep, flag.pos.roomName);
+    if (!flag)
+        return this.assignAction(creep, 'recycling');
+    else if (creep.pos.roomName !== flag.pos.roomName)
+        return Creep.action.travelling.assignRoom(creep, flag.pos.roomName);
     super_nextAction.call(this, creep);
 };
 mod.strategies.defaultStrategy.moveOptions = function(options) {

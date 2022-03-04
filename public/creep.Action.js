@@ -39,7 +39,13 @@ let Action = function (actionName) {
 	// determines, if a target is valid. Gets validated only once upon assignment.
 	// check possible override in derived action
 	this.isAddableTarget = function (target, creep) { // target is valid to be given to an additional creep
-		return (!target.targetOf || this.maxPerTarget === Infinity || _.filter(target.targetOf, {'actionName': this.name}).length < this.maxPerTarget);
+		let ret = (!target.targetOf || this.maxPerTarget === Infinity || _.filter(target.targetOf, {'actionName': this.name}).length < this.maxPerTarget);
+
+		if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, creep.room.name))
+			global.logSystem(creep.room.name, `${creep.name} WARRIOR: selecting new target isAddable: ${ret}`);
+
+
+		return ret;
 	};
 	// find a new target for that action
 	// needs implementation in derived action
@@ -58,7 +64,7 @@ let Action = function (actionName) {
 		let range = creep.pos.getRangeTo(creep.target);
 		if (range <= this.targetRange) {
 			let workResult = this.work(creep);
-			if (workResult != OK) {
+			if (workResult !== OK) {
 				creep.handleError({errorCode: workResult, action: this, target: creep.target, range, creep});
 				return this.unassign(creep);
 			}
@@ -98,17 +104,51 @@ let Action = function (actionName) {
 	// assign the action to a creep
 	// optionally predefine a fixed target
 	this.assign = function (creep, target) {
-		if (target === undefined)
+		if (target === undefined) {
+
 			target = this.newTarget(creep);
+
+			if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, creep.room.name) && creep.data.creepType === 'warrior')
+				global.logSystem(creep.room.name, `${creep.name} WARRIOR: selecting new target: ${target} this.name: ${this.name}`);
+
+		} else if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, creep.room.name) && creep.data.creepType === 'warrior')
+			global.logSystem(creep.room.name, `${creep.name} WARRIOR: already has target: ${target}`);
 
 		// if (target === undefined) {
 		// 	target = this.nextOtherAction(creep);
 		// }
 
-		if (target && this.isAddableTarget(target, creep)) {
+		let isAddable;
+
+		if (target)
+			isAddable = this.isAddableTarget(target, creep);
+		else
+			isAddable = false;
+
+		if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, creep.room.name) && creep.data.creepType === 'warrior')
+			global.logSystem(creep.room.name, `${creep.name} WARRIOR: addable action ${isAddable} target: ${target}`);
+
+		if (target && isAddable) {
+
+			if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, creep.room.name) && creep.data.creepType === 'warrior') {
+				global.logSystem(creep.room.name, `${creep.name}, WARRIOR: assign: OK`);
+				// trace is not working
+				global.Util.trace('Action', {creepName: creep.name, assign: this.name, target: !target || target.name || target.id, Action: 'assign'});
+			}
+
+
+
 			if (global.DEBUG && global.TRACE)
-				global.trace('Action', {creepName: creep.name, assign: this.name, target: !target || target.name || target.id, Action: 'assign'});
+				global.Util.trace('Action', {creepName: creep.name, assign: this.name, target: !target || target.name || target.id, Action: 'assign'});
+
+			if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, creep.room.name) && creep.data.creepType === 'warrior')
+				global.logSystem(creep.room.name, `${creep.name} action: ${!creep.action || creep.action.name !== this.name} target: ${!creep.target || creep.target.id !== target.id || creep.target.name !== target.name}`);
+
 			if (!creep.action || creep.action.name !== this.name || !creep.target || creep.target.id !== target.id || creep.target.name !== target.name) {
+				if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, creep.room.name) && creep.data.creepType === 'warrior'){
+					global.logSystem(creep.room.name, `${creep.name}, WARRIOR: Population.registerAction`);
+				}
+
 				global.Population.registerAction(creep, this, target);
 				this.onAssignment(creep, target);
 			}

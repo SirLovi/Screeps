@@ -10,13 +10,16 @@ action.isValidAction = function (creep) {
 };
 action.isValidTarget = function (target, creep) {
 	if (!target) return false;
-	if (target.structureType == 'link') {
+	if (target.structureType === 'link') {
 		return target.energy > 0;
-	} else if (target.structureType == 'container') {
+	} else if (target.structureType === 'container') {
 		let min = 0;
-		if (target.source === true && target.controller == true) min = target.store.getCapacity() * MANAGED_CONTAINER_TRIGGER;
-		else if (creep.data.creepType.indexOf('remote') >= 0) min = 250;
-		else min = 500;
+		if (target.source === true && target.controller === true)
+			min = target.store.getCapacity() * global.MANAGED_CONTAINER_TRIGGER;
+		else if (creep.data.creepType.indexOf('remote') >= 0)
+			min = 250;
+		else
+			min = 500;
 		return target.sum > min;
 	}
 	return false;
@@ -60,9 +63,9 @@ action.newTarget = function (creep) {
 };
 action.work = function (creep) {
 	let workResult = OK;
-	if (creep.target.source === true && creep.target.controller == true) {
+	if (creep.target.source === true && creep.target.controller === true) {
 		// managed container fun...
-		let max = creep.target.sum - (creep.target.store.getCapacity() * (1 - MANAGED_CONTAINER_TRIGGER));
+		let max = creep.target.sum - (creep.target.store.getCapacity() * (1 - global.MANAGED_CONTAINER_TRIGGER));
 		if (max < 1) workResult = ERR_NOT_ENOUGH_RESOURCES;
 		else {
 			let space = creep.carryCapacity - creep.sum;

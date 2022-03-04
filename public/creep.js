@@ -146,8 +146,8 @@ mod.extend = function () {
 	Creep.prototype.leaveBorder = function () {
 
 
-		if (this.name === 'guard-Flag176-2')
-			global.logSystem(this.room.name, `${this.name} LEAVEBORDER`);
+		// if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, this.room.name))
+		// 	global.logSystem(this.room.name, `${this.name} LEAVE BORDER`);
 
 		RoomPosition.prototype.fromDirection = function (direction, creep) {
 			const
@@ -242,13 +242,14 @@ mod.extend = function () {
 				let stuff = roomPos.look();
 
 				if (_.findIndex(stuff, p => p.type === 'creep' || (p.structure && OBSTACLE_OBJECT_TYPES[p.structure.structureType]) || p.terrain === 'wall') === -1) {
-					if (this.name === 'guard-Flag176-2')
-						global.logSystem(this.room.name, `${this.name} LEAVEBORDER - direction: ${direction}`);
+					if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, this.room.name))
+						global.logSystem(this.room.name, `${this.name} LEAVE BORDER - direction: ${direction}`);
 					this.move(direction);
 					return direction;
 				}
 			}
 		}
+		return false;
 	};
 	Creep.prototype.honk = function () {
 		if (HONK) this.say('\u{26D4}\u{FE0E}', SAY_PUBLIC);
@@ -728,12 +729,15 @@ mod.bodyThreat = function (body) {
 };
 mod.register = function () {
 	for (const action in Creep.action) {
-		if (Creep.action[action].register) Creep.action[action].register(this);
+		if (Creep.action[action].register)
+			Creep.action[action].register(this);
 	}
 	for (const behaviour in Creep.behaviour) {
-		if (Creep.behaviour[behaviour].register) Creep.behaviour[behaviour].register(this);
+		if (Creep.behaviour[behaviour].register)
+			Creep.behaviour[behaviour].register(this);
 	}
 	for (const setup in Creep.setup) {
-		if (Creep.setup[setup].register) Creep.setup[setup].register(this);
+		if (Creep.setup[setup].register)
+			Creep.setup[setup].register(this);
 	}
 };
