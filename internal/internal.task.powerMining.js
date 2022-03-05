@@ -8,7 +8,7 @@ mod.handleFlagRemoved = flagName => {
     const flagMem = Memory.flags[flagName];
     if( flagMem && flagMem.task === mod.name && flagMem.roomName ){
         // if there is still a powerMining flag in that room ignore.
-        const flags = FlagDir.filter(FLAG_COLOR.powerMining, new RoomPosition(25,25,flagMem.roomName), true);
+        const flags = global.FlagDir.filter(global.FLAG_COLOR.invade.powerMining, new RoomPosition(25,25,flagMem.roomName), true);
         if( flags && flags.length > 0 )
             return;
         else {
@@ -20,22 +20,22 @@ mod.handleFlagRemoved = flagName => {
 };
 mod.handleFlagFound = flag => {
     // Analyze Flag
-    if (flag.compareTo(FLAG_COLOR.powerMining) && Task.nextCreepCheck(flag, mod.name)){
+    if (flag.compareTo(global.FLAG_COLOR.invade.powerMining) && global.Task.nextCreepCheck(flag, mod.name)){
         flag.memory.roomName = flag.pos.roomName;
         flag.memory.task = mod.name;
         // check if a new creep has to be spawned
-        Task.powerMining.checkForRequiredCreeps(flag);
+        global.Task.powerMining.checkForRequiredCreeps(flag);
     }
 };
 // remove creep from task memory of queued creeps
 mod.handleSpawningStarted = params => {
-    if ( !params.destiny || !params.destiny.task || params.destiny.task != mod.name )
+    if ( !params.destiny || !params.destiny.task || params.destiny.task !== mod.name )
         return;
     const flag = Game.flags[params.destiny.targetName];
     if (flag) {
-        const memory = Task.powerMining.memory(params.destiny.room);
-        const priority = _.find(Task.powerMining.creep, {behaviour: params.destiny.type}).queue;
-        Task.validateQueued(memory, flag, mod.name, {subKey: params.destiny.type, queues: [priority]});
+        const memory = global.Task.powerMining.memory(params.destiny.room);
+        const priority = _.find(global.Task.powerMining.creep, {behaviour: params.destiny.type}).queue;
+        global.Task.validateQueued(memory, flag, mod.name, {subKey: params.destiny.type, queues: [priority]});
 
         if (params.body) params.body = _.countBy(params.body);
         // save spawning creep to task memory
@@ -54,11 +54,11 @@ mod.handleSpawningCompleted = creep => {
         // TODO: implement better distance calculation
         creep.data.predictedRenewal = creep.data.spawningTime + (global.Util.routeRange(creep.data.homeRoom, creep.data.destiny.room)*50);
         // get task memory
-        const memory = Task.powerMining.memory(creep.data.destiny.room);
+        const memory = global.Task.powerMining.memory(creep.data.destiny.room);
         // save running creep to task memory
         memory.running[creep.data.destiny.type].push(creep.name);
         // clean/validate task memory spawning creeps
-        Task.validateSpawning(memory, flag, mod.name, {roomName: creep.data.destiny.room, subKey: creep.data.destiny.type});
+        global.Task.validateSpawning(memory, flag, mod.name, {roomName: creep.data.destiny.room, subKey: creep.data.destiny.type});
     }
 };
 // when a creep died (or will die soon)
@@ -77,8 +77,8 @@ mod.handleCreepDied = name => {
 };
 // this only exists so action.harvestPower can work, once that is refactored not to look at the task it can be removed
 mod.validateRunning = function(roomName, type) {
-    const memory = Task.powerMining.memory(roomName);
-    Task.validateRunning(memory, null, mod.name, {roomName, subKey: type});
+    const memory = global.Task.powerMining.memory(roomName);
+    global.Task.validateRunning(memory, null, mod.name, {roomName, subKey: type});
 };
 mod.needsReplacement = (creep) => {
     // (c.ticksToLive || CREEP_LIFE_TIME) < (50 * travel - 40 + c.data.spawningTime)
@@ -91,11 +91,11 @@ mod.checkForRequiredCreeps = (flag) => {
     const room = Game.rooms[roomName];
     // Use the roomName as key in Task.memory?
     // Prevents accidentally processing same room multiple times if flags > 1
-    const memory = Task.powerMining.memory(roomName);
+    const memory = global.Task.powerMining.memory(roomName);
 
     const trainCount = memory.trainCount || 1;
     let countExisting = type => {
-        const priority = _.find(Task.powerMining.creep, {behaviour: type}).queue;
+        const priority = _.find(global.Task.powerMining.creep, {behaviour: type}).queue;
         Task.validateAll(memory, flag, mod.name, {roomName, subKey: type, queues: [priority], checkValid: true});
         return memory.queued[type].length + memory.spawning[type].length + memory.running[type].length;
     };
@@ -112,12 +112,12 @@ mod.checkForRequiredCreeps = (flag) => {
             minerTTLs: _.map(_.map(memory.running.powerMiner, n=>Game.creeps[n]), "ticksToLive"), [mod.name]:'minerCount'});
 
         for(let i = minerCount; i < trainCount; i++) {
-            Task.spawn(
-                Task.powerMining.creep.miner, // creepDefinition
+            global.Task.spawn(
+                global.Task.powerMining.creep.miner, // creepDefinition
                 { // destiny
                     task: mod.name, // taskName
                     targetName: flag.name, // targetName
-                    type: Task.powerMining.creep.miner.behaviour // custom
+                    type: global.Task.powerMining.creep.miner.behaviour // custom
                 },
                 { // spawn room selection params
                     targetRoom: roomName,
@@ -125,7 +125,7 @@ mod.checkForRequiredCreeps = (flag) => {
                     rangeRclRatio: 1,
                 },
                 creepSetup => { // onQueued callback
-                    let memory = Task.powerMining.memory(creepSetup.destiny.room);
+                    let memory = global.Task.powerMining.memory(creepSetup.destiny.room);
                     memory.queued[creepSetup.behaviour].push({
                         room: creepSetup.queueRoom,
                         name: creepSetup.name
@@ -138,19 +138,19 @@ mod.checkForRequiredCreeps = (flag) => {
     let maxHealers = Math.min(trainCount, minerCount) * 2;
     if(healerCount < maxHealers ) {
         for(let i = healerCount; i < maxHealers; i++) {
-            Task.spawn(
-                Task.powerMining.creep.healer, // creepDefinition
+            global.Task.spawn(
+                global.Task.powerMining.creep.healer, // creepDefinition
                 { // destiny
                     task: mod.name, // taskName
                     targetName: flag.name, // targetName
-                    type: Task.powerMining.creep.healer.behaviour // custom
+                    type: global.Task.powerMining.creep.healer.behaviour // custom
                 },
                 { // spawn room selection params
                     targetRoom: roomName,
                     minEnergyCapacity: 3000
                 },
                 creepSetup => { // onQueued callback
-                    let memory = Task.powerMining.memory(creepSetup.destiny.room);
+                    let memory = global.Task.powerMining.memory(creepSetup.destiny.room);
                     memory.queued[creepSetup.behaviour].push({
                         room: creepSetup.queueRoom,
                         name: creepSetup.name
@@ -177,7 +177,7 @@ mod.checkForRequiredCreeps = (flag) => {
                 const storageRoom = mod.strategies.hauler.spawnRoom(roomName) || spawnRoom;
 
                 // spawning a new hauler
-                const creepDefinition = _.create(Task.powerMining.creep.hauler);
+                const creepDefinition = _.create(global.Task.powerMining.creep.hauler);
                 if (neededCarryParts > 25){
                     creepDefinition.minMulti = 24;
                     neededCarryParts -= 25;
@@ -189,14 +189,14 @@ mod.checkForRequiredCreeps = (flag) => {
                     { // destiny
                         task: mod.name, // taskName
                         targetName: flag.name, // targetName
-                        type: Task.powerMining.creep.hauler.behaviour, // custom
+                        type: global.Task.powerMining.creep.hauler.behaviour, // custom
                         homeRoom: storageRoom.name
                     }, {
                         targetRoom: roomName,
                         explicit: spawnRoom.name,
                     },
                     creepSetup => { // onQueued callback
-                        let memory = Task.powerMining.memory(creepSetup.destiny.room);
+                        let memory = global.Task.powerMining.memory(creepSetup.destiny.room);
                         memory.queued[creepSetup.behaviour].push({
                             room: creepSetup.queueRoom,
                             name: creepSetup.name,
@@ -245,16 +245,16 @@ mod.memory = key => {
     }
     if( !memory.hasOwnProperty('spawning') ){
         memory.spawning = {
-            powerMiner: Task.powerMining.findSpawning(key, 'powerMiner'),
-            powerHauler: Task.powerMining.findSpawning(key, 'powerHauler'),
-            powerHealer: Task.powerMining.findSpawning(key, 'powerHealer')
+            powerMiner: global.Task.powerMining.findSpawning(key, 'powerMiner'),
+            powerHauler: global.Task.powerMining.findSpawning(key, 'powerHauler'),
+            powerHealer: global.Task.powerMining.findSpawning(key, 'powerHealer')
         };
     }
     if( !memory.hasOwnProperty('running') ){
         memory.running = {
-            powerMiner: Task.powerMining.findRunning(key, 'powerMiner'),
-            powerHauler: Task.powerMining.findRunning(key, 'powerHauler'),
-            powerHealer: Task.powerMining.findRunning(key, 'powerHealer')
+            powerMiner: global.Task.powerMining.findRunning(key, 'powerMiner'),
+            powerHauler: global.Task.powerMining.findRunning(key, 'powerHauler'),
+            powerHealer: global.Task.powerMining.findRunning(key, 'powerHealer')
         };
     }
     if( !memory.hasOwnProperty('trainCount') ){
@@ -312,7 +312,7 @@ mod.creep = {
 
 mod.storage = function(roomName, storageRoom) {
     const room = Game.rooms[roomName];
-    let memory = Task.powerMining.memory(roomName);
+    let memory = global.Task.powerMining.memory(roomName);
     if (storageRoom) {
         const was = memory.storageRoom;
         memory.storageRoom = storageRoom;
@@ -336,7 +336,7 @@ mod.strategies = {
         name: `hauler-${mod.name}`,
         homeRoom: function(flagRoomName) {
             // Explicity set by user?
-            let memory = Task.powerMining.memory(flagRoomName);
+            let memory = global.Task.powerMining.memory(flagRoomName);
             if(memory.storageRoom)
                 return Game.rooms[memory.storageRoom];
             // Otherwise, score it

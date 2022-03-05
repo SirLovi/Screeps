@@ -8,7 +8,7 @@ mod.register = () => {
 // for each flag
 mod.handleFlagFound = flag => {
 	// if it is a sourceKiller flag
-	if (flag.compareTo(global.FLAG_COLOR.sourceKiller) && global.Task.nextCreepCheck(flag, mod.name)) {
+	if (flag.compareTo(global.FLAG_COLOR.defense.sourceKiller) && global.Task.nextCreepCheck(flag, mod.name)) {
 		global.Util.set(flag.memory, 'task', mod.name);
 		// check if a new creep has to be spawned
 		global.Task.sourceKiller.checkForRequiredCreeps(flag);

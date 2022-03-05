@@ -28,11 +28,11 @@ action.newTarget = function(creep) {
 
 action.targetFlag = function(creep) {
     return (creep.data.destiny && Game.flags[creep.data.destiny.targetName || creep.data.destiny.flagName || creep.data.flagName])
-        || FlagDir.find(FLAG_COLOR.powerMining, creep.pos);
+        || global.FlagDir.find(global.FLAG_COLOR.invade.powerMining, creep.pos);
 };
 
 action.work = function(creep) {
-    Population.registerCreepFlag(creep, action.targetFlag(creep));
+    global.Population.registerCreepFlag(creep, action.targetFlag(creep));
     if (creep.hits > 100) {
         creep.attack(creep.target);
     }

@@ -130,7 +130,6 @@ global.install = () => {
 		Memory.modules.valid = Game.time;
 	}
 	// Initialize global & parameters
-	//let glob = load("global");
 	global.inject(global, load('global'));
 	_.assign(global, load('parameter'));
 	_.assign(global, {Autobahn: load("autobahn")});
@@ -194,6 +193,7 @@ global.install = () => {
 			healing: load('creep.action.healing'),
 			idle: load('creep.action.idle'),
 			invading: load('creep.action.invading'),
+			invadersCore: load('creep.action.invadersCore'),
 			mining: load('creep.action.mining'),
 			picking: load('creep.action.picking'),
 			pickingTombstones: load('creep.action.pickingTombstones'),

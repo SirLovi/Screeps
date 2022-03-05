@@ -9,8 +9,8 @@ mod.register = () => {
 // for each flag
 mod.handleFlagFound = flag => {
 	// if it is a yellow/yellow or red/red flag
-	// if ((flag.compareTo(global.FLAG_COLOR.defense) || flag.compareTo(global.FLAG_COLOR.defense.boosted) || flag.compareTo(global.FLAG_COLOR.invade)) && global.Task.nextCreepCheck(flag, mod.name)) {
-	if ((flag.compareTo(global.FLAG_COLOR.defense) || flag.compareTo(global.FLAG_COLOR.defense.boosted)) && global.Task.nextCreepCheck(flag, mod.name)) {
+	if ((flag.compareTo(global.FLAG_COLOR.defense) || flag.compareTo(global.FLAG_COLOR.defense.boosted) || flag.compareTo(global.FLAG_COLOR.defense.invadersCore)) && global.Task.nextCreepCheck(flag, mod.name)) {
+	// if ((flag.compareTo(global.FLAG_COLOR.defense) || flag.compareTo(global.FLAG_COLOR.defense.boosted)) && global.Task.nextCreepCheck(flag, mod.name)) {
 		global.Util.set(flag.memory, 'task', mod.name);
 
 		// let roomName = flag.room ? flag.room.name : flag.memory.roomName;
@@ -20,6 +20,14 @@ mod.handleFlagFound = flag => {
 		// check if a new creep has to be spawned
 		global.Task.guard.checkForRequiredCreeps(flag);
 	}
+
+	// if (global.Task.nextCreepCheck(flag, mod.name)) {
+	// 	if (flag.compareTo(global.FLAG_COLOR.defense) || flag.compareTo(global.FLAG_COLOR.defense.boosted)) {
+	// 		global.Util.set(flag.memory, 'task', mod.name);
+	// 	}
+	// }
+
+
 };
 mod.creep = {
 	guard: {
@@ -61,6 +69,30 @@ mod.creep = {
 		},
 		maxRange: 4,
 	},
+	invadersCoreGuard: {
+		fixedBody: [
+			ATTACK,
+			MOVE,
+		],
+		multiBody: [
+			ATTACK,
+			ATTACK,
+			ATTACK,
+			MOVE,
+			MOVE,
+			HEAL,
+		],
+		name: 'guard',
+		behaviour: 'warrior',
+		queue: 'High',
+		sort: (a, b) => {
+			const partsOrder = [MOVE, ATTACK, HEAL];
+			const indexOfA = partsOrder.indexOf(a);
+			const indexOfB = partsOrder.indexOf(b);
+			return indexOfA - indexOfB;
+		},
+		maxRange: 4,
+	},
 };
 // check if a new creep has to be spawned
 mod.checkForRequiredCreeps = (flag) => {
@@ -71,7 +103,15 @@ mod.checkForRequiredCreeps = (flag) => {
 	// count creeps assigned to task
 	let count = memory.queued.length + memory.spawning.length + memory.running.length;
 	let boosted = flag.compareTo(global.FLAG_COLOR.defense.boosted);
-	let guard = global.Task.guard.creep.guard;
+	let invadersCore = flag.compareTo(global.FLAG_COLOR.defense.invadersCore);
+
+	let guard;
+
+	if (invadersCore)
+		guard = global.Task.guard.creep.invadersCoreGuard;
+	else {
+		guard = global.Task.guard.creep.guard;
+	}
 	if (boosted) {
 		guard.fixedBody = guard.boostedBody.fixedBody;
 		guard.multiBody = guard.boostedBody.multiBody;

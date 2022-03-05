@@ -185,7 +185,12 @@ mod.hasDefenseFlag = function () {
 	}
 	return this._hasDefenseFlag;
 };
-
+mod.hasInvadersCoreFlag = function () {
+	if (_.isUndefined(this._hasDefenseFlag)) {
+		this._hasDefenseFlag = (this.findName(global.FLAG_COLOR.defense.invadersCore) !== null);
+	}
+	return this._hasDefenseFlag;
+};
 mod.extend = function () {
 	Object.defineProperty(Flag.prototype, 'cloaking', {
 		configurable: true,

@@ -40,12 +40,12 @@ mod.nextAction = function(creep) {
         return this.assignAction(creep, 'travelling', miner);
     } else if (creep.pos.getRangeTo(flag) > 2) {
         creep.data.travelRange = 2;
-        return this.assignAction(creep, 'travelling', flag);        
+        return this.assignAction(creep, 'travelling', flag);
     }
     return this.assignAction(creep, 'idle');
 };
 mod.getFlag = function(creep) {
     let flag = creep.data.destiny && Game.flags[creep.data.destiny.targetName];
     if (flag) return flag;
-    else return FlagDir.find(FLAG_COLOR.powerMining, creep.pos, false);
+    else return global.FlagDir.find(global.FLAG_COLOR.invade.powerMining, creep.pos, false);
 };

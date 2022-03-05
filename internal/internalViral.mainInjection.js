@@ -3,10 +3,10 @@ module.exports = mod;
 mod.extend = function(){
     try {
         // Temporary requirement to force `delete Memory.modules`
-        if (!Memory.modules.internalViral.global) delete Memory.modules;
+        // if (!Memory.modules.internalViral.global) delete Memory.modules;
 
         // Install Tasks
-        Task.installTask(...[
+        global.Task.installTask(...[
             'flagSequence',
             'hopper',
             'powerMining',

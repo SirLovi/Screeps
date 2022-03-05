@@ -56,6 +56,22 @@ mod.FLAG_COLOR = {
 			color: COLOR_RED,
 			secondaryColor: COLOR_CYAN,
 		},
+		powerMining: {
+			color: COLOR_RED,
+			secondaryColor: COLOR_BROWN,
+		},
+		hopper: {
+			color: COLOR_RED,
+			secondaryColor: COLOR_PURPLE,
+		},
+		hopperHome: {
+			color: COLOR_RED,
+			secondaryColor: COLOR_BLUE,
+		},
+		attackTrain: {
+			color: COLOR_RED,
+			secondaryColor: COLOR_WHITE,
+		},
 	},
 	//COLOR_PURPLE - Reserved labs
 	labs: { // could be used to define certain lab commands
@@ -70,6 +86,18 @@ mod.FLAG_COLOR = {
 
 	},
 	//COLOR_BLUE - Reserved (internal use)
+	trainHeal: {
+		color: COLOR_BLUE,
+		secondaryColor: COLOR_GREEN,
+	},
+	trainTurret: {
+		color: COLOR_BLUE,
+		secondaryColor: COLOR_WHITE,
+	},
+	boostedTrain: {
+		color: COLOR_BLUE,
+		secondaryColor: COLOR_YELLOW,
+	},
 	//COLOR_CYAN - Reserved (build related)
 	construct: {
 		extension: {
@@ -149,11 +177,27 @@ mod.FLAG_COLOR = {
 			color: COLOR_GREEN,
 			secondaryColor: COLOR_YELLOW,
 		},
+		portal: {
+			color: COLOR_GREEN,
+			secondaryColor: COLOR_BLUE,
+		}
 	},
 	//COLOR_YELLOW
 	defense: { // point to gather troops
 		color: COLOR_YELLOW,
 		secondaryColor: COLOR_YELLOW,
+		invadersCore: {
+			color: COLOR_YELLOW,
+			secondaryColor: COLOR_ORANGE,
+		},
+		boosted: {
+			color: COLOR_YELLOW,
+			secondaryColor:COLOR_BLUE,
+		},
+		sourceKiller: {
+			color: COLOR_YELLOW,
+			secondaryColor: COLOR_RED,
+		},
 	},
 	//COLOR_ORANGE
 	destroy: { // destroy whats standing here
@@ -170,6 +214,10 @@ mod.FLAG_COLOR = {
 		secondaryColor: COLOR_BROWN,
 	},
 	// COLOR_GREY
+	sequence: {
+		color: COLOR_GREY,
+		secondaryColor: COLOR_GREY,
+	},
 	// COLOR_WHITE
 	command: { // command api
 		color: COLOR_WHITE,

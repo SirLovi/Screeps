@@ -23,16 +23,16 @@ mod.nextAction = function(creep) {
     if (!rallyFlag) {
             return this.assignAction(creep, 'recycling');
     } else if(!creep.data.destiny.boosted || (creep.data.destiny.boosted && !Creep.action.boosting.assign(creep))){
-        const attackFlag = FlagDir.find(FLAG_COLOR.attackTrain, creep.pos, false);
-        Population.registerCreepFlag(creep, rallyFlag);
+        const attackFlag = global.FlagDir.find(global.FLAG_COLOR.invade.attackTrain, creep.pos, false);
+        global.Population.registerCreepFlag(creep, rallyFlag);
         // find the creep ahead of us in the train
-        const leadingCreep = Task.train.findLeading(creep);
+        const leadingCreep = global.Task.train.findLeading(creep);
         const leadingRoom = leadingCreep && leadingCreep.pos.roomName;
         const attackRoom = attackFlag && attackFlag.pos.roomName;
         const rallyRoom = rallyFlag && rallyFlag.pos.roomName;
         if (!leadingCreep) {
                 this.assignAction(creep, 'travelling', rallyFlag);
-        } 
+        }
         else if (creep.pos.getRangeTo(leadingCreep) >= 1) {
             creep.moveTo(leadingCreep);
         } else {

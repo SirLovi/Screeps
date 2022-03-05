@@ -25,7 +25,7 @@ let mod = {
 				miningFlagPos = new RoomPosition(52, 50, room.name);
 
 			defenderFlagPos.newFlag(global.FLAG_COLOR.defense);
-			sourceKillerFlagPos.newFlag(global.FLAG_COLOR.sourceKiller);
+			sourceKillerFlagPos.newFlag(global.FLAG_COLOR.defense.sourceKiller);
 			miningFlagPos.newFlag(global.FLAG_COLOR.mining);
 
 		} else if (flags.length > 0) {
@@ -90,22 +90,19 @@ let mod = {
 
 		for (let core of invadersCore) {
 			let room = Game.rooms[core.pos.roomName];
-			let attackFlag = room.find(FIND_FLAGS, {
-				filter: {color: COLOR_RED, secondaryColor: COLOR_RED},
-			});
-			let miningFlag = room.find(FIND_FLAGS, {
-				filter: {color: COLOR_GREEN, secondaryColor: COLOR_BROWN},
-			});
-			let controllerAttackFlag = room.find(FIND_FLAGS, {
-				filter: {color: COLOR_RED, secondaryColor: COLOR_CYAN},
-			});
+			// invadersCore
+			let attackFlag = global.FlagDir.find(global.FLAG_COLOR.defense.invadersCore, core.pos, false);
+			let miningFlag = global.FlagDir.find(global.FLAG_COLOR.claim.mining, core.pos, false);
+			let controllerAttackFlag = global.FlagDir.find(global.FLAG_COLOR.invade.attackController, core.pos, false);
+
+			global.logSystem(core.pos.roomName, `attackFlag: ${attackFlag} miningFlag: ${miningFlag} ${!_.isNull(miningFlag)} controllerAttackFlag: ${controllerAttackFlag}`);
 
 
-			if (miningFlag.length > 0) {
+			if (!_.isNull(miningFlag)) {
 
 				if ((!room.controller.owner || room.controller.my) &&
-					(room.controller.reservation && room.controller.reservation.username !== global.ME)) {
-					if (controllerAttackFlag.length > 0) {
+					room.controller.reservation && room.controller.reservation.username !== global.ME) {
+					if (!_.isNull(controllerAttackFlag)) {
 						global.logSystem(core.pos.roomName, `controller attack flag found!`);
 					} else {
 						global.logSystem(core.pos.roomName, `controller lost, flag placed`);
@@ -113,11 +110,11 @@ let mod = {
 					}
 
 				}
-				if (attackFlag.length > 0) {
+				if (!_.isNull(attackFlag)) {
 					global.logSystem(core.pos.roomName, `attack core flag found!`);
 				} else {
 					global.logSystem(core.pos.roomName, `flag placed`);
-					core.pos.newFlag(global.FLAG_COLOR.invade);
+					core.pos.newFlag(global.FLAG_COLOR.defense.invadersCore);
 
 				}
 			}

@@ -7,10 +7,10 @@ mod.register = () => {};
 // for each flag
 mod.handleFlagFound = flag => {
     // if it is a hopper flag
-    if (flag.compareTo(FLAG_COLOR.hopper) && Task.nextCreepCheck(flag, mod.name)) {
-        Util.set(flag.memory, 'task', mod.name);
+    if (flag.compareTo(global.FLAG_COLOR.invade.hopper) && global.Task.nextCreepCheck(flag, mod.name)) {
+        global.Util.set(flag.memory, 'task', mod.name);
         // check if a new creep has to be spawned
-        Task.hopper.checkForRequiredCreeps(flag);
+        global.Task.hopper.checkForRequiredCreeps(flag);
     }
 };
 // check if a new creep has to be spawned

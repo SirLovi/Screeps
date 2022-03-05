@@ -6,7 +6,7 @@ mod.invalidAction = function(creep) {
     const flag = mod.getFlag(creep);
     if (creep.hits === creep.hitsMax) {
         // target, or nearest
-        const hopTarget = Game.flags[creep.data.destiny.targetName] || FlagDir.find(FLAG_COLOR.hopper, creep.pos, false);
+        const hopTarget = Game.flags[creep.data.destiny.targetName] || global.FlagDir.find(global.FLAG_COLOR.invade.hopper, creep.pos, false);
         // if we're fully healed, but not moving towards the hopper flag, or we've arrived in the target room
         const ret = hopTarget && creep.action.name === 'travelling' &&
             (!creep.target ||
@@ -34,7 +34,7 @@ mod.goTo = function(creep, flag) {
     }
 };
 mod.getFlag = function(creep) {
-    return Game.flags[creep.data.destiny.targetName] || FlagDir.find(FLAG_COLOR.hopper, creep.pos, false);
+    return Game.flags[creep.data.destiny.targetName] || global.FlagDir.find(global.FLAG_COLOR.invade.hopper, creep.pos, false);
 };
 mod.nextAction = function(creep, oldTargetId){
     const hopTarget = mod.getFlag(creep);
@@ -44,11 +44,11 @@ mod.nextAction = function(creep, oldTargetId){
         return this.assignAction(creep, 'recycling', Game.spawns[creep.data.motherSpawn]);
     }
 
-    const homeTarget = FlagDir.find(FLAG_COLOR.hopperHome, hopTarget.pos, false);
+    const homeTarget = global.FlagDir.find(global.FLAG_COLOR.invade.hopperHome, hopTarget.pos, false);
     if (homeTarget && creep.pos.roomName !== homeTarget.pos.roomName && creep.pos.roomName !== hopTarget.pos.roomName) {
         // go through the heal flag on initial approach
         return mod.goTo(creep, homeTarget);
-    } 
+    }
     if (creep.hits === creep.hitsMax) { // hop
         Population.registerCreepFlag(creep, hopTarget);
         return mod.goTo(creep, hopTarget);

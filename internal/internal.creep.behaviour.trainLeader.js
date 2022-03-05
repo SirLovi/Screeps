@@ -2,7 +2,7 @@ const mod = new Creep.Behaviour('trainLeader');
 module.exports = mod;
 const super_invalidAction = mod.invalidAction;
 mod.invalidAction = function (creep) {
-	const attackFlag = FlagDir.find(FLAG_COLOR.attackTrain, creep.pos, false);
+	const attackFlag = global.FlagDir.find(global.FLAG_COLOR.invade.attackTrain, creep.pos, false);
 	let hasRangedAttack = creep.hasActiveBodyparts(RANGED_ATTACK);
 	if (hasRangedAttack) {
 		const targets = creep.pos.findInRange(creep.room.hostiles, 3);
@@ -25,8 +25,8 @@ mod.nextAction = function (creep) {
 	if (!rallyFlag) {
 		return this.assignAction(creep, 'recycling');
 	} else if (!creep.data.destiny.boosted || (creep.data.destiny.boosted && !Creep.action.boosting.assign(creep))) {
-		let attackFlag = global.FlagDir.find(FLAG_COLOR.attackTrain, creep.pos, false);
-		let dismantleFlag = creep.hasActiveBodyparts(WORK) ? FlagDir.find(FLAG_COLOR.destroy.dismantle, creep.pos) : FlagDir.find(FLAG_COLOR.destroy, creep.pos);
+		let attackFlag = global.FlagDir.find(global.FLAG_COLOR.invade.attackTrain, creep.pos, false);
+		let dismantleFlag = creep.hasActiveBodyparts(WORK) ? global.FlagDir.find(global.FLAG_COLOR.destroy.dismantle, creep.pos) : global.FlagDir.find(global.FLAG_COLOR.destroy, creep.pos);
 		global.logSystem(creep.room.name, `nextAction - attackFlag ${global.json(attackFlag)}`);
 		global.logSystem(creep.room.name, `nextAction - dismantleFlag: ${global.json(dismantleFlag)}`);
 		global.logSystem(creep.room.name, `nextAction - rallyFlag: ${global.json(rallyFlag)}`);

@@ -2,56 +2,57 @@ const mod = new Creep.Behaviour('warrior');
 module.exports = mod;
 const super_invalidAction = mod.invalidAction;
 mod.name = 'warrior'
-mod.invalidAction = function (creep) {
-
-	// let isInvasionRoom = (creep) => {
-	// 	let adjacentRooms = creep.room.adjacentAccessibleRooms;
-	//
-	// 	for (const roomName of adjacentRooms) {
-	// 		let room = Game.rooms[roomName];
-	// 		if (!!room && room.situation.remoteInvasion)
-	// 			return true
-	// 	}
-	// 	return false;
-	// }
-	//
-	// let remoteRoom = creep.action.name === 'guarding'
-	// 	&& (!creep.flag || (creep.flag.pos.roomName !== creep.pos.roomName && !creep.leaveBorder()));
-	// let isAdjacentRoomInvasionRoom = creep.action.name === 'guarding' && !isInvasionRoom(creep);
-	// return super_invalidAction.call(this, creep) || remoteRoom || isAdjacentRoomInvasionRoom;
-
-	// return super_invalidAction.call(this, creep)
-
-
-	// TODO Check situation.remoteInvasion in adjacentAccessibleRooms
-	// return super_invalidAction.call(this, creep) || (creep.action.name === 'guarding'
-	// 		&& (!creep.flag || (creep.flag.pos.roomName !== creep.pos.roomName && !creep.leaveBorder()))
-	// 	);
-
-
-
-	let leaveBorder = creep.leaveBorder();
-	let ret = super_invalidAction.call(this, creep)
-		|| (creep.action.name === 'guarding')
-		&& (!creep.flag || creep.flag.pos.roomName === creep.pos.roomName || leaveBorder
-		// && (!creep.flag || leaveBorder
-	);
-
-	if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, creep.room.name)) {
-		global.logSystem(creep.room.name, `${creep.name} WARRIOR: => flag ${creep.flag} atTargetRoom: ${!creep.flag || creep.flag.pos.roomName === creep.pos.roomName} leaveBorder: ${leaveBorder}`);
-		global.logSystem(creep.room.name, `${creep.name} ${creep.data.actionName} WARRIOR: INVALID ACTION: ${ret}`);
-	}
-
-	// if (!creep.flag && creep.data.destiny)
-	// 	creep.flag = Game.flags[creep.data.destiny.flagName];
-	//
-	// if (ret && creep.flag && creep.flag.pos.roomName !== creep.pos.roomName) {
-	// 	this.gotoTargetRoom(creep, creep.flag)
-	// }
-
-	return ret;
-
-};
+// mod.invalidAction = function (creep) {
+//
+// 	// let isInvasionRoom = (creep) => {
+// 	// 	let adjacentRooms = creep.room.adjacentAccessibleRooms;
+// 	//
+// 	// 	for (const roomName of adjacentRooms) {
+// 	// 		let room = Game.rooms[roomName];
+// 	// 		if (!!room && room.situation.remoteInvasion)
+// 	// 			return true
+// 	// 	}
+// 	// 	return false;
+// 	// }
+// 	//
+// 	// let remoteRoom = creep.action.name === 'guarding'
+// 	// 	&& (!creep.flag || (creep.flag.pos.roomName !== creep.pos.roomName && !creep.leaveBorder()));
+// 	// let isAdjacentRoomInvasionRoom = creep.action.name === 'guarding' && !isInvasionRoom(creep);
+// 	// return super_invalidAction.call(this, creep) || remoteRoom || isAdjacentRoomInvasionRoom;
+//
+// 	// return super_invalidAction.call(this, creep)
+//
+//
+// 	// TODO Check situation.remoteInvasion in adjacentAccessibleRooms
+// 	// return super_invalidAction.call(this, creep) || (creep.action.name === 'guarding'
+// 	// 		&& (!creep.flag || (creep.flag.pos.roomName !== creep.pos.roomName && !creep.leaveBorder()))
+// 	// 	);
+//
+//
+//
+// 	let leaveBorder = creep.leaveBorder();
+// 	let ret = super_invalidAction.call(this, creep)
+// 		|| (creep.action.name === 'guarding')
+// 		// && (!creep.flag || creep.flag.pos.roomName === creep.pos.roomName || leaveBorder
+// 		&& (!creep.flag || creep.data.destiny.flagName !== creep.data.flagName || leaveBorder
+// 		// && (!creep.flag || leaveBorder
+// 	);
+//
+// 	if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, creep.room.name)) {
+// 		global.logSystem(creep.room.name, `${creep.name} WARRIOR: => flag ${creep.flag} atTargetRoom: ${!creep.flag || creep.flag.pos.roomName === creep.pos.roomName} leaveBorder: ${leaveBorder}`);
+// 		global.logSystem(creep.room.name, `${creep.name} ${creep.data.actionName} WARRIOR: INVALID ACTION: ${ret}`);
+// 	}
+//
+// 	// if (!creep.flag && creep.data.destiny)
+// 	// 	creep.flag = Game.flags[creep.data.destiny.flagName];
+// 	//
+// 	// if (ret && creep.flag && creep.flag.pos.roomName !== creep.pos.roomName) {
+// 	// 	this.gotoTargetRoom(creep, creep.flag)
+// 	// }
+//
+// 	return ret;
+//
+// };
 const super_run = mod.run;
 mod.run = function (creep) {
 	creep.flee = creep.flee || !creep.hasActiveBodyparts([ATTACK, RANGED_ATTACK]);
@@ -63,6 +64,7 @@ mod.run = function (creep) {
 mod.actions = function (creep) {
 	let temp = [
 		Creep.action.invading,
+		Creep.action.invadersCore,
 		Creep.action.defending,
 		Creep.action.sourceKiller,
 		Creep.action.guarding,
