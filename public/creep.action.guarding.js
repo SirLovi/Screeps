@@ -2,7 +2,8 @@ let action = new Creep.Action('guarding');
 module.exports = action;
 action.name = 'guarding';
 action.isValidAction = function (creep) {
-	return global.FlagDir.hasDefenseFlag() && (creep.data.destiny.flagName === creep.data.flagName);
+	// return global.FlagDir.hasDefenseFlag() && (creep.data.destiny.flagName === creep.data.flagName);
+	return global.FlagDir.hasDefenseFlag();
 };
 action.isAddableAction = function () {
 	return true;

@@ -185,11 +185,17 @@ mod.hasDefenseFlag = function () {
 	}
 	return this._hasDefenseFlag;
 };
-mod.hasInvadersCoreFlag = function () {
-	if (_.isUndefined(this._hasDefenseFlag)) {
-		this._hasDefenseFlag = (this.findName(global.FLAG_COLOR.defense.invadersCore) !== null);
+mod.hasSKFlag = function () {
+	if (_.isUndefined(this._hasSKFlag)) {
+		this._hasSKFlag = (this.findName(global.FLAG_COLOR.defense.sourceKiller) !== null);
 	}
-	return this._hasDefenseFlag;
+	return this._hasSKFlag;
+};
+mod.hasInvadersCoreFlag = function () {
+	if (_.isUndefined(this._hasInvadersCoreFlag)) {
+		this._hasInvadersCoreFlag = (this.findName(global.FLAG_COLOR.defense.invadersCore) !== null);
+	}
+	return this._hasInvadersCoreFlag;
 };
 mod.extend = function () {
 	Object.defineProperty(Flag.prototype, 'cloaking', {

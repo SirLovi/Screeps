@@ -145,19 +145,5 @@ const Behaviour = function(name) {
     this.selectStrategies = function(actionName) {
         return [this.strategies.defaultStrategy, this.strategies[actionName]];
     };
-    this.gotoTargetRoom = function (creep, flag) {
-
-        if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, creep.room.name))
-            global.logSystem(creep.room.name, `${creep.name} flag: ${flag} go to target, BEHAVIOUR`);
-
-        if (flag) {
-            let ret = Creep.action.travelling.assignRoom(creep, flag.pos.roomName);
-            if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, creep.room.name))
-                global.logSystem(creep.room.name, `${creep.name} WARRIOR: go to target ret: ${ret}`);
-            return ret;
-        } else {
-            return false;
-        }
-    };
 };
 module.exports = Behaviour;

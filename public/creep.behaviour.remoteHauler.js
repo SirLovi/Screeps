@@ -132,11 +132,10 @@ mod.nextAction = function (creep) {
 			ret = mod.deposit(this, creep);
 		} else {
 			if (creep.sum > 0) {
-				ret = this.nextEnergyAction(creep);
-				if (ret && global.DEBUG && global.debugger(global.DEBUGGING.remoteHaulersPicking, creep.room.name)) {
+				ret = this.nextEnergyAction(creep) && (creep.action.name === 'picking' || creep.action.name === 'pickingTombstones');
+				if (global.DEBUG && global.debugger(global.DEBUGGING.remoteHaulersPicking, creep.room.name)) {
 					global.logSystem(creep.room.name, `${creep.name} remote nextEnergyAction: ${ret}`);
 					global.logSystem(creep.room.name, `${creep.name} remote current action: ${creep.action.name}`);
-					return ret;
 				}
 			} else if (!ret) {
 				if (this.assignAction(creep, 'renewing')) {
@@ -149,7 +148,7 @@ mod.nextAction = function (creep) {
 
 
 		if (!ret) {
-			ret = this.gotoTargetRoom(creep, flag);
+			ret = mod.gotoTargetRoom(creep, flag);
 		}
 
 		return ret;
@@ -164,13 +163,11 @@ mod.nextAction = function (creep) {
 
 		if (this.needEnergy(creep)) {
 			ret = this.nextEnergyAction(creep);
-			// if (global.DEBUG && global.debugger(global.DEBUGGING.targetRoom, creep.room.name)) {
-			// 	global.logSystem(creep.room.name, `${creep.name} nextEnergyAction: ${ret}`);
-			// 	global.logSystem(creep.room.name, `${creep.name} current action: ${creep.action.name}`);
-			// }
+			if (global.DEBUG && global.debugger(global.DEBUGGING.targetRoom, creep.room.name)) {
+				global.logSystem(creep.room.name, `${creep.name} nextEnergyAction: ${ret}`);
+				global.logSystem(creep.room.name, `${creep.name} current action: ${creep.action.name}`);
+			}
 		}
-
-
 
 		if (!ret) {
 			ret = mod.goHome(creep, homeRoomName);
@@ -229,6 +226,20 @@ mod.needEnergy = function (creep, atHome = false) {
 mod.goHome = function (creep, homeRoomName) {
 	// global.logSystem(creep.room.name, `${creep.name} is going home ${homeRoomName}`);
 	return Creep.action.travelling.assignRoom(creep, homeRoomName);
+};
+mod.gotoTargetRoom = function (creep, flag) {
+
+	if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, creep.room.name))
+		global.logSystem(creep.room.name, `${creep.name} flag: ${flag} go to target, BEHAVIOUR`);
+
+	if (flag) {
+		let ret = Creep.action.travelling.assignRoom(creep, flag.pos.roomName);
+		if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, creep.room.name))
+			global.logSystem(creep.room.name, `${creep.name} WARRIOR: go to target ret: ${ret}`);
+		return ret;
+	} else {
+		return false;
+	}
 };
 
 mod.strategies.picking = {

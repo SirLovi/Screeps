@@ -20,7 +20,7 @@ action.newTarget = function (creep) {
 
 	if (!flag) {
 		// TODO rangeModPerCrowd only works for traveling creeps's
-		flag = global.FlagDir.find(global.FLAG_COLOR.defense.sourceKiller, creep.pos, false, global.FlagDir.rangeMod, {
+		flag = global.FlagDir.find(global.FLAG_COLOR.sourceKiller, creep.pos, false, global.FlagDir.rangeMod, {
 			rangeModPerCrowd: 10,
 		});
 
