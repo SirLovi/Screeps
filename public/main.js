@@ -156,8 +156,8 @@ global.install = () => {
 		SpiralIterator: load('util.spiral.iterator'),
 	});
 	_.assign(global.Task, {
-		guard: load('task.guard'),
 		defense: load('task.defense'),
+		guard: load('task.guard'),
 		mining: load('task.mining'),
 		claim: load('task.claim'),
 		reserve: load('task.reserve'),
@@ -361,9 +361,6 @@ module.exports.loop = wrapLoop(function () {
 			let fillTime = bucketData.bucketFillIntervals[2] - bucketData.bucketFillIntervals[1];
 			if (fillTime > 100)
 				bucketData.bucketFillTime = fillTime;
-			else
-				bucketData.bucketFillTime = 0;
-
 			bucketData.bucketFillIntervals.shift();
 		}
 	}

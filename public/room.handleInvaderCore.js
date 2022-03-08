@@ -20,9 +20,9 @@ let mod = {
 		global.logSystem(room.name, `FLAGS: ${flags.length}`);
 
 		if ((ticksRemaining < 100 || timeToLand < 100) && flags.length === 0) {
-			let defenderFlagPos = new RoomPosition(48, 50, room.name),
-				sourceKillerFlagPos = new RoomPosition(50, 50, room.name),
-				miningFlagPos = new RoomPosition(52, 50, room.name);
+			let defenderFlagPos = new RoomPosition(23, 25, room.name),
+				sourceKillerFlagPos = new RoomPosition(25, 25, room.name),
+				miningFlagPos = new RoomPosition(27, 25, room.name);
 
 			defenderFlagPos.newFlag(global.FLAG_COLOR.defense);
 			sourceKillerFlagPos.newFlag(global.FLAG_COLOR.defense.sourceKiller);

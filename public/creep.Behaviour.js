@@ -110,6 +110,11 @@ const Behaviour = function(name) {
         return !creep.action;
     };
     this.run = function(creep) {
+
+        // if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, creep.room.name)) {
+        //     global.logSystem(creep.room.name, `${creep.name} ${creep.data.actionName} BEHAVIOUR RUN: ${creep}`);
+        // }
+
         // Assign next Action
         if (this.invalidAction(creep)) {
             if (creep.data.destiny && creep.data.destiny.task && global.Task[creep.data.destiny.task] && global.Task[creep.data.destiny.task].nextAction) {

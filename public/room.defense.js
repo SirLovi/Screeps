@@ -131,15 +131,18 @@ mod.extend = function () {
 
 		let registerHostile = creep => {
 			// if (Room.isCenterNineRoom(this.name)) return;
+			if (creep.owner.username === 'Source Keeper')
+				return;
 			// if invader id unregistered
 			if (!that.memory.hostileIds.includes(creep.id)) {
+				global.logSystem(creep.room.name, `${creep.id} register as hostile`);
 				// handle new invader
 				// register
 				that.memory.hostileIds.push(creep.id);
 				// save to trigger subscribers later
 				that.newInvader.push(creep);
 				// create statistics
-				if (SEND_STATISTIC_REPORTS) {
+				if (global.SEND_STATISTIC_REPORTS) {
 					let bodyCount = JSON.stringify(_.countBy(creep.body, 'type'));
 					if (that.memory.statistics.invaders === undefined)
 						that.memory.statistics.invaders = [];

@@ -327,6 +327,22 @@ mod.translateErrorCode = function (code) {
 	};
 	return codes[code * -1];
 };
+mod.translateColorCode = (code => {
+	let codes = {
+		1: 'COLOR_RED',
+		2: 'COLOR_PURPLE',
+		3: 'COLOR_BLUE',
+		4: 'COLOR_CYAN',
+		5: 'COLOR_GREEN',
+		6: 'COLOR_YELLOW',
+		7: 'COLOR_ORANGE',
+		8: 'COLOR_BROWN',
+		9: 'COLOR_GREY',
+		10: 'COLOR_WHITE',
+	};
+	return codes[code];
+});
+
 // manipulate log output
 // simply put a color as "style"
 // or an object, containing any css

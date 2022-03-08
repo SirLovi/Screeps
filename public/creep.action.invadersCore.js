@@ -3,7 +3,8 @@ module.exports = action;
 action.name = 'invadersCore';
 action.isValidAction = function (creep) {
 	// return global.FlagDir.hasInvadersCoreFlag() && (creep.data.destiny.flagName === creep.data.targetId || creep.data.destiny.flagName === creep.data.flagName);
-	return global.FlagDir.hasInvadersCoreFlag() && (creep.data.destiny.flagName === creep.data.flagName);
+	// return global.FlagDir.hasInvadersCoreFlag(creep.pos) && creep.data.destiny.flagName === creep.data.flagName;
+	return global.FlagDir.hasInvadersCoreFlag(creep.pos) === creep.data.destiny.flagName;
 };
 action.isAddableAction = function () {
 	return true;

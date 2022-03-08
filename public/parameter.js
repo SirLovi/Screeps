@@ -180,9 +180,9 @@ let mod = {
         DRIVE_BY_REPAIR_RANGE_ROAD: 0,
         MIN_LOAD: 0.75, // Haulers will return home as long as their ratio of carrying/capacity is above this amount.
         MIN_WEIGHT: 800, // Small haulers are a CPU drain.
+        MULTIPLY_ENABLED_AT: 500, // dropped energy threshold at remoteRoom to enable more remoteHaulers
         MULTIPLIER: 4, // Max number of haulers spawned per source in a remote mining room.
         REHOME: true, // May haulers choose closer storage for delivery?
-        RESET_STORAGE_SPAWN_ROOMS_INTERVAL: 100, // looking for the best spawn room
         RENEW: true, // remoteHaulers will renew himself.
     },
     FIND_SPAWN_ROOM_WEIGHT: {

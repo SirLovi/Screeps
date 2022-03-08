@@ -17,14 +17,26 @@ mod.handleNewInvader = invaderCreep => {
 		return;
 
 	// if not our room and not our reservation
-	global.logSystem(invaderCreep.pos.roomName, `Hostile Invaders detected`);
+	global.logSystem(invaderCreep.pos.roomName, `Hostile Invaders detected: ${invaderCreep.name}`);
+	global.logSystem(invaderCreep.pos.roomName, `Hostile Invaders detected in: ${invaderCreep.room}`);
+	global.logSystem(invaderCreep.pos.roomName, `Hostile Invaders detected in: ${invaderCreep.pos}`);
 
 	// if ((!invaderCreep.room.my && !invaderCreep.room.reserved) || invaderCreep.room.isCenterNineRoom) {
 	if (!invaderCreep.room.my && !invaderCreep.room.reserved) {
 		// if it is not our exploiting target
-		let validColor = flagEntry => (
-			(Flag.compare(flagEntry, global.FLAG_COLOR.invade.exploit)) || (flagEntry.color === global.FLAG_COLOR.claim.color)
-		);
+		let validColor = (flagEntry) => {
+
+			let exploit = Flag.compare(flagEntry, global.FLAG_COLOR.invade.exploit);
+			let mining = Flag.compare(flagEntry, global.FLAG_COLOR.claim.mining);
+
+			global.logSystem(invaderCreep.room.name, `flagEntry: ${global.json(flagEntry)}`);
+			global.logSystem(invaderCreep.room.name, `exploit: ${exploit} mining: ${mining}`);
+			global.logSystem(invaderCreep.room.name, `ret: ${exploit || mining}`);
+
+			return exploit || mining;
+		};
+
+
 		let flag = global.FlagDir.find(validColor, invaderCreep.pos, true);
 
 		if (!flag) {
@@ -119,7 +131,7 @@ mod.creep = {
 		behaviour: 'warrior',
 		queue: 'High',
 		sort: true,
-		maxRange: 3,
+		maxRange: 5,
 	},
 };
 // spawn defenses against an invader creep

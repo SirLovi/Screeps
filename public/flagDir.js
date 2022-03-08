@@ -1,7 +1,8 @@
 let mod = {};
 module.exports = mod;
 mod.flagFilter = function (flagColour) {
-	if (!flagColour) return;
+	if (!flagColour)
+		return;
 	let filter;
 	if (flagColour.filter) {
 		filter = _.clone(flagColour.filter);
@@ -13,14 +14,14 @@ mod.flagFilter = function (flagColour) {
 mod.findName = function (flagColor, pos, mod, modArgs, local = true) {
 	let list = this.list;
 
-	// console.log(`flagColor: ${global.json(flagColor)}`);
-
 	if (!flagColor || list.length === 0)
 		return null;
 
 	let filter;
 	if (pos instanceof Room)
 		pos = pos.getPositionAt(25, 25);
+
+	// global.logSystem(pos.roomName, `flagColor: ${pos} ${global.translateColorCode(flagColor.color)} ${global.translateColorCode(flagColor.secondaryColor)}`);
 
 	if (typeof flagColor === 'function') {
 		filter = function (flagEntry) {
@@ -46,9 +47,6 @@ mod.findName = function (flagColor, pos, mod, modArgs, local = true) {
 	}
 	let flags = _.filter(list, filter);
 
-	// if (flags.length > 0)
-	// 	console.log(`FLAGS: ${flags[0].name}`);
-
 	if (flags.length === 0)
 		return null;
 	if (flags.length === 1)
@@ -60,6 +58,9 @@ mod.findName = function (flagColor, pos, mod, modArgs, local = true) {
 			// console.log(`flag: ${global.json(flag)} pos: ${global.json(flag)}`);
 			let range;
 			let roomDist = global.Util.routeRange(pos.roomName, flag.roomName);
+			// if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, pos.roomName)) {
+			// 	global.logSystem(pos.roomName, `FlagColor: ${flagColor} roomDist: ${roomDist}`);
+			// }
 			if (roomDist === 0) {
 				// range = _.max([Math.abs(flag.x - pos.x), Math.abs(flag.y - pos.y)]);
 				range = global.Util.getDistance(flag, pos);
@@ -74,6 +75,11 @@ mod.findName = function (flagColor, pos, mod, modArgs, local = true) {
 
 		};
 		let flag = _.min(flags, range); //_.sortBy(flags, range)[0];
+
+		if (pos && flags.length && global.DEBUG && global.debugger(global.DEBUGGING.warrior, pos.roomName)) {
+			global.logSystem(pos.roomName, `FLAG findName: ${global.translateColorCode(flagColor.color)} ${global.translateColorCode(flagColor.secondaryColor)} ${flags.length} flag: ${flag}`);
+		}
+
 		// console.log(`FLAG: ${flag}`);
 		return flag.valid ? flag.name : null;
 	} else {
@@ -81,12 +87,12 @@ mod.findName = function (flagColor, pos, mod, modArgs, local = true) {
 	}
 };
 mod.find = function (flagColor, pos, local = true, module, modArgs) {
-	if (pos instanceof Room)
-		pos = pos.getPositionAt(25, 25);
-	let id = mod.findName(flagColor, pos, module, modArgs, local);
-	if (id === null)
+	// if (pos instanceof Room)
+	// 	pos = pos.getPositionAt(25, 25);
+	let name = mod.findName(flagColor, pos, module, modArgs, local);
+	if (name === null)
 		return null;
-	return Game.flags[id];
+	return Game.flags[name];
 };
 mod.removeFromDir = function (name) {
 	let index = this.list.indexOf(f => f.name === name);
@@ -173,28 +179,29 @@ mod.exploitMod = function (range, flagItem, creepName) {
 	}
 	return range;
 };
-mod.hasInvasionFlag = function () {
-	if (_.isUndefined(this._hasInvasionFlag)) {
-		this._hasInvasionFlag = (this.findName(global.FLAG_COLOR.invade) !== null) || (this.findName(global.FLAG_COLOR.destroy) !== null);
+mod.hasInvasionFlag = function (pos) {
+	if (!this._hasInvasionFlag) {
+		this._hasInvasionFlag = this.findName(global.FLAG_COLOR.invade, pos) || this.findName(global.FLAG_COLOR.destroy, pos);
 	}
 	return this._hasInvasionFlag;
 };
-mod.hasDefenseFlag = function () {
-	if (_.isUndefined(this._hasDefenseFlag)) {
-		this._hasDefenseFlag = (this.findName(global.FLAG_COLOR.defense) !== null);
+mod.hasDefenseFlag = function (pos) {
+	if (!this._hasDefenseFlag) {
+		this._hasDefenseFlag = this.findName(global.FLAG_COLOR.defense, pos);
 	}
 	return this._hasDefenseFlag;
 };
-mod.hasSKFlag = function () {
-	if (_.isUndefined(this._hasSKFlag)) {
-		this._hasSKFlag = (this.findName(global.FLAG_COLOR.defense.sourceKiller) !== null);
+mod.hasSKFlag = function (pos) {
+	if (!this._hasSKFlag) {
+		this._hasSKFlag = this.findName(global.FLAG_COLOR.defense.sourceKiller, pos);
 	}
 	return this._hasSKFlag;
 };
-mod.hasInvadersCoreFlag = function () {
-	if (_.isUndefined(this._hasInvadersCoreFlag)) {
-		this._hasInvadersCoreFlag = (this.findName(global.FLAG_COLOR.defense.invadersCore) !== null);
+mod.hasInvadersCoreFlag = function (pos) {
+	if (!this._hasInvadersCoreFlag) {
+		this._hasInvadersCoreFlag = this.findName(global.FLAG_COLOR.defense.invadersCore, pos);
 	}
+	// console.log(`invadersCoreFlag: ${this._hasInvadersCoreFlag} color: ${global.json(global.FLAG_COLOR.defense.invadersCore)} pos: ${pos}`);
 	return this._hasInvadersCoreFlag;
 };
 mod.extend = function () {
@@ -259,6 +266,10 @@ mod.flush = function () {
 	this.list = [];
 	this.stale = [];
 	delete this._hasInvasionFlag;
+	delete this._hasDefenseFlag;
+	delete this._hasSKFlag;
+	delete this._hasInvadersCoreFlag;
+
 };
 mod.analyze = function () {
 	let register = flag => {

@@ -1,10 +1,24 @@
 let action = new Creep.Action('sourceKiller');
 module.exports = action;
 action.isValidAction = function (creep) {
-	return creep.room.hostiles.length === 0;
+	// return creep.room.hostiles.length === 0 && creep.data.flagName === creep.data.destiny.flagName;
+	// return creep.room.hostiles.length === 0 && !creep.room.invadersCore;
+	if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, creep.room.name)) {
+		global.logSystem(creep.room.name, `${creep.name} SOURCEKILLER: hostiles: ${creep.room.hostiles.length === 0} atTargetRoom: ${global.FlagDir.hasSKFlag(creep.pos)} ${creep.data.destiny.targetName}`);
+	}
+	// return creep.room.hostiles.length === 0 && global.FlagDir.hasSKFlag(creep.pos) === creep.data.destiny.targetName;
+	return creep.room.hostiles.length === 0
 };
 action.isValidTarget = function (target, creep) {
-	return target && (target.room !== creep.room || target.ticksToSpawn);
+	let ret;
+
+	if (target) {
+		if (target.room) {
+			ret = target.room.name === creep.room.name && target.ticksToSpawn;
+		}
+	}
+	return ret;
+	// return global.FlagDir.hasSKFlag(creep.pos) && creep.data.destiny.flagName === creep.data.flagName;
 };
 action.isAddableAction = function () {
 	return true;
@@ -20,7 +34,7 @@ action.newTarget = function (creep) {
 
 	if (!flag) {
 		// TODO rangeModPerCrowd only works for traveling creeps's
-		flag = global.FlagDir.find(global.FLAG_COLOR.sourceKiller, creep.pos, false, global.FlagDir.rangeMod, {
+		flag = global.FlagDir.find(global.FLAG_COLOR.defense.sourceKiller, creep.pos, false, global.FlagDir.rangeMod, {
 			rangeModPerCrowd: 10,
 		});
 

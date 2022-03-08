@@ -159,7 +159,6 @@ mod.countCreep = function (room, entry) {
 		this.typeWeight[entry.creepType] = entry.weight;
 	else this.typeWeight[entry.creepType] += entry.weight;
 };
-
 mod.flush = function () {
 	this.typeCount = {};
 	this.typeWeight = {};

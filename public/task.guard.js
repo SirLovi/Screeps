@@ -80,6 +80,8 @@ mod.creep = {
 			ATTACK,
 			MOVE,
 			MOVE,
+			MOVE,
+			MOVE,
 			HEAL,
 		],
 		name: 'guard',

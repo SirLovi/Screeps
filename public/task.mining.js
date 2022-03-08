@@ -153,14 +153,34 @@ mod.checkForRequiredCreeps = (flag) => {
 
 	let maxHaulers;
 
+	// let runningHaulerMaxBody = Game.creeps[memory.running.remoteHauler[0]].body.length === 50;
+
+	let runningHaulerMaxBody;
+
+	if (!_.isUndefined(memory.running.remoteHauler) && memory.running.remoteHauler.length > 0) {
+
+		// runningHaulerMaxBody = _.some(Game.creeps[memory.running.remoteHauler], creep => {
+		// 	return creep && creep.body && creep.body.length < 50;
+		// });
+
+		runningHaulerMaxBody = _.every(memory.running.remoteHauler, creepId => {
+			let creep = Game.creeps[creepId];
+			return creep && creep.body && creep.body.length === 50;
+		})
+	}
+	else
+		runningHaulerMaxBody = false
+
 	let dropped = room ? room.droppedResourcesAmount() : 0;
 
-	if (dropped > 500)
+	if (dropped > global.REMOTE_HAULER.MULTIPLY_ENABLED_AT && runningHaulerMaxBody)
 		maxHaulers = global.round((memory.running.remoteMiner.length || 1) * global.REMOTE_HAULER.MULTIPLIER);
-	else
+	else if (dropped > global.REMOTE_HAULER.MULTIPLY_ENABLED_AT)
 		maxHaulers = memory.running.remoteMiner.length || 0;
+	else
+		maxHaulers = 1;
 
-	// global.logSystem(miningRoomName, `MAX HAULERS for ${miningRoomName}: ${maxHaulers} => needMore: ${haulerCount < maxHaulers}, time: ${!memory.capacityLastChecked || Game.time - memory.capacityLastChecked > global.TASK_CREEP_CHECK_INTERVAL}`);
+	global.logSystem(miningRoomName, `MAX HAULERS for ${miningRoomName}: ${maxHaulers} => needMore: ${haulerCount < maxHaulers}, time: ${!memory.capacityLastChecked || Game.time - memory.capacityLastChecked > global.TASK_CREEP_CHECK_INTERVAL}`);
 
 	if (haulerCount < maxHaulers && (!memory.capacityLastChecked || Game.time - memory.capacityLastChecked > global.TASK_CREEP_CHECK_INTERVAL)) {
 		for (let i = haulerCount; i < maxHaulers; i++) {
@@ -202,7 +222,7 @@ mod.checkForRequiredCreeps = (flag) => {
 
 			hauler.maxMulti = maxMulti;
 
-			if (flag.room.isCenterNineRoom)
+			if (flag && flag.room && flag.room.isCenterNineRoom)
 				global.logSystem(flag.room.name, `SKHauler maxMulti is ${maxMulti}`);
 			else
 				global.logSystem(flag.room.name, `remoteHauler maxMulti is ${maxMulti}`);
