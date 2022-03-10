@@ -1,10 +1,10 @@
 const mod = new Creep.Behaviour('hauler');
 module.exports = mod;
-mod.actions = (creep) => {
-	return [
-		Creep.action.renewing,
-	];
-};
+// mod.actions = (creep) => {
+// 	return [
+// 		Creep.action.renewing,
+// 	];
+// };
 mod.inflowActions = (creep) => {
 	if (creep.room.situation.invasion) {
         return [
@@ -43,7 +43,8 @@ mod.nextAction = function (creep) {
 		return Creep.action.travelling.assignRoom(creep, creep.data.homeRoom);
 	}
 	if (creep.sum === 0 && this.assignAction(creep, 'renewing')) {
-		global.logSystem(creep.room.name, `${creep.name} renewing => ttl: ${creep.data.ttl} action:${creep.action.name}`);
+		if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name))
+			global.logSystem(creep.room.name, `${creep.name} RENEWING: => ttl: ${creep.data.ttl} action:${creep.action.name}`);
 		return true;
 	}
 	return this.nextEnergyAction(creep);

@@ -137,9 +137,11 @@ mod.nextAction = function (creep) {
 					global.logSystem(creep.room.name, `${creep.name} remote nextEnergyAction: ${ret}`);
 					global.logSystem(creep.room.name, `${creep.name} remote current action: ${creep.action.name}`);
 				}
-			} else if (!ret) {
+			}
+			else if (!ret) {
 				if (this.assignAction(creep, 'renewing')) {
-					global.logSystem(creep.room.name, `${creep.name} renewing => ttl: ${creep.data.ttl} action:${creep.action.name}`);
+					if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name))
+						global.logSystem(creep.room.name, `${creep.name} RENEWING: => ttl: ${creep.data.ttl} action:${creep.action.name}`);
 					return true;
 				}
 			}

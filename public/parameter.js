@@ -195,23 +195,38 @@ let mod = {
     RENEW: {
         hauler: {
             renew: true,
-            ttl: 3 // creep.data.predictedRenewal multiplier
+            prMultiplier: {
+                start: 2,
+                end: 3
+            } // creep.data.predictedRenewal multiplier
         },
         worker: {
             renew: true,
-            ttl: 3 // creep.data.predictedRenewal multiplier
+            prMultiplier: {
+                start: 2,
+                end: 3
+            } // creep.data.predictedRenewal multiplier
         },
         remoteHauler: {
             renew: true,
-            ttl: 3 // creep.data.predictedRenewal multiplier
+            prMultiplier: {
+                start: 2,
+                end: 3
+            } // creep.data.predictedRenewal multiplier
         },
         labTech: {
-            renew: true,
-            prMultiplier: 3 // creep.data.predictedRenewal multiplier
+            renew: false,
+            prMultiplier: {
+                start: 2,
+                end: 3
+            } // creep.data.predictedRenewal multiplier
         },
         collapseWorker: {
             renew: false,
-            prMultiplier: 3 // creep.data.predictedRenewal multiplier
+            prMultiplier: {
+                start: 2,
+                end: 3
+            } // creep.data.predictedRenewal multiplier
         },
     },
     TASK_CREEP_CHECK_INTERVAL: 250, // Maximum number of ticks before a task checks to see if it needs to spawn new creeps

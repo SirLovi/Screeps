@@ -152,7 +152,8 @@ mod.nextAction = function (creep) {
         return true;
     }
     if (creep.sum === 0 && this.assignAction(creep, 'renewing')) {
-        global.logSystem(creep.room.name, `${creep.name} renewing => ttl: ${creep.data.ttl} action:${creep.action.name}`);
+        if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name))
+            global.logSystem(creep.room.name, `${creep.name} RENEWING: => ttl: ${creep.data.ttl} action:${creep.action.name}`);
         return true;
     }
     return this.nextEnergyAction(creep);

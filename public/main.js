@@ -129,11 +129,18 @@ global.install = () => {
 	} else if (_.isUndefined(Memory.modules.valid)) {
 		Memory.modules.valid = Game.time;
 	}
+
+	Creep.Action = load('creep.Action');
+	Creep.Behaviour = load('creep.Behaviour');
+	Creep.Setup = load('creep.Setup');
+
 	// Initialize global & parameters
 	global.inject(global, load('global'));
 	_.assign(global, load('parameter'));
 	_.assign(global, {Autobahn: load("autobahn")});
 	global.mainInjection = load('mainInjection');
+
+
 
 	// Load modules
 	_.assign(global, {
@@ -170,9 +177,6 @@ global.install = () => {
 		scheduler: load('task.scheduler'),
 		train: load('task.train'),
 	});
-	Creep.Action = load('creep.Action');
-	Creep.Behaviour = load('creep.Behaviour');
-	Creep.Setup = load('creep.Setup');
 	_.assign(Creep, {
 		action: {
 			attackController: load('creep.action.attackController'),

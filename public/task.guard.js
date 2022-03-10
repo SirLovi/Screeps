@@ -120,7 +120,14 @@ mod.checkForRequiredCreeps = (flag) => {
 	}
 	// if creep count below requirement spawn a new creep creep
 	if (count < 1) {
-		global.logSystem(flag.room.name, `SPAWNING GUARD for ${flag.name}`);
+		try {
+			global.logSystem(flag.room.name, `SPAWNING GUARD for ${flag.name}`);
+		} catch (e) {
+			global.logSystem('NO_FLAG: task.guard', `SPAWNING GUARD with no flag:`);
+			global.logSystem('NO_FLAG: task.guard', `SPAWNING GUARD with no flag: ${e.message} ${e.stack}`);
+
+		}
+
 		global.Task.spawn(
 			guard, // creepDefinition
 			{ // destiny

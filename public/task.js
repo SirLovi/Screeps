@@ -281,6 +281,19 @@ mod.validateSpawning = function (memory, flag, task, options = {}) {
 		_.set(flag.memory, ['nextCheck', task], nextCheck);
 	}
 };
+mod.predictedRenewal = (creep, roomName) => {
+
+	if (_.isUndefined(roomName))
+		roomName = creep.room.name;
+
+	// TODO: better distance calculation
+	if (!creep.data.predictedRenewal) {
+		if (creep.data.spawningTime)
+			creep.data.predictedRenewal = creep.data.spawningTime + (global.Util.routeRange(creep.data.homeRoom, roomName) * 50);
+		else
+			creep.data.predictedRenewal = (global.Util.routeRange(creep.data.homeRoom, roomName) + 1) * 50;
+	}
+};
 mod.validateRunning = function (memory, flag, task, options = {}) {
 	const subKey = options.subKey ? 'running.' + options.subKey : 'running';
 	const checkPath = options.subKey ? 'nextRunningCheck.' + options.subKey : 'nextRunningCheck';
@@ -304,23 +317,33 @@ mod.validateRunning = function (memory, flag, task, options = {}) {
 			// invalidate old creeps for predicted spawning
 			if (!creep || !creep.data)
 				return;
-			// TODO: better distance calculation
-			let prediction;
-			if (creep.data.predictedRenewal)
-				prediction = creep.data.predictedRenewal;
-			else if (creep.data.spawningTime)
-				prediction = (creep.data.spawningTime + (global.Util.routeRange(creep.data.homeRoom, roomName) * 50));
-			else prediction = (global.Util.routeRange(creep.data.homeRoom, roomName) + 1) * 50;
-			if (creep.name !== deadCreep && creep.ticksToLive > prediction) {
-				const untilRenewal = creep.ticksToLive - prediction;
-				minRemaining = (!minRemaining || untilRenewal < minRemaining) ? untilRenewal : minRemaining;
-				validated.push(entry);
+
+			mod.predictedRenewal(creep, roomName);
+
+			let prediction = creep.data.predictedRenewal;
+
+
+			if (creep.name !== deadCreep) {
+
+				// if (creep.data.creepType === 'hauler' || creep.data.creepType === 'worker' || creep.data.creepType === 'remoteHauler') {
+				// 	if (Creep.Behaviour.assignAction(creep, 'renewing'))
+				// 		return true;
+				// }
+
+				if (creep.ticksToLive > prediction) {
+					const untilRenewal = creep.ticksToLive - prediction;
+					minRemaining = (!minRemaining || untilRenewal < minRemaining) ? untilRenewal : minRemaining;
+					validated.push(entry);
+				}
 			}
+
+
+
 		};
 		running.forEach(_validateRunning);
 		_.set(memory, subKey, validated);
 		if (minRemaining) {
-			nextCheck = Game.time + Math.min(TASK_CREEP_CHECK_INTERVAL, minRemaining); // check running at least every 250 ticks
+			nextCheck = Game.time + Math.min(global.TASK_CREEP_CHECK_INTERVAL, minRemaining); // check running at least every TASK_CREEP_CHECK_INTERVAL ticks
 			global.Util.set(memory, checkPath, nextCheck, false);
 		} else {
 			if (options.subKey && memory.nextRunningCheck)

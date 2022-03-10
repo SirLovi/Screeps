@@ -176,9 +176,9 @@ mod.checkForRequiredCreeps = (flag) => {
 	if (dropped > global.REMOTE_HAULER.MULTIPLY_ENABLED_AT && runningHaulerMaxBody)
 		maxHaulers = global.round((memory.running.remoteMiner.length || 1) * global.REMOTE_HAULER.MULTIPLIER);
 	else if (dropped > global.REMOTE_HAULER.MULTIPLY_ENABLED_AT)
-		maxHaulers = memory.running.remoteMiner.length || 0;
+		maxHaulers = memory.running.remoteMiner.length || 1;
 	else
-		maxHaulers = 1;
+		maxHaulers = memory.running.remoteMiner.length || 0;
 
 	global.logSystem(miningRoomName, `MAX HAULERS for ${miningRoomName}: ${maxHaulers} => needMore: ${haulerCount < maxHaulers}, time: ${!memory.capacityLastChecked || Game.time - memory.capacityLastChecked > global.TASK_CREEP_CHECK_INTERVAL}`);
 

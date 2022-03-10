@@ -1117,6 +1117,42 @@ mod.hostileRooms = () => {
 	}
 }
 
+mod.deleteSpawnRenewQueue = () => {
+	for (const roomName in Memory.rooms)
+		delete Memory.rooms[roomName].spawnRenewQueue;
+}
+
+mod.testArrayOfObjects = () => {
+ let obj = {
+	 Spawn1: ['A'],
+	 Spawn2: ['A'],
+	 Spawn3: []
+ };
+
+	// let targetName = (obj) => {
+	// 	let target = {};
+	// 	for (const [key, value] of Object.entries(obj))
+	// 		target[key] = value.length;
+	// 	return target;
+	// }
+	// let targetObject = targetName(obj);
+	//
+	// console.log(`targetObj: ${global.json(targetObject)}`);
+
+	// let filtered = _.filter(Object.entries(obj), key => {
+	// 	console.log(`key: ${key[1].length}`);
+	// 	return key[1].length === 0;
+	// })
+
+	let filtered = _.min(Object.entries(obj), key => {
+		return key[1].length;
+	})
+
+	console.log(`winner is: ${filtered[0]} ${filtered[1].length}`);
+}
+
+
+
 
 // HERE comes room.memory.resources
 

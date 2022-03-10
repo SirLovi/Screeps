@@ -1,15 +1,35 @@
 let action = new Creep.Action('renewing');
 module.exports = action;
-action.memory = (creep) => {
-	return global.RENEW[creep.data.creepType]
+action.threshold = (creep, start = true) => {
+	if (global.RENEW[creep.data.creepType].renew) {
+		if (start)
+			return global.RENEW[creep.data.creepType].prMultiplier.start;
+		else
+			return global.RENEW[creep.data.creepType].prMultiplier.end;
+	} else
+		return 0;
+
+};
+action.needToRenew = (creep) => {
+	return creep.data.ttl < creep.data.predictedRenewal * action.threshold(creep);
+};
+action.finishedRenew = (creep) => {
+	return creep.data.ttl > creep.data.predictedRenewal * action.threshold(creep, false);
 }
+action.creepDataRenew = (creep) => {
+	if (action.needToRenew(creep) && !creep.data.reNewing) {
+		creep.data.reNewing = true;
+	} else if (action.finishedRenew(creep) && creep.data.reNewing)
+		creep.data.reNewing = false;
+}
+
 action.isValidAction = function (creep) {
 	return !creep.room.situation.invasion;
 };
 action.isAddableAction = () => true;
 action.isAddableTarget = () => true;
 action.checkMemory = (creep) => {
-
+	// create Memory.rooms.roomName.spawnRenewQueue
 	let roomName = creep.pos.roomName;
 	let spawns = creep.room.structures.spawns;
 
@@ -20,6 +40,10 @@ action.checkMemory = (creep) => {
 				Memory.rooms[roomName].spawnRenewQueue[spawn.name] = [];
 		}
 	}
+	//
+	global.Task.predictedRenewal(creep);
+	action.creepDataRenew(creep);
+
 };
 action.energyPrice = (creep) => {
 	let creepCost = creep.data.bodyCost;
@@ -31,8 +55,8 @@ action.energyPrice = (creep) => {
 };
 action.newTarget = function (creep) {
 
-	// if (!global.debugger(global.DEBUGGING.renewing, creep.room.name))
-	// 	return false;
+	if (global.debugger(global.DEBUGGING.renewing, creep.room.name))
+		global.logSystem(creep.room.name, `${creep.name} RENEWING: AT renewing.newTarget`);
 
 	action.checkMemory(creep);
 
@@ -42,63 +66,64 @@ action.newTarget = function (creep) {
 	let spawnRenewQueueMemory = roomMemory.spawnRenewQueue;
 	let inMyRoom = room && room.my;
 	let oldTarget = creep.target;
-	let newTarget;
 
 	// global.logSystem(currentRoomName, `room.my: ${room.my} creep.data.homeRoom: ${creep.data.homeRoom}`);
 
 	if (!inMyRoom) {
-		global.logSystem(currentRoomName, `${creep.name} is not at Home, no renew`);
+		global.logSystem(currentRoomName, `${creep.name} RENEWING: is not at Home, no renew`);
 		return false;
 	}
 
-	let needToRenew = creep.data.ttl < creep.data.predictedRenewal * action.memory(creep).prMultiplier;
+	// let needToRenew = creep.data.ttl < creep.data.predictedRenewal * action.threshold(creep);
 
-	if (!needToRenew) {
+	if (!creep.data.reNewing) {
 		if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name))
-			global.logSystem(currentRoomName, `${creep.name} no need to renew`);
+			global.logSystem(currentRoomName, `${creep.name} RENEWING: no need to renew => TTL: ${creep.data.ttl} reNewAt ${creep.data.predictedRenewal * action.threshold(creep)}`);
+		action.removeFromQueue(creep);
 		return false;
 	}
 	if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name))
-		global.logSystem(currentRoomName, `${creep.name} selecting target spawn for renew`);
+		global.logSystem(currentRoomName, `${creep.name} RENEWING: selecting target spawn for renew`);
 
 	let spawns = room.structures.spawns;
 	let availableSpawns = _.filter(spawns, spawn => {
-		return _.isNull(spawn.spawning) && spawn.store[RESOURCE_ENERGY] >= action.energyPrice(creep) * 2 && spawnRenewQueueMemory[spawn.name].length <= 1;
+		if (roomMemory.spawnQueueHigh.length === 0 && roomMemory.spawnQueueMedium.length === 0 && roomMemory.spawnQueueLow.length === 0)
+			return _.isNull(spawn.spawning) && spawn.store[RESOURCE_ENERGY] >= action.energyPrice(creep) * 2 && spawnRenewQueueMemory[spawn.name].length === 0;
+		else {
+			return false;
+		}
 	});
 
 	if (availableSpawns.length === 0) {
-		// console.log(`not available spawns`);
-		availableSpawns = _.filter(spawns, spawn => {
-			return spawn.store[RESOURCE_ENERGY] >= action.energyPrice(creep) * 2 && spawnRenewQueueMemory[spawn.name].length === 0;
-		});
-		if (availableSpawns.length === 0)
-			return false;
-		if (roomMemory.spawnQueueHigh.length === 0 && roomMemory.spawnQueueMedium.length === 0 && roomMemory.spawnQueueLow.length === 0) {
-			newTarget = _.min(availableSpawns, 'spawning.remainingTime');
-			if (newTarget.spawning.remainingTime + 20 > creep.data.ttl) {
-				if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name))
-					global.logSystem(currentRoomName, `NO AVAILABLE SPAWN for ${creep.name}, 'NEW_TARGET'`);
-				return false;
-			}
-		}
-	} else {
-		// find closest spawn, should balance allocations
-		newTarget = _.chain(availableSpawns).sortBy(function (spawn) {
-			return creep.pos.getRangeTo(spawn) - spawn.store[RESOURCE_ENERGY] / 10 + spawnRenewQueueMemory[spawn.name].length;
-		}).first().value();
-
-		if (!oldTarget || newTarget.name !== oldTarget.name)
-			return newTarget;
-		else {
-			if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name))
-				global.logSystem(currentRoomName, `NO AVAILABLE SPAWN for ${creep.name}, 'NEW_TARGET'`);
-			return false;
-		}
+		action.removeFromQueue(creep);
+		if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name))
+			global.logSystem(currentRoomName, `${creep.name} RENEWING: RENEWING: NO AVAILABLE SPAWN`);
+		return false;
+	} else if (availableSpawns === 1) {
+		if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name))
+			global.logSystem(currentRoomName, `${creep.name} RENEWING: new target ${availableSpawns[0].name}`);
+		return availableSpawns[0];
 	}
+
+
+	// find best
+	let newTarget = _.chain(availableSpawns).sortBy(function (spawn) {
+		return creep.pos.getRangeTo(spawn) - spawn.store[RESOURCE_ENERGY] / 10
+	}).first().value();
+
+	if (newTarget && (!oldTarget || newTarget.name !== oldTarget.name)) {
+		if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name))
+			global.logSystem(currentRoomName, `${creep.name} RENEWING: new target ${newTarget.name}`);
+		return newTarget;
+	}
+	// else {
+	// 	if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name))
+	// 		global.logSystem(currentRoomName, `${creep.name} RENEWING: NO AVAILABLE SPAWN`);
+	// 	action.removeFromQueue(creep);
+	// 	return false;
+	// }
+
 };
-
-
-
 action.addToQueue = function (creep) {
 
 	let roomName = creep.room.name;
@@ -114,17 +139,22 @@ action.removeFromQueue = function (creep) {
 
 	let roomName = creep.room.name;
 	let spawn = creep.target;
+
+	if (!spawn)
+		return;
+
 	let renewQueue = Memory.rooms[roomName].spawnRenewQueue[spawn.name];
 
-	function removeItem(arr, value) {
-		let index = arr.indexOf(value);
+	global.logSystem(creep.room.name, `${creep.name} RENEWING: remove from queue: ${spawn}`);
+
+	function removeItem(creepName) {
+		let index = renewQueue.indexOf(creepName);
 		if (index > -1) {
-			arr.splice(index, 1);
+			renewQueue.splice(index, 1);
 		}
 	}
 
-	if (renewQueue.includes(creep.name))
-		removeItem(renewQueue, creep.name);
+	removeItem(creep.name);
 
 };
 action.work = function (creep) {
@@ -133,8 +163,7 @@ action.work = function (creep) {
 		return false;
 	let roomName = creep.room.name;
 	let room = Game.rooms[roomName];
-	let needToRenew = creep.data.ttl < creep.data.predictedRenewal * action.memory(creep).prMultiplier;
-	let finishedRenew = creep.data.ttl >= creep.data.predictedRenewal * action.memory(creep).prMultiplier;
+
 	// let inMyRoom = room && room.my;
 
 	action.checkMemory(creep);
@@ -143,6 +172,9 @@ action.work = function (creep) {
 	let flee = false;
 	let renewQueue = Memory.rooms[roomName].spawnRenewQueue[spawn.name];
 
+	// let needToRenew = creep.data.ttl < creep.data.predictedRenewal * action.threshold(creep);
+	// let finishedRenew = creep.data.ttl > creep.data.predictedRenewal * action.threshold(creep, false);
+
 	// if (spawn.pos.y - 1 === creep.pos.y && creep.pos.x === spawn.pos.y && needToRenew) {
 	// 	if (action.testCreep() === creep.name) {
 	// 		console.log(`flee 1`);
@@ -150,10 +182,13 @@ action.work = function (creep) {
 	// 	flee = true;
 	// }
 
-	if (needToRenew) {
+	if (creep.data.reNewing) {
+
 		if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name))
-			global.logSystem(creep.room.name, `${creep.name} is RENEWING. TTL: ${creep.data.ttl}`);
+			global.logSystem(creep.room.name, `${creep.name} RENEWING: is RENEWING. TTL: ${creep.data.ttl}`);
+
 		renewQueue = action.addToQueue(creep);
+
 		// step toward spawn and request renew
 		if (spawn.pos.isNearTo(creep)) {
 			if (_.first(renewQueue) === creep.name) {
@@ -161,28 +196,37 @@ action.work = function (creep) {
 				if (ret === ERR_NOT_ENOUGH_ENERGY || ret === ERR_BUSY) {
 					action.removeFromQueue(creep);
 					if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name))
-						console.log(`old target: ${creep.target}`);
+						console.log(`RENEWING: old target: ${creep.target}`);
 					let retNewTarget = action.newTarget(creep);
 
 					if (!retNewTarget) {
 						if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name))
-							console.log(`no new target for ${creep.name}`);
-						this.unassign(creep)
+							console.log(`RENEWING: no new target for ${creep.name}`);
+						this.unassign(creep);
 						return false;
 					} else {
 						creep.target = retNewTarget;
 						if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name))
-							console.log(`getting new target: ${creep.target.name}`);
+							console.log(`RENEWING: getting new target: ${creep.target.name}`);
 					}
-				} else
-					return global.translateErrorCode(ret) === OK;
+				} else if (ret === OK) {
+					if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name))
+						console.log(`RENEWING: OK: ${creep.target.name}`);
+					return true;
+				} else {
+					if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name))
+						console.log(`RENEWING: ERROR: ${global.translateColorCode(ret)}`);
+					action.removeFromQueue(creep);
+					return false;
+				}
+
 			}
 		} else {
 			creep.move(creep.pos.getDirectionTo(spawn));
 		}
-	} else if (finishedRenew) {
+	} else {
 		if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name))
-			console.log(`finishedRenew: ${creep.target.name}`);
+			console.log(`RENEWING: finishedRenew: ${creep.target.name}`);
 		action.removeFromQueue(creep);
 		this.unassign(creep);
 		flee = true;
