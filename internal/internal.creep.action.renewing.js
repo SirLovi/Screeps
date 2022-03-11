@@ -27,8 +27,9 @@ action.isValidAction = function (creep) {
 };
 action.isAddableAction = () => true;
 action.isAddableTarget = () => true;
-action.checkMemory = (creep) => {
-	// create Memory.rooms.roomName.spawnRenewQueue
+action.checkPrerequisites = (creep) => {
+
+	// check Memory.rooms.roomName.spawnRenewQueue
 	let roomName = creep.pos.roomName;
 	let spawns = creep.room.structures.spawns;
 
@@ -39,7 +40,7 @@ action.checkMemory = (creep) => {
 				Memory.rooms[roomName].spawnRenewQueue[spawn.name] = [];
 		}
 	}
-	//
+	// add creep.data properties
 	global.Task.predictedRenewal(creep);
 	action.creepDataRenew(creep);
 
@@ -48,6 +49,7 @@ action.energyPrice = (creep) => {
 	let creepCost = creep.data.bodyCost;
 	if (_.isUndefined(creepCost))
 		creepCost = creep.data.bodyCost = Creep.bodyCosts(creep.body, true);
+	// TODO could it be undefined?
 
 	return Math.ceil(creepCost / 2.5 / creep.body.length);
 
@@ -115,7 +117,7 @@ action.newTarget = function (creep) {
 	if (global.debugger(global.DEBUGGING.renewing, creep.room.name))
 		global.logSystem(creep.room.name, `${creep.name} RENEWING: AT renewing.newTarget`);
 
-	action.checkMemory(creep);
+	action.checkPrerequisites(creep);
 
 	let currentRoomName = creep.room.name;
 	let room = Game.rooms[currentRoomName];
@@ -192,7 +194,7 @@ action.work = function (creep) {
 
 	// let inMyRoom = room && room.my;
 
-	action.checkMemory(creep);
+	action.checkPrerequisites(creep);
 
 	let spawn = creep.target;
 	let flee = false;
