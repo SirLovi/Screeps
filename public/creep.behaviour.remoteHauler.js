@@ -75,7 +75,9 @@ mod.deposit = (that, creep) => {
 		deposit = deposit.concat(creep.room.structures.container.privateers);
 	// Choose the closest
 	if (deposit.length > 0) {
-		let target = creep.pos.findClosestByRange(deposit);
+		// TODO consider validMineralToTerminal
+		let target = creep.pos.findClosestByRange(deposit)
+
 		if (target.structureType === STRUCTURE_STORAGE && that.assignAction(creep, 'storing', target))
 			return true;
 		else if (that.assignAction(creep, 'charging', target))

@@ -4,6 +4,8 @@ action.name = 'defending';
 action.isValidAction = function (creep) {
 	if (creep.data.creepType !== 'sourceKiller' && Game.flags[creep.data.destiny.flagName] && Game.flags[creep.data.destiny.flagName].room && Game.flags[creep.data.destiny.flagName].room.name !== creep.room.name)
 		return false;
+	// if (creep.data.creepType === 'sourceKiller' && Game.flags[creep.data.destiny.flagName] && Game.flags[creep.data.destiny.flagName].room && Game.flags[creep.data.destiny.flagName].room.name !== creep.room.name)
+	// 	return false;
 	let hostilesExist = creep.room ? creep.room.hostiles.length > 0 : creep.room.memory.hostileIds.length > 0;
 	let flagExist = !!global.FlagDir.find(global.FLAG_COLOR.claim.mining, creep.pos, true);
 	let myRoom = !!creep.room.my;
