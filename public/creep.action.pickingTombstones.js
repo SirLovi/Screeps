@@ -61,10 +61,10 @@ action.newTarget = function (creep) {
 			ret = this.resourcesWithLoot(tombStones, creep, action.defaultStrategy.energyOnly);
 		}
 		if (ret) {
-			if (global.DEBUG && global.debugger(global.DEBUGGING.targetRoom, creep.room.name)) {
-				global.logSystem(creep.room.name, `${creep.name} tombStones: ${ret.length}`);
-				global.logSystem(creep.room.name, `${creep.name} picking: ${ret}`);
-			}
+			// if (global.DEBUG && global.debugger(global.DEBUGGING.targetRoom, creep.room.name)) {
+			// 	// global.logSystem(creep.room.name, `${creep.name} tombStones: ${ret.length}`);
+			// 	// global.logSystem(creep.room.name, `${creep.name} picking: ${ret}`);
+			// }
 			return ret;
 		}
 		return false;

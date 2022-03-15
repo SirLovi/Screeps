@@ -70,6 +70,9 @@ mod.deposit = (that, creep) => {
 	// storage?
 	if (creep.room.storage)
 		deposit.push(creep.room.storage);
+	// terminal?
+	// if (creep.room.terminal)
+	// 	deposit.push(creep.room.terminal);
 	// containers?
 	if (creep.room.structures.container)
 		deposit = deposit.concat(creep.room.structures.container.privateers);
@@ -78,12 +81,22 @@ mod.deposit = (that, creep) => {
 		// TODO consider validMineralToTerminal
 		let target = creep.pos.findClosestByRange(deposit)
 
-		if (target.structureType === STRUCTURE_STORAGE && that.assignAction(creep, 'storing', target))
+		// if (target.structureType === STRUCTURE_STORAGE && that.assignAction(creep, 'storing', target))
+		// 	return true;
+		// else if (that.assignAction(creep, 'charging', target))
+		// 	return true;
+		// else if (that.assignAction(creep, 'storing'))
+		// 	return true; // prefer storage
+
+
+		// if (target.structureType === STRUCTURE_STORAGE && that.assignAction(creep, 'storing', target))
+		// 	return true;
+		if (that.assignAction(creep, 'charging', target))
 			return true;
-		else if (that.assignAction(creep, 'charging', target))
+		else if (that.assignAction(creep, 'storing', target))
 			return true;
 		else if (that.assignAction(creep, 'storing'))
-			return true; // prefer storage
+			return true;
 
 	}
 
@@ -167,10 +180,10 @@ mod.nextAction = function (creep) {
 
 		if (this.needEnergy(creep)) {
 			ret = this.nextEnergyAction(creep);
-			if (global.DEBUG && global.debugger(global.DEBUGGING.targetRoom, creep.room.name)) {
-				global.logSystem(creep.room.name, `${creep.name} nextEnergyAction: ${ret}`);
-				global.logSystem(creep.room.name, `${creep.name} current action: ${creep.action.name}`);
-			}
+			// if (global.DEBUG && global.debugger(global.DEBUGGING.targetRoom, creep.room.name)) {
+			// 	// global.logSystem(creep.room.name, `${creep.name} nextEnergyAction: ${ret}`);
+			// 	// global.logSystem(creep.room.name, `${creep.name} current action: ${creep.action.name}`);
+			// }
 		}
 
 		if (!ret) {

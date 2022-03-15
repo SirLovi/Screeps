@@ -1129,21 +1129,6 @@ mod.testArrayOfObjects = () => {
 	 Spawn3: []
  };
 
-	// let targetName = (obj) => {
-	// 	let target = {};
-	// 	for (const [key, value] of Object.entries(obj))
-	// 		target[key] = value.length;
-	// 	return target;
-	// }
-	// let targetObject = targetName(obj);
-	//
-	// console.log(`targetObj: ${global.json(targetObject)}`);
-
-	// let filtered = _.filter(Object.entries(obj), key => {
-	// 	console.log(`key: ${key[1].length}`);
-	// 	return key[1].length === 0;
-	// })
-
 	let filtered = _.min(Object.entries(obj), key => {
 		return key[1].length;
 	})
@@ -1151,6 +1136,11 @@ mod.testArrayOfObjects = () => {
 	console.log(`winner is: ${filtered[0]} ${filtered[1].length}`);
 }
 
+
+mod.testValid= (creepName) => {
+	let creep = Game.creeps[creepName];
+	console.log(`valid: ${Creep.action.renewing.isValidAction(creep)}`);
+}
 
 
 

@@ -11,7 +11,7 @@ setup.maxMulti = function (room) {
 	max += Creep.setup.upgrader._maxMulti(room);
 
 	let ret = Math.min(max, 15);
-	global.logSystem(room.name, `HAULER maxMulti: ${ret}`);
+	// global.logSystem(room.name, `HAULER maxMulti: ${ret}`);
 	return ret;
 };
 setup.maxCount = function (room) {

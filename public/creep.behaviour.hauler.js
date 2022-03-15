@@ -7,12 +7,12 @@ module.exports = mod;
 // };
 mod.inflowActions = (creep) => {
 	if (creep.room.situation.invasion) {
-        return [
+		return [
 			Creep.action.uncharging,
 			Creep.action.withdrawing,
 			Creep.action.reallocating,
 		];
-    }
+	}
 	return [
 		Creep.action.uncharging,
 		Creep.action.picking,
@@ -24,9 +24,9 @@ mod.inflowActions = (creep) => {
 mod.outflowActions = (creep) => {
 	let priority = [
 		Creep.action.feeding,
+		Creep.action.storing,
 		Creep.action.charging,
 		Creep.action.fueling,
-		Creep.action.storing,
 	];
 	if (creep.sum > creep.carry.energy ||
 		(!creep.room.situation.invasion &&
@@ -37,6 +37,9 @@ mod.outflowActions = (creep) => {
 		priority.unshift(Creep.action.fueling);
 	}
 	return priority;
+};
+mod.needEnergy = function (creep) {
+	return creep.sum / creep.carryCapacity < global.REMOTE_HAULER.MIN_LOAD;
 };
 mod.nextAction = function (creep) {
 	if (creep.pos.roomName !== creep.data.homeRoom && Game.rooms[creep.data.homeRoom] && Game.rooms[creep.data.homeRoom].controller) {

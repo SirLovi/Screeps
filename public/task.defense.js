@@ -29,9 +29,9 @@ mod.handleNewInvader = invaderCreep => {
 			let exploit = Flag.compare(flagEntry, global.FLAG_COLOR.invade.exploit);
 			let mining = Flag.compare(flagEntry, global.FLAG_COLOR.claim.mining);
 
-			global.logSystem(invaderCreep.room.name, `flagEntry: ${global.json(flagEntry)}`);
-			global.logSystem(invaderCreep.room.name, `exploit: ${exploit} mining: ${mining}`);
-			global.logSystem(invaderCreep.room.name, `ret: ${exploit || mining}`);
+			// global.logSystem(invaderCreep.room.name, `flagEntry: ${global.json(flagEntry)}`);
+			// global.logSystem(invaderCreep.room.name, `exploit: ${exploit} mining: ${mining}`);
+			// global.logSystem(invaderCreep.room.name, `ret: ${exploit || mining}`);
 
 			return exploit || mining;
 		};

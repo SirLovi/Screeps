@@ -2,7 +2,7 @@ let action = new Creep.Action('defending');
 module.exports = action;
 action.name = 'defending';
 action.isValidAction = function (creep) {
-	if (creep.data.creepType !== 'sourceKiller' && Game.flags[creep.data.destiny.flagName] && Game.flags[creep.data.destiny.flagName].room && Game.flags[creep.data.destiny.flagName].room.name !== creep.room.name)
+	if ((creep.data.creepType !== 'sourceKiller') && Game.flags[creep.data.destiny.flagName] && Game.flags[creep.data.destiny.flagName].room && Game.flags[creep.data.destiny.flagName].room.name !== creep.room.name)
 		return false;
 	// if (creep.data.creepType === 'sourceKiller' && Game.flags[creep.data.destiny.flagName] && Game.flags[creep.data.destiny.flagName].room && Game.flags[creep.data.destiny.flagName].room.name !== creep.room.name)
 	// 	return false;

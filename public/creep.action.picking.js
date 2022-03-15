@@ -29,10 +29,10 @@ action.newTarget = function (creep) {
 		const droppedResources = action.defaultStrategy.energyOnly ? _.filter(creep.room.droppedResources, {resourceType: RESOURCE_ENERGY}) : creep.room.droppedResources;
 		let ret = action.lootFilter(droppedResources, creep);
 		if (action.isValidTarget(ret) && action.isAddableTarget(ret, creep)) {
-			if (global.DEBUG && global.debugger(global.DEBUGGING.targetRoom, creep.room.name)) {
-				global.logSystem(creep.room.name, `${creep.name} droppedResources: ${droppedResources.length}`);
-				global.logSystem(creep.room.name, `${creep.name} picking: ${ret}`);
-			}
+			// if (global.DEBUG && global.debugger(global.DEBUGGING.targetRoom, creep.room.name)) {
+			// 	global.logSystem(creep.room.name, `${creep.name} droppedResources: ${droppedResources.length}`);
+			// 	global.logSystem(creep.room.name, `${creep.name} picking: ${ret}`);
+			// }
 			return ret;
 		} else
 			return false;

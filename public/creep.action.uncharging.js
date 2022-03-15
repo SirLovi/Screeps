@@ -66,7 +66,8 @@ action.work = function (creep) {
 	if (creep.target.source === true && creep.target.controller === true) {
 		// managed container fun...
 		let max = creep.target.sum - (creep.target.store.getCapacity() * (1 - global.MANAGED_CONTAINER_TRIGGER));
-		if (max < 1) workResult = ERR_NOT_ENOUGH_RESOURCES;
+		if (max < 1)
+			workResult = ERR_NOT_ENOUGH_RESOURCES;
 		else {
 			let space = creep.carryCapacity - creep.sum;
 			let amount = _.min([creep.target.store.energy, max, space]);

@@ -8,7 +8,7 @@ mod.creep = {
         behaviour: "warrior",
         queue: 'High',
         sort: (a, b) => {
-            const partsOrder = [TOUGH, MOVE, ATTACK, RANGED_ATTACK, HEAL];
+            const partsOrder = [TOUGH, ATTACK, MOVE, RANGED_ATTACK, HEAL];
             const indexOfA = partsOrder.indexOf(a);
             const indexOfB = partsOrder.indexOf(b);
             return indexOfA - indexOfB;

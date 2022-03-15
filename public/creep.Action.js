@@ -162,11 +162,11 @@ let Action = function (actionName) {
 				// if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, creep.room.name) && creep.data.creepType === 'warrior'){
 				// 	global.logSystem(creep.room.name, `${creep.name}, WARRIOR: Population.registerAction`);
 				// }
-				if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name)
-					&& this.name === 'renewing'
-					&& (creep.data.creepType === 'hauler' || creep.data.creepType === 'remoteHauler' || creep.data.creepType === 'worker'))
-				{
-					global.logSystem(creep.room.name, `${creep.name}, RENEWING: Population.registerAction`);
+				if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name) && this.name === 'renewing'
+					&& (creep.data.creepType === 'hauler' || creep.data.creepType === 'remoteHauler' || creep.data.creepType === 'worker')) {
+
+					global.logSystem(creep.room.name, `${creep.name}, RENEWING: Population.registerAction -> target: ${target}`);
+
 				}
 
 

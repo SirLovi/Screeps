@@ -12,6 +12,42 @@ mod.count = (miningRoomName, type, memory, flag) => {
 	};
 	return countExisting(type);
 };
+mod.getMaxHaulers = (miningRoomName) => {
+	let maxHaulers;
+
+	let memory = global.Task.mining.memory(miningRoomName);
+	let room = Game.rooms[miningRoomName];
+
+	// let runningHaulerMaxBody = Game.creeps[memory.running.remoteHauler[0]].body.length === 50;
+
+	let runningHaulerMaxBody;
+
+	if (!_.isUndefined(memory.running.remoteHauler) && memory.running.remoteHauler.length > 0) {
+
+		// runningHaulerMaxBody = _.some(Game.creeps[memory.running.remoteHauler], creep => {
+		// 	return creep && creep.body && creep.body.length < 50;
+		// });
+
+		runningHaulerMaxBody = _.every(memory.running.remoteHauler, creepId => {
+			let creep = Game.creeps[creepId];
+			return creep && creep.body && creep.body.length === 50;
+		})
+	}
+	else
+		runningHaulerMaxBody = false
+
+	let dropped = room ? room.droppedResourcesAmount() : 0;
+
+	if (dropped > global.REMOTE_HAULER.MULTIPLY_ENABLED_AT && runningHaulerMaxBody)
+		maxHaulers = global.round((memory.running.remoteMiner.length || 1) * global.REMOTE_HAULER.MULTIPLIER);
+	else if (dropped > global.REMOTE_HAULER.MULTIPLY_ENABLED_AT)
+		maxHaulers = memory.running.remoteMiner.length || 1;
+	else
+		maxHaulers = memory.running.remoteMiner.length || 0;
+
+	return maxHaulers
+
+}
 mod.handleFlagRemoved = flagName => {
 	// check flag
 	const flagMem = Memory.flags[flagName];
@@ -151,36 +187,10 @@ mod.checkForRequiredCreeps = (flag) => {
 
 	// only spawn haulers for sources a miner has been spawned for
 
-	let maxHaulers;
+	let maxHaulers = mod.getMaxHaulers(miningRoomName)
 
-	// let runningHaulerMaxBody = Game.creeps[memory.running.remoteHauler[0]].body.length === 50;
-
-	let runningHaulerMaxBody;
-
-	if (!_.isUndefined(memory.running.remoteHauler) && memory.running.remoteHauler.length > 0) {
-
-		// runningHaulerMaxBody = _.some(Game.creeps[memory.running.remoteHauler], creep => {
-		// 	return creep && creep.body && creep.body.length < 50;
-		// });
-
-		runningHaulerMaxBody = _.every(memory.running.remoteHauler, creepId => {
-			let creep = Game.creeps[creepId];
-			return creep && creep.body && creep.body.length === 50;
-		})
-	}
-	else
-		runningHaulerMaxBody = false
-
-	let dropped = room ? room.droppedResourcesAmount() : 0;
-
-	if (dropped > global.REMOTE_HAULER.MULTIPLY_ENABLED_AT && runningHaulerMaxBody)
-		maxHaulers = global.round((memory.running.remoteMiner.length || 1) * global.REMOTE_HAULER.MULTIPLIER);
-	else if (dropped > global.REMOTE_HAULER.MULTIPLY_ENABLED_AT)
-		maxHaulers = memory.running.remoteMiner.length || 1;
-	else
-		maxHaulers = memory.running.remoteMiner.length || 0;
-
-	global.logSystem(miningRoomName, `MAX HAULERS for ${miningRoomName}: ${maxHaulers} => needMore: ${haulerCount < maxHaulers}, time: ${!memory.capacityLastChecked || Game.time - memory.capacityLastChecked > global.TASK_CREEP_CHECK_INTERVAL}`);
+	if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, miningRoomName))
+		global.logSystem(miningRoomName, `MAX HAULERS for ${miningRoomName}: ${maxHaulers} => needMore: ${haulerCount < maxHaulers}, time: ${!memory.capacityLastChecked || Game.time - memory.capacityLastChecked > global.TASK_CREEP_CHECK_INTERVAL}`);
 
 	if (haulerCount < maxHaulers && (!memory.capacityLastChecked || Game.time - memory.capacityLastChecked > global.TASK_CREEP_CHECK_INTERVAL)) {
 		for (let i = haulerCount; i < maxHaulers; i++) {
@@ -218,14 +228,12 @@ mod.checkForRequiredCreeps = (flag) => {
 			if (minWeight)
 				hauler.minWeight = minWeight;
 
-			let maxMulti = mod.strategies.remoteHauler.maxMulti(flag.room);
+			hauler.maxMulti = mod.strategies.remoteHauler.maxMulti(flag.room);
 
-			hauler.maxMulti = maxMulti;
-
-			if (flag && flag.room && flag.room.isCenterNineRoom)
-				global.logSystem(flag.room.name, `SKHauler maxMulti is ${maxMulti}`);
-			else
-				global.logSystem(flag.room.name, `remoteHauler maxMulti is ${maxMulti}`);
+			// if (flag && flag.room && flag.room.isCenterNineRoom)
+			// 	global.logSystem(flag.room.name, `SKHauler maxMulti is ${maxMulti}`);
+			// else
+			// 	global.logSystem(flag.room.name, `remoteHauler maxMulti is ${maxMulti}`);
 
 
 			// console.log(`remoteHauler fixedBody: ${Creep.bodyCosts(remoteHauler.fixedBody)}`);
@@ -432,14 +440,14 @@ mod.creep = {
 		maxRange: 4,
 	},
 };
-mod.countBody = function (fixedBody) {
+mod.countBody = function (fixedBody, move = false) {
 	let count = 0;
 	for (const [fixedBodyPart, amount] of Object.entries(fixedBody)) {
-		if (fixedBodyPart !== MOVE) {
+		if (fixedBodyPart !== MOVE && !move) {
 			count += amount;
-		}
+		} else
+			count += amount;
 	}
-
 	return count;
 
 };
@@ -627,9 +635,9 @@ mod.strategies = {
 			let neededCarry = ept * travel * 2 - existingCarry - queuedCarry;
 			const maxWeight = mod.creepSize(flagRoomName, neededCarry, this.setup(flagRoomName));
 
-			if (global.DEBUG && global.debugger(global.DEBUGGING.targetRoom, flagRoomName)) {
-				global.logSystem(flagRoomName, `maxWeight: ${maxWeight} neededCarry: ${neededCarry} behaviour: ${this.setup(flagRoomName).fixedBody[HEAL] > 0 ? 'SKHauler' : 'remoteHauler'}`);
-			}
+			// if (global.DEBUG && global.debugger(global.DEBUGGING.targetRoom, flagRoomName)) {
+			// 	global.logSystem(flagRoomName, `maxWeight: ${maxWeight} neededCarry: ${neededCarry} behaviour: ${this.setup(flagRoomName).fixedBody[HEAL] > 0 ? 'SKHauler' : 'remoteHauler'}`);
+			// }
 
 
 			if (global.DEBUG && global.TRACE)
@@ -651,8 +659,8 @@ mod.strategies = {
 			}
 			// TODO count 15 (max) in every MaxMulti (fixedBody.length - 50) / multiBody.length
 			let ret = Math.min(max, 15);
-			if (room)
-				global.logSystem(room.name, `HAULER maxMulti: ${ret}`);
+			// if (room)
+			// 	global.logSystem(room.name, `HAULER maxMulti: ${ret}`);
 			return ret;
 		},
 	},

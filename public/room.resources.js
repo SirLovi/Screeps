@@ -319,7 +319,7 @@ mod.extend = function () {
 			y: m.pos.y,
 		});
 		const validMineral = this.find(FIND_MINERALS).filter(hasExtractor);
-		global.logSystem(this.name, `EXTRACTOR: ${validMineral.length}`);
+		// global.logSystem(this.name, `EXTRACTOR: ${validMineral.length}`);
 		if (validMineral.length > 0) {
 			let id = o => o.id;
 			this.memory.minerals = _.map(validMineral, id);
