@@ -39,7 +39,8 @@ mod.outflowActions = (creep) => {
 	return priority;
 };
 mod.needEnergy = function (creep) {
-	return creep.sum / creep.carryCapacity < global.REMOTE_HAULER.MIN_LOAD;
+	// return creep.sum / creep.carryCapacity < global.REMOTE_HAULER.MIN_LOAD;
+	return creep.sum / creep.carryCapacity < 0.5;
 };
 mod.nextAction = function (creep) {
 	if (creep.pos.roomName !== creep.data.homeRoom && Game.rooms[creep.data.homeRoom] && Game.rooms[creep.data.homeRoom].controller) {

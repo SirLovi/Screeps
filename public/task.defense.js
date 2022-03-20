@@ -307,10 +307,17 @@ mod.nextAction = creep => {
 
 	if (!(creep.data.destiny.boosted && Creep.action.boosting.assign(creep))) {
 
+
+		if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, creep.room.name))
+			global.logSystem(creep.room.name, `${creep.name} DEFENDING`);
+
+
 		// travel to invader
 		let invader = Game.getObjectById(creep.data.destiny.invaderId);
-		if (invader && creep.pos.roomName === invader.pos.roomName) {
+		if (invader && creep.pos.roomName === invader.pos.roomName && !creep.pos.inRangeTo(invader, 3)) {
 			Creep.action.travelling.assign(creep, invader);
+			if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, creep.room.name))
+				global.logSystem(creep.room.name, `${creep.name} ${creep.data.actionName} DEFENDING 1`);
 			return;
 		}
 		// travel to initial calling room
@@ -341,16 +348,16 @@ mod.nextAction = creep => {
 					return Creep.action.travelling.assignRoom(creep, invasionRoom);
 				} else {
 					// there is no action
-					global.Task.reCycleOrIdle(creep)
+					global.Task.reCycleOrIdle(creep);
 				}
 			} else {
 				// recycle self
 				// let mother = Game.spawns[creep.data.motherSpawn];
 
 				// there is no action
-				global.Task.reCycleOrIdle(creep)
+				global.Task.reCycleOrIdle(creep);
 			}
-		} else {
+		} else if (!this.assignAction(creep, 'healing')) {
 			global.Task.reCycleOrIdle(creep)
 		}
 	}

@@ -66,9 +66,9 @@ action.work = function (creep) {
 
 	creep.controllerSign();
 
-	global.logSystem(creep.room.name, `${creep.target.owner && !creep.target.my} ${creep.target.reservation && !global.Task.reputation.allyOwner(creep.target.reservation)}`);
+	global.logSystem(creep.room.name, `THING: ${!!creep.target.owner && !creep.target.my} ${creep.target.reservation && !global.Task.reputation.allyOwner(creep.target.reservation)}`);
 
-	if ((creep.target.owner && !creep.target.my) ||
+	if ((!!creep.target.owner && !creep.target.my) ||
 		(creep.target.reservation && !global.Task.reputation.allyOwner(creep.target.reservation))) {
 		workResult = creep.attackController(creep.target);
 		global.logSystem(creep.room.name, `workResult for attackController: ${global.translateErrorCode(workResult)}`);

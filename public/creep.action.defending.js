@@ -2,7 +2,7 @@ let action = new Creep.Action('defending');
 module.exports = action;
 action.name = 'defending';
 action.isValidAction = function (creep) {
-	if ((creep.data.creepType !== 'sourceKiller') && Game.flags[creep.data.destiny.flagName] && Game.flags[creep.data.destiny.flagName].room && Game.flags[creep.data.destiny.flagName].room.name !== creep.room.name)
+	if ((creep.data.creepType !== 'sourceKiller' || creep.name.indexOf('defender') < 0) && Game.flags[creep.data.destiny.flagName] && Game.flags[creep.data.destiny.flagName].room && Game.flags[creep.data.destiny.flagName].room.name !== creep.room.name)
 		return false;
 	// if (creep.data.creepType === 'sourceKiller' && Game.flags[creep.data.destiny.flagName] && Game.flags[creep.data.destiny.flagName].room && Game.flags[creep.data.destiny.flagName].room.name !== creep.room.name)
 	// 	return false;
@@ -52,8 +52,12 @@ action.newTarget = function (creep) {
 action.step = function (creep) {
 	if (global.CHATTY)
 		creep.say(this.name, global.SAY_PUBLIC);
-	if (creep.target.pos.roomName !== creep.room.name)
+	if (creep.target.pos.roomName !== creep.room.name) {
+		if (global.DEBUG && global.debugger(global.DEBUGGING.remoteHauler, creep.room.name))
+			global.logSystem(creep.room.name, `${creep.name} Travelling`);
+
 		return Creep.action.travelling.assignRoom(creep, creep.target.pos.roomName);
+	}
 	this.run[creep.data.creepType](creep);
 };
 action.makeRangedAttack = function (creep, range) {
@@ -109,8 +113,8 @@ action.run = {
 	},
 	warrior: function (creep) {
 
-		//if (creep.target.owner.username === 'Invader')
-		//    global.logSystem(creep.room.name, `Hello Warrior ${creep.name}`);
+		if (global.DEBUG && global.debugger(global.DEBUGGING.remoteHauler, creep.room.name))
+		   global.logSystem(creep.room.name, `Hello Warrior ${creep.name}`);
 
 		let hasAttack = creep.hasActiveBodyparts(ATTACK);
 		let hasRangedAttack = creep.hasActiveBodyparts(RANGED_ATTACK);

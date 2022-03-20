@@ -658,7 +658,7 @@ mod.extend = function () {
 			get() {
 				if (!this.controller)
 					return;
-				return Util.get(this.memory, 'RCL', this.controller.level);
+				return global.Util.get(this.memory, 'RCL', this.controller.level);
 			},
 		},
 		'skip': {

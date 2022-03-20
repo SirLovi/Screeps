@@ -20,14 +20,14 @@ mod.strategies.mining = {
             const hasThisSource = data => data.creepName !== creep.name && data.determinatedTarget === source.id;
             // const hasThisSource = data => data.creepName !== creep.name;
             let ret =  !_.find(Memory.population, hasThisSource);
-            global.logSystem(creep.room.name, `${creep.name} mineral occupied ret: ${ret}`);
+            // global.logSystem(creep.room.name, `${creep.name} mineral occupied ret: ${ret}`);
             return ret;
         };
         let ret = _.find(creep.room.minerals, notOccupied);
         // if (!ret && creep.data.lastTarget === creep.room.memory.minerals && Game.getObjectById(creep.room.memory.minerals) && Game.getObjectById(creep.room.memory.minerals).mineralAmount === 0)
         //     global.Task.reCycleOrIdle(creep);
 
-        global.logSystem(creep.room.name, `${creep.name} TARGET: ${ret}`);
+        // global.logSystem(creep.room.name, `${creep.name} TARGET: ${ret}`);
 
         return ret;
     },

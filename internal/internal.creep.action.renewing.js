@@ -26,11 +26,16 @@ action.creepDataRenew = (creep) => {
 };
 action.isValidAction = function (creep) {
 
+
+	if (!global.RENEW[creep.data.creepType].renew)
+		return false;
+
 	let typeValidation;
 	let newSetup;
 	let newBodyLength;
 	let haulerCount;
 	let maxHaulers;
+
 
 	// if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name)) {
 	// 	global.logSystem(creep.room.name, `${creep.name} RENEWING: VALID ACTION check : flag: ${creep.data.targetName}`);
@@ -42,10 +47,12 @@ action.isValidAction = function (creep) {
 	switch (creep.data.creepType) {
 		case 'hauler':
 
+			// global.Population.countCreep(creep.room, creep.data);
+
 			newSetup = Creep.setup.hauler.RCL[creep.room.controller.level];
 			newBodyLength = newSetup.fixedBody.length + newSetup.multiBody.length * newSetup.maxMulti(creep.room);
 			haulerCount = creep.room.population.typeCount['hauler'];
-			maxHaulers = newSetup.maxCount(creep.room)
+			maxHaulers = newSetup.maxCount(creep.room);
 			break;
 
 		case 'remoteHauler':
@@ -57,13 +64,15 @@ action.isValidAction = function (creep) {
 			let miningRoomName = Memory.flags[flagName].roomName;
 			let miningRoom = Game.rooms[miningRoomName];
 			let memory = global.Task.mining.memory(miningRoomName);
-			let maxMulti = global.Task.mining.strategies.remoteHauler.maxMulti(miningRoom);
+			maxHaulers = global.Task.mining.getMaxHaulers(miningRoomName);
+			let sourceCount = global.Task.mining.numberOfSource(miningRoomName);
+			let maxMulti = global.Task.mining.strategies.remoteHauler.maxMulti(miningRoom, maxHaulers, sourceCount);
 			let fixedBodyLength = global.Task.mining.countBody(newSetup.fixedBody, true);
 			let multiBodyLength = global.Task.mining.countBody(newSetup.multiBody, true);
 			newBodyLength = fixedBodyLength + maxMulti * multiBodyLength;
 			let flag = Game.flags[flagName];
 			haulerCount = global.Task.mining.count(miningRoomName, 'remoteHauler', memory, flag);
-			maxHaulers = global.Task.mining.getMaxHaulers(memory)
+
 
 			break;
 
@@ -71,14 +80,17 @@ action.isValidAction = function (creep) {
 			typeValidation = false;
 	}
 
-	let needMoreCreep =  maxHaulers <= haulerCount;
+	let isnumberOfCreepsOk = maxHaulers >= haulerCount;
 	let isBodyLengthOk = newBodyLength === creep.body.length;
-	typeValidation = needMoreCreep && isBodyLengthOk;
+	typeValidation = isnumberOfCreepsOk && isBodyLengthOk;
 
 	let ret = !creep.room.situation.invasion && typeValidation;
 
 	if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name)) {
-		global.logSystem(creep.room.name, `${creep.name} RENEWING: VALID ACTION:  needMoreCreep: ${needMoreCreep} isBodyLengthOk: ${isBodyLengthOk} ret: ${ret}`);
+		global.logSystem(creep.room.name, `${creep.name} RENEWING: VALID ACTION: maxHaulers: ${maxHaulers} currentHaulers: ${haulerCount}`);
+		global.logSystem(creep.room.name, `${creep.name} RENEWING: VALID ACTION: newBodyLength: ${newBodyLength} currentBodyLength: ${creep.body.length}`);
+		global.logSystem(creep.room.name, `${creep.name} RENEWING: VALID ACTION: ret: ${ret}`);
+
 	}
 
 	return ret;
@@ -168,17 +180,22 @@ action.removeFromQueue = function (creep) {
 			}
 
 		}
+		creep.data.renewing = false;
 		return;
 	}
 
 	let renewQueue = Memory.rooms[roomName].spawnRenewQueue[spawn.name]
+
+	if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name))
+		global.logSystem(creep.room.name, `${creep.name} RENEWING: Removing from removeQueue -> spawn: ${spawn.name} queuedCreep: ${creep.name}`);
+
 	let ret = removeItem(renewQueue, creep.name);
 
 	if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name)) {
 		if (ret)
-			global.logSystem(creep.room.name, `${creep.name} RENEWING: NO SPAWN => Removed from removeQueue -> renewQueueSpawn: ${global.json(renewQueue)}`);
+			global.logSystem(creep.room.name, `${creep.name} RENEWING: Removed from removeQueue -> renewQueueSpawn: ${spawn.name}`);
 		else
-			global.logSystem(creep.room.name, `${creep.name} RENEWING: NO SPAWN => no need to remove from removeQueue -> renewQueueSpawn: ${global.json(renewQueue)}`);
+			global.logSystem(creep.room.name, `${creep.name} RENEWING: no need to remove from removeQueue -> renewQueueSpawn: ${spawn.name}`);
 	}
 	creep.data.renewing = false;
 

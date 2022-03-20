@@ -1142,6 +1142,10 @@ mod.testValid= (creepName) => {
 	console.log(`valid: ${Creep.action.renewing.isValidAction(creep)}`);
 }
 
+mod.maxHaulers = (miningRoomName) => {
+	global.Task.mining.getMaxHaulers(miningRoomName);
+}
+
 
 
 // HERE comes room.memory.resources

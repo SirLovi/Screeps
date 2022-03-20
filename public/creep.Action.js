@@ -219,10 +219,16 @@ let Action = function (actionName) {
 		if (creep.room.my && creep.room.situation.invasion) {
 			// pickup near sources only
 			filter = (loot) => creep.pos.findInRange(loot, 1).length > 0;
-			return creep.pos.findClosestByPath(loots, {filter: filter});
-		} else {
-			return creep.pos.findClosestByPath(loots);
+
 		}
+
+		// else if (creep.data.creepType === 'remoteHauler') {
+		// 	filter = (loot) => creep.pos.findInRange(loot, 3).length > 0;
+		// } else
+		// 	filter = (loot) => true;
+
+
+		return creep.pos.findClosestByPath(loots, {filter: filter});
 
 	};
 };

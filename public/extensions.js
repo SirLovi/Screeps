@@ -160,8 +160,6 @@ mod.extend = function () {
 			if (_.isUndefined(this.memory.container)) {
 				this.room.saveContainers();
 			}
-			;
-
 			if (_.isUndefined(this._container)) {
 				if (this.memory.storage) {
 					this._container = Game.getObjectById(this.memory.storage);
@@ -205,7 +203,6 @@ mod.extend = function () {
 			if (_.isUndefined(this.memory.container)) {
 				this.room.saveContainers();
 			}
-			;
 
 			if (_.isUndefined(this._container)) {
 				if (this.memory.terminal) {

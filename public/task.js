@@ -88,8 +88,7 @@ mod.memory = (task, s) => { // task:  (string) name of the task, s: (string) any
 	// delete memory.queuedValid;
 	// delete memory.runningValid;
 	// delete memory.spawningValid;
-
-	return global.Util.get(Memory, ['tasks', task, s], {});;
+	return global.Util.get(Memory, ['tasks', task, s], {});
 };
 mod.cleanup = function (subKeys, task, s) {
 	mod.removeQueued(mod.memory(task, s), subKeys);

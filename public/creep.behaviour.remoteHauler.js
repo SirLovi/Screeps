@@ -1,45 +1,29 @@
 const mod = new Creep.Behaviour('remoteHauler');
 module.exports = mod;
-// mod.actions = (creep, atHome) => {
-//
-// 	if (atHome) {
-// 		return [
-// 			Creep.action.renewing,
-// 			Creep.action.gotoTargetRoom(creep),
-// 		];
-// 	} else {
-// 		return [
-// 			Creep.action.healing,
-// 			Creep.action.gotoTargetRoom(creep),
-// 			Creep.action.goHome(creep),
-// 		];
-// 	}
-// 	// return [
-// 	// 		// Creep.action.healing,
-// 	// 		Creep.action.gotoTargetRoom(creep),
-// 	// 		// mod.goHome(creep),
-// 	// 	];
-//
-//
-// };
+mod.name = 'remoteHauler';
 mod.inflowActions = (creep) => {
 
-	// at home
-	// if (creep.room.name === creep.data.destiny.homeRoom
-	// 	&& (creep.sum / creep.carryCapacity < global.REMOTE_HAULER.MIN_LOAD)) {
-	// 	return [
-	// 		Creep.action.picking,
-	// 		Creep.action.pickingTombstones,
-	// 	];
-	// }
-	return [
-		Creep.action.picking,
-		Creep.action.uncharging,
-		Creep.action.pickingTombstones,
-		// Creep.action.healing,
-		// Creep.action.renewing,
+	if (creep.room.name === creep.data.destiny.homeRoom || creep.room.my) {
+		return [
+			Creep.action.picking,
+			Creep.action.pickingTombstones,
+		];
+	} else {
+		return [
+			Creep.action.picking,
+			Creep.action.pickingTombstones,
+			Creep.action.uncharging,
 
-	];
+		];
+	}
+
+	// return [
+	// 	Creep.action.picking,
+	// 	Creep.action.pickingTombstones,
+	// 	Creep.action.uncharging,
+	//
+	// ];
+
 };
 mod.outflowActions = (creep) => {
 
@@ -63,6 +47,9 @@ mod.outflowActions = (creep) => {
 	return priority;
 };
 mod.deposit = (that, creep) => {
+	if (creep.sum === 0)
+		return false;
+
 	let deposit = []; // deposit energy in...
 	// links?
 	if (creep.carry.energy === creep.sum)
@@ -79,7 +66,7 @@ mod.deposit = (that, creep) => {
 	// Choose the closest
 	if (deposit.length > 0) {
 		// TODO consider validMineralToTerminal
-		let target = creep.pos.findClosestByRange(deposit)
+		let target = creep.pos.findClosestByRange(deposit);
 
 		// if (target.structureType === STRUCTURE_STORAGE && that.assignAction(creep, 'storing', target))
 		// 	return true;
@@ -146,23 +133,21 @@ mod.nextAction = function (creep) {
 		if (!this.needEnergy(creep, true)) {
 			ret = mod.deposit(this, creep);
 		} else {
-			if (creep.sum > 0) {
-				ret = this.nextEnergyAction(creep) && (creep.action.name === 'picking' || creep.action.name === 'pickingTombstones');
-				if (global.DEBUG && global.debugger(global.DEBUGGING.remoteHaulersPicking, creep.room.name)) {
-					global.logSystem(creep.room.name, `${creep.name} remote nextEnergyAction: ${ret}`);
-					global.logSystem(creep.room.name, `${creep.name} remote current action: ${creep.action.name}`);
-				}
+			ret = this.nextEnergyAction(creep);
+			if (global.DEBUG && global.debugger(global.DEBUGGING.remoteHaulersPicking, creep.room.name)) {
+				global.logSystem(creep.room.name, `${creep.name} remote nextEnergyAction: ${ret}`);
+				global.logSystem(creep.room.name, `${creep.name} remote current action: ${creep.action.name}`);
 			}
-			else if (!ret) {
-				if (this.assignAction(creep, 'renewing')) {
-					if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name))
-						global.logSystem(creep.room.name, `${creep.name} RENEWING: => ttl: ${creep.data.ttl} action:${creep.action.name}`);
-					return true;
-				}
-			}
-
 		}
 
+		if (!ret) {
+			ret = this.assignAction(creep, 'renewing');
+			if (ret) {
+				if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name))
+					global.logSystem(creep.room.name, `${creep.name} RENEWING: => ttl: ${creep.data.ttl} action:${creep.action.name}`);
+				return true;
+			}
+		}
 
 		if (!ret) {
 			ret = mod.gotoTargetRoom(creep, flag);
@@ -230,14 +215,22 @@ mod.nextAction = function (creep) {
 	}
 };
 mod.needEnergy = function (creep, atHome = false) {
+	// at target
+	if (creep.room.name === creep.data.destiny.homeRoom || creep.room.my) {
+	// 	return (creep.sum / creep.carryCapacity < global.REMOTE_HAULER.MIN_LOAD * 0.5) && creep.sum > 0;
+		return false;
+	} else if (creep.room.name === creep.data.destiny.room) { // at destiny room
+		let dropped = creep.room ? creep.room.droppedResourcesAmount() : 0;
+		let miningRoomContainerSum = creep.room ? _.sum(creep.room.structures.container.in, 'sum') : 0;
+		let energyToPickUp = dropped + miningRoomContainerSum;
 
-	if (creep.data.creepType.indexOf('remote') === 0 && (creep.room.name === creep.data.destiny.homeRoom || creep.room.my))
-		if (creep.sum === 0)
+		// if (energyToPickUp >= 100 && creep.sum / creep.carryCapacity < global.REMOTE_HAULER.MAX_LOAD)
+		// 	return true;
+		if (energyToPickUp >= creep.store.getFreeCapacity(RESOURCE_ENERGY) / 2 && creep.sum / creep.carryCapacity < global.REMOTE_HAULER.MAX_LOAD)
 			return true;
-		else
-			return creep.sum / creep.carryCapacity < global.REMOTE_HAULER.MIN_LOAD * 0.25
-				&& creep.sum > 0;
 
+	}
+    // at somewhere
 	return creep.sum / creep.carryCapacity < global.REMOTE_HAULER.MIN_LOAD;
 };
 mod.goHome = function (creep, homeRoomName) {
@@ -262,6 +255,7 @@ mod.gotoTargetRoom = function (creep, flag) {
 mod.strategies.picking = {
 	name: `picking-${mod.name}`,
 	energyOnly: false,
+	range: 3,
 };
 mod.strategies.defaultStrategy.moveOptions = function (options) {
 	options.avoidSKCreeps = true;

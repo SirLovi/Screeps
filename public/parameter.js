@@ -179,8 +179,16 @@ let mod = {
         DRIVE_BY_REPAIR_RANGE: 1, // range that remote haulers should search when trying to repair and move
         DRIVE_BY_REPAIR_RANGE_ROAD: 0,
         MIN_LOAD: 0.75, // Haulers will return home as long as their ratio of carrying/capacity is above this amount.
+        MAX_LOAD: 0.95, // Haulers will take energy as long as their ratio of carrying/capacity is below this amount.
         MIN_WEIGHT: 800, // Small haulers are a CPU drain.
-        MULTIPLY_ENABLED_AT: 500, // dropped energy threshold at remoteRoom to enable more remoteHaulers
+        MULTIPLY_CONST: { // thresholds at remoteRoom to count max number of remoteHaulers (task.mining.getMaxHaulers)
+            droppedEnergy: 500,
+            containerFull: {
+                high: 0.75,
+                medium: 0.5,
+                low: 0.25,
+            }
+        },
         MULTIPLIER: 4, // Max number of haulers spawned per source in a remote mining room.
         REHOME: true, // May haulers choose closer storage for delivery?
         RENEW: true, // remoteHaulers will renew himself.

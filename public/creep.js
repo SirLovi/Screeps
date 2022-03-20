@@ -127,7 +127,10 @@ mod.extend = function () {
 							body: _.countBy(this.body, 'type'),
 						});
 						Population.countCreep(this.room, entry);
-					} else this.suicide();
+					}
+
+					// else
+					// 	this.suicide();
 					p.checkCPU('!this.data', PROFILING.MIN_THRESHOLD);
 				}
 			}
@@ -242,8 +245,8 @@ mod.extend = function () {
 				let stuff = roomPos.look();
 
 				if (_.findIndex(stuff, p => p.type === 'creep' || (p.structure && OBSTACLE_OBJECT_TYPES[p.structure.structureType]) || p.terrain === 'wall') === -1) {
-					if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, this.room.name))
-						global.logSystem(this.room.name, `${this.name} LEAVE BORDER - direction: ${direction}`);
+					// if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, this.room.name))
+					// 	global.logSystem(this.room.name, `${this.name} LEAVE BORDER - direction: ${direction}`);
 					this.move(direction);
 					return direction;
 				}
@@ -411,8 +414,8 @@ mod.extend = function () {
 				if (repairTarget.structureType !== STRUCTURE_ROAD)
 					this.repair(repairTarget);
 				else if (this.pos.inRangeTo(repairTarget, global.DRIVE_BY_REPAIR_RANGE_ROAD)) {
-					if (this.room.name === 'E22S19')
-						global.logSystem(this.room.name, `${this.name} REPAIRS: ${repairTarget.structureType} RANGE: ${global.DRIVE_BY_REPAIR_RANGE_ROAD}`);
+					// if (this.room.name === 'E22S19')
+					// 	global.logSystem(this.room.name, `${this.name} REPAIRS: ${repairTarget.structureType} RANGE: ${global.DRIVE_BY_REPAIR_RANGE_ROAD}`);
 					this.repair(repairTarget);
 				}
 			}
