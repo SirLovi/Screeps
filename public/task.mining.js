@@ -14,7 +14,7 @@ mod.count = (miningRoomName, type, memory, flag) => {
 };
 mod.getMaxHaulers = (miningRoomName, spawnRoomName) => {
 
-	let sourcesLength = Memory.rooms[miningRoomName].sources ? Memory.rooms[miningRoomName].sources.length : 0;
+	let sourcesLength = Memory.rooms[miningRoomName] ? Memory.rooms[miningRoomName].sources ? Memory.rooms[miningRoomName].sources.length : 1 : 1;
 	let miningRoom = Game.rooms[miningRoomName];
 	let spawnRoom = Game.rooms[spawnRoomName];
 	let maxHaulers = 1;

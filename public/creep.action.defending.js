@@ -113,7 +113,7 @@ action.run = {
 	},
 	warrior: function (creep) {
 
-		if (global.DEBUG && global.debugger(global.DEBUGGING.remoteHauler, creep.room.name))
+		if (global.DEBUG && global.debugger(global.DEBUGGING.warrior, creep.room.name))
 		   global.logSystem(creep.room.name, `Hello Warrior ${creep.name}`);
 
 		let hasAttack = creep.hasActiveBodyparts(ATTACK);

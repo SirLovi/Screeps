@@ -322,7 +322,7 @@ mod.nextAction = creep => {
 		}
 		// travel to initial calling room
 		let callingRoom = Game.rooms[creep.data.destiny.spottedIn];
-		if (!callingRoom || callingRoom.hostiles.length > 0) {
+		if (!callingRoom || callingRoom.hostiles.length > 0 && creep.pos.roomName !== callingRoom.name) {
 			return Creep.action.travelling.assignRoom(creep, creep.data.destiny.spottedIn);
 		}
 		// defend current room
@@ -346,20 +346,21 @@ mod.nextAction = creep => {
 				let invasionRoom = targetRooms.find(hasHostile);
 				if (invasionRoom) {
 					return Creep.action.travelling.assignRoom(creep, invasionRoom);
-				} else {
+				} else  {
 					// there is no action
-					global.Task.reCycleOrIdle(creep);
+					// global.Task.reCycleOrIdle(creep);
 				}
-			} else {
+			} else  {
 				// recycle self
 				// let mother = Game.spawns[creep.data.motherSpawn];
 
 				// there is no action
-				global.Task.reCycleOrIdle(creep);
+				// global.Task.reCycleOrIdle(creep);
 			}
-		} else if (!this.assignAction(creep, 'healing')) {
-			global.Task.reCycleOrIdle(creep)
+		} else  {
+			// global.Task.reCycleOrIdle(creep);
 		}
+
 	}
 };
 mod.nuked = room => {
