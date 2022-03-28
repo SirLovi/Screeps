@@ -26,74 +26,66 @@ action.creepDataRenew = (creep) => {
 };
 action.isValidAction = function (creep) {
 
+	// TODO add other creep types (worker, labTech)
+
 
 	if (!global.RENEW[creep.data.creepType].renew)
 		return false;
 
-	let typeValidation;
-	let newSetup;
-	let newBodyLength;
-	let haulerCount;
-	let maxHaulers;
+	let isValid = (maxHaulers, haulerCount, newBodyLength) => {
 
+		let isnumberOfCreepsOk = maxHaulers >= haulerCount;
+		let isBodyLengthOk = newBodyLength === creep.body.length;
+		let typeValidation = isnumberOfCreepsOk && isBodyLengthOk;
 
-	// if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name)) {
-	// 	global.logSystem(creep.room.name, `${creep.name} RENEWING: VALID ACTION check : flag: ${creep.data.targetName}`);
-	// }
+		let ret = !creep.room.situation.invasion && typeValidation;
 
-	// global.logSystem(creep.room.name, `${creep.name} RENEWING: VALID ACTION check : flag: ${global.json(creep.data.destiny)}`);
+		if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name)) {
+			global.logSystem(creep.room.name, `${creep.name} RENEWING: VALID ACTION: maxHaulers: ${maxHaulers} currentHaulers: ${haulerCount}`);
+			global.logSystem(creep.room.name, `${creep.name} RENEWING: VALID ACTION: newBodyLength: ${newBodyLength} currentBodyLength: ${creep.body.length}`);
+			global.logSystem(creep.room.name, `${creep.name} RENEWING: VALID ACTION: ret: ${ret}`);
 
+		}
 
-	switch (creep.data.creepType) {
-		case 'hauler':
-
-			// global.Population.countCreep(creep.room, creep.data);
-
-			newSetup = Creep.setup.hauler.RCL[creep.room.controller.level];
-			newBodyLength = newSetup.fixedBody.length + newSetup.multiBody.length * newSetup.maxMulti(creep.room);
-			haulerCount = creep.room.population.typeCount['hauler'];
-			maxHaulers = newSetup.maxCount(creep.room);
-			break;
-
-		case 'remoteHauler':
-
-			// global.logSystem(creep.room.name, `${creep.name} RENEWING: VALID ACTION check : flag: ${creep.data.destiny.targetName}`);
-
-			newSetup = global.Task.mining.creep.remoteHauler
-			let flagName = creep.data.destiny.targetName;
-			let miningRoomName = Memory.flags[flagName].roomName;
-			let miningRoom = Game.rooms[miningRoomName];
-			let memory = global.Task.mining.memory(miningRoomName);
-			maxHaulers = global.Task.mining.getMaxHaulers(miningRoomName);
-			let sourceCount = global.Task.mining.numberOfSource(miningRoomName);
-			let maxMulti = global.Task.mining.strategies.remoteHauler.maxMulti(miningRoom, maxHaulers, sourceCount);
-			let fixedBodyLength = global.Task.mining.countBody(newSetup.fixedBody, true);
-			let multiBodyLength = global.Task.mining.countBody(newSetup.multiBody, true);
-			newBodyLength = fixedBodyLength + maxMulti * multiBodyLength;
-			let flag = Game.flags[flagName];
-			haulerCount = global.Task.mining.count(miningRoomName, 'remoteHauler', memory, flag);
-
-
-			break;
-
-		default:
-			typeValidation = false;
+		return ret;
 	}
 
-	let isnumberOfCreepsOk = maxHaulers >= haulerCount;
-	let isBodyLengthOk = newBodyLength === creep.body.length;
-	typeValidation = isnumberOfCreepsOk && isBodyLengthOk;
 
-	let ret = !creep.room.situation.invasion && typeValidation;
+	let creepType = creep.data.creepType;
 
-	if (global.DEBUG && global.debugger(global.DEBUGGING.renewing, creep.room.name)) {
-		global.logSystem(creep.room.name, `${creep.name} RENEWING: VALID ACTION: maxHaulers: ${maxHaulers} currentHaulers: ${haulerCount}`);
-		global.logSystem(creep.room.name, `${creep.name} RENEWING: VALID ACTION: newBodyLength: ${newBodyLength} currentBodyLength: ${creep.body.length}`);
-		global.logSystem(creep.room.name, `${creep.name} RENEWING: VALID ACTION: ret: ${ret}`);
+	if (creepType === 'hauler') {
+		let newSetup = Creep.setup.hauler.RCL[creep.room.controller.level];
+		let newBodyLength = newSetup.fixedBody.length + newSetup.multiBody.length * newSetup.maxMulti(creep.room);
+		let haulerCount = creep.room.population.typeCount['hauler'];
+		let maxHaulers = newSetup.maxCount(creep.room);
+
+		return isValid(maxHaulers, haulerCount, newBodyLength);
+
+
+
+	} else if (creepType === 'remoteHauler') {
+
+		let newSetup = global.Task.mining.creep.remoteHauler
+		let flagName = creep.data.destiny.targetName;
+		let miningRoomName = Memory.flags[flagName].roomName;
+		let miningRoom = Game.rooms[miningRoomName];
+		let memory = global.Task.mining.memory(miningRoomName);
+		let maxHaulers = global.Task.mining.getMaxHaulers(miningRoomName);
+		let sourceCount = global.Task.mining.numberOfSource(miningRoomName);
+		let maxMulti = global.Task.mining.strategies.remoteHauler.maxMulti(miningRoom, maxHaulers, sourceCount);
+		let fixedBodyLength = global.Task.mining.countBody(newSetup.fixedBody, true);
+		let multiBodyLength = global.Task.mining.countBody(newSetup.multiBody, true);
+		let newBodyLength = fixedBodyLength + maxMulti * multiBodyLength;
+		let flag = Game.flags[flagName];
+		let haulerCount = global.Task.mining.count(miningRoomName, 'remoteHauler', memory, flag);
+
+		return isValid(maxHaulers, haulerCount, newBodyLength);
 
 	}
 
-	return ret;
+	return false;
+
+
 };
 action.isAddableAction = () => true;
 action.isAddableTarget = () => true;

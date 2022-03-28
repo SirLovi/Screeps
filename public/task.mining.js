@@ -58,13 +58,15 @@ mod.getMaxHaulers = (miningRoomName, spawnRoomName) => {
 	if (dropped > global.REMOTE_HAULER.MULTIPLY_CONST.droppedEnergy && (miningRoomContainerSum > containerFull * global.REMOTE_HAULER.MULTIPLY_CONST.containerFull.high) && runningHaulerMaxBody) {
 		if (miningRoom.isCenterNineRoom)
 			maxHaulers = global.round((memory.running.remoteMiner.length || 1) * global.REMOTE_HAULER.MULTIPLIER);
+		else
+			maxHaulers = memory.running.remoteMiner.length || 1;
 	}
 	else if (dropped > global.REMOTE_HAULER.MULTIPLY_CONST.droppedEnergy && miningRoomContainerSum > containerFull * global.REMOTE_HAULER.MULTIPLY_CONST.containerFull.medium)
 		maxHaulers = memory.running.remoteMiner.length || 1;
 	else if (dropped || miningRoomContainerSum > global.REMOTE_HAULER.MULTIPLY_CONST.containerFull.low) {
 		// maxHaulers = memory.running.remoteMiner.length - 1 <= 0 ? 1 : memory.running.remoteMiner.length;
 		maxHaulers = 1;
-	} else if (memory.running.remoteMiner.length === 0)
+	} else if (!dropped  && miningRoomContainerSum < global.REMOTE_HAULER.MULTIPLY_CONST.containerFull.low && memory.running.remoteMiner.length === 0)
 		maxHaulers = 0;
 
 	if (global.DEBUG && global.debugger(global.DEBUGGING.remoteHauler, miningRoomName)) {
