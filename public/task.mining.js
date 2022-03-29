@@ -24,19 +24,19 @@ mod.getMaxHaulers = (miningRoomName, spawnRoomName) => {
 		global.logSystem(miningRoomName, `spawningRoomName: ${spawnRoomName} spawningRoom.RCL: ${spawnRoom ? spawnRoom.RCL : 'no spawnRoom'} `);
 	}
 
-	if (spawnRoom && spawnRoom.RCL === 8) {
-
-		if (miningRoom && !miningRoom.isCenterNineRoom) {
-			let remoteMinerLength = memory.running.remoteMiner.length > 0 || memory.spawning.remoteMiner.length > 0;
-			if (global.DEBUG && global.debugger(global.DEBUGGING.remoteHauler, miningRoomName)) {
-				global.logSystem(miningRoomName, `not centerNine, remoteMiners: ${remoteMinerLength}`);
-			}
-			if (remoteMinerLength) {
-				return 1;
-			} else
-				return 0;
-		}
-	}
+	// if (spawnRoom && spawnRoom.RCL === 8) {
+	//
+	// 	if (miningRoom && !miningRoom.isCenterNineRoom) {
+	// 		let remoteMinerLength = memory.running.remoteMiner.length > 0 || memory.spawning.remoteMiner.length > 0;
+	// 		if (global.DEBUG && global.debugger(global.DEBUGGING.remoteHauler, miningRoomName)) {
+	// 			global.logSystem(miningRoomName, `not centerNine, remoteMiners: ${remoteMinerLength}`);
+	// 		}
+	// 		if (remoteMinerLength) {
+	// 			return 1;
+	// 		} else
+	// 			return 0;
+	// 	}
+	// }
 
 	let runningHaulerMaxBody;
 
@@ -56,23 +56,40 @@ mod.getMaxHaulers = (miningRoomName, spawnRoomName) => {
 
 
 	if (dropped > global.REMOTE_HAULER.MULTIPLY_CONST.droppedEnergy && (miningRoomContainerSum > containerFull * global.REMOTE_HAULER.MULTIPLY_CONST.containerFull.high) && runningHaulerMaxBody) {
-		if (miningRoom.isCenterNineRoom)
+		if (miningRoom && miningRoom.isCenterNineRoom)
 			maxHaulers = global.round((memory.running.remoteMiner.length || 1) * global.REMOTE_HAULER.MULTIPLIER);
 		else
 			maxHaulers = memory.running.remoteMiner.length || 1;
 	}
-	else if (dropped > global.REMOTE_HAULER.MULTIPLY_CONST.droppedEnergy && miningRoomContainerSum > containerFull * global.REMOTE_HAULER.MULTIPLY_CONST.containerFull.medium)
-		maxHaulers = memory.running.remoteMiner.length || 1;
+	else if (dropped > global.REMOTE_HAULER.MULTIPLY_CONST.droppedEnergy && miningRoomContainerSum > containerFull * global.REMOTE_HAULER.MULTIPLY_CONST.containerFull.medium) {
+		if (miningRoom && miningRoom.isCenterNineRoom)
+			maxHaulers = global.round((memory.running.remoteMiner.length || 1) * global.REMOTE_HAULER.MULTIPLIER);
+		else
+			maxHaulers = memory.running.remoteMiner.length || 1;
+	}
+
 	else if (dropped || miningRoomContainerSum > global.REMOTE_HAULER.MULTIPLY_CONST.containerFull.low) {
-		// maxHaulers = memory.running.remoteMiner.length - 1 <= 0 ? 1 : memory.running.remoteMiner.length;
-		maxHaulers = 1;
-	} else if (!dropped  && miningRoomContainerSum < global.REMOTE_HAULER.MULTIPLY_CONST.containerFull.low && memory.running.remoteMiner.length === 0)
-		maxHaulers = 0;
+		if (miningRoom && miningRoom.isCenterNineRoom)
+			maxHaulers = global.round((memory.running.remoteMiner.length || 1) * global.REMOTE_HAULER.MULTIPLIER);
+		else
+			maxHaulers = 1;
+
+	} else if (!dropped && miningRoomContainerSum < global.REMOTE_HAULER.MULTIPLY_CONST.containerFull.low && memory.running.remoteMiner.length === 0) {
+		if (miningRoom && miningRoom.isCenterNineRoom)
+			maxHaulers = global.round((memory.running.remoteMiner.length || 1) * global.REMOTE_HAULER.MULTIPLIER);
+		else
+			maxHaulers = 0;
+	}
 
 	if (global.DEBUG && global.debugger(global.DEBUGGING.remoteHauler, miningRoomName)) {
-		console.log(`getMaxHaulers running ${miningRoomName} dropped: ${dropped} containerFull: ${containerFull} miningRoomContainerSum: ${miningRoomContainerSum}`);
-		console.log(`getMaxHaulers running ${miningRoomName} maxBody: ${runningHaulerMaxBody} sourcesLength: ${sourcesLength}`);
-		console.log(`getMaxHaulers running ${miningRoomName} ret: ${maxHaulers}`);
+		// console.log(`getMaxHaulers running ${miningRoomName} dropped: ${dropped} containerFull: ${containerFull} miningRoomContainerSum: ${miningRoomContainerSum}`);
+		// console.log(`getMaxHaulers running ${miningRoomName} maxBody: ${runningHaulerMaxBody} sourcesLength: ${sourcesLength}`);
+		// console.log(`getMaxHaulers running ${miningRoomName} ret: ${maxHaulers}`);
+
+		global.logSystem(miningRoomName, `getMaxHaulers running ${miningRoomName} dropped: ${dropped} containerFull: ${containerFull} miningRoomContainerSum: ${miningRoomContainerSum}`);
+		global.logSystem(miningRoomName, `getMaxHaulers running ${miningRoomName} maxBody: ${runningHaulerMaxBody} sourcesLength: ${sourcesLength}`);
+		global.logSystem(miningRoomName, `getMaxHaulers running ${miningRoomName} ret: ${maxHaulers}`);
+
 	}
 
 	return maxHaulers;

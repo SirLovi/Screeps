@@ -1146,6 +1146,12 @@ mod.maxHaulers = (miningRoomName) => {
 	global.Task.mining.getMaxHaulers(miningRoomName);
 }
 
+mod.deleteSpawnRenewQueue = () => {
+	for (const roomName in Memory.rooms) {
+		delete Memory.rooms[roomName].spawnRenewQueue;
+	}
+};
+
 
 
 // HERE comes room.memory.resources
