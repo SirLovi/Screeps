@@ -869,6 +869,7 @@ mod.extend = function () {
 			if (creep.data.creepType === 'upgrader'
 			|| creep.data.creepType === 'miner'
 			|| creep.data.creepType === 'reserver'
+			|| creep.data.creepType === 'robber'
 			|| creep.data.creepType === 'claimer'
 			|| creep.data.creepType === 'pioneer') {
 				return;
