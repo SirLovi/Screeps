@@ -4,7 +4,7 @@
   "private": true,
   "devDependencies": {
     "babel-core": "^6.2.0",
-    "babel-loader": "^6.2.9",
+    "babel-loader": "^10.0.0",
     "babel-preset-es2016": "^6.24.1",
     "grunt": "^1.0.1",
     "grunt-babel": "^8.0.0",
