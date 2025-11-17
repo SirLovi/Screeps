@@ -12,7 +12,7 @@
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-uglify": "git+https://github.com/gruntjs/grunt-contrib-uglify.git#harmony",
     "grunt-contrib-watch": "^1.0.0",
-    "grunt-eslint": "24.0.0",
+    "grunt-eslint": "26.0.0",
     "grunt-git": "^1.0.3",
     "grunt-screeps": "^1.2.1",
     "grunt-webpack": "^7.0.0",
